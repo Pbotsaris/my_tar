@@ -70,6 +70,7 @@ option_t check_option(int argc, char **format)
 
         if (format[index][2] == 'f' && flag_f != TRUE)
             flag_f = TRUE;
+
         index++;
     }
 
