@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 typedef enum
 {
     c,
@@ -30,43 +32,44 @@ option_t check_spam(option_t flag)
 
 option_t check_option(int argc, char **format)
 {
-    int index = 0;
+    int index = 1;
 
     option_t flag_opt = NONE;
     bool_f flag_f = FALSE;
 
-    while (format[index] && flag_f == FALSE)
+    while (format[index])
     {
-        if (format[index] == '-')
+        if (format[index][0] == '-')
         {
             switch (format[index][1])
             {
             case 'c':
-                if (check_spam(flag_opt) == NONE)
+                if ((flag_opt = check_spam(flag_opt)) == NONE)
                     flag_opt = c;
                 break;
             case 't':
-                if (check_spam(flag_opt) == NONE)
+                if ((flag_opt = check_spam(flag_opt)) == NONE)
                     flag_opt = t;
                 break;
             case 'r':
-                if (check_spam(flag_opt) == NONE)
+                if ((flag_opt = check_spam(flag_opt)) == NONE)
                     flag_opt = r;
                 break;
             case 'u':
-                if (check_spam(flag_opt) == NONE)
+                if ((flag_opt = check_spam(flag_opt)) == NONE)
                     flag_opt = u;
             case 'x':
-                if (check_spam(flag_opt) == NONE)
+                if ((flag_opt = check_spam(flag_opt)) == NONE)
                     flag_opt = x;
                 break;
             case 'f':
                 flag_f = TRUE;
                 break;
             }
-            if (format[index][2] == 'f' && flag_f != TRUE)
-                flag_f = TRUE;
         }
+
+        if (format[index][2] == 'f' && flag_f != TRUE)
+            flag_f = TRUE;
         index++;
     }
 
@@ -79,4 +82,10 @@ option_t check_option(int argc, char **format)
         printf(NULL_OPT);
 
     return flag_opt;
+}
+
+int main(int argc, char **argv)
+{
+    check_option(argc, argv);
+    return 0;
 }
