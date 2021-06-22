@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 typedef enum
 {
     c,
@@ -83,10 +81,4 @@ option_t check_option(int argc, char **format)
         printf(NULL_OPT);
 
     return flag_opt;
-}
-
-int main(int argc, char **argv)
-{
-    check_option(argc, argv);
-    return 0;
 }
