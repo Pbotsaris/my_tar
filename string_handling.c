@@ -9,3 +9,5 @@ size_t my_strlen(char *str)
 
     return counter;
 }
+
+sad
