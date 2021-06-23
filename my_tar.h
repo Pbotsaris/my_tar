@@ -1,3 +1,18 @@
+/* ========================================================================= */
+
+// LIBRARIES
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+
+/* ========================================================================= */
+
+#ifndef MY_TAR_H
+#define MY_TAR_H
 
 typedef struct posix_header
 {                     /* byte offset */
@@ -37,3 +52,45 @@ typedef struct posix_header
 #define NA 00000 /* 0 if non applicable */
 
 header_t *create_header(char *path);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef OPTION_H
+#define OPTION_H
+
+typedef enum
+{
+  c,
+  r,
+  t,
+  u,
+  x,
+  NONE,
+  ERROROPT
+} option_t;
+
+typedef enum
+{
+  TRUE,
+  FALSE,
+  ERRORF
+} bool_f;
+
+#define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
+#define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
+#define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
+
+option_t check_option(char **format);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef MY_ITOA_H
+#define MY_ITOA_H
+
+void my_itoa(char *str, int num, int base);
+
+#endif
