@@ -1,26 +1,4 @@
-#include "string_handling.c"
-
-typedef enum
-{
-    c,
-    r,
-    t,
-    u,
-    x,
-    NONE,
-    ERROROPT
-} option_t;
-
-typedef enum
-{
-    TRUE,
-    FALSE,
-    ERRORF
-} bool_f;
-
-#define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
-#define F_ERROR "You must specify one of the the following options -c -r -t -u -x"
-#define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
+#include "option.h"
 
 option_t check_spam(option_t flag)
 {
@@ -35,17 +13,19 @@ option_t check_spam(option_t flag)
 bool_f check_f(bool_f flag_f, option_t flag_opt, char **format, int index)
 {
     if (flag_opt == NONE)
-        if (format[index][0] == 'f')
+        if (format[index][1] == 'f')
             return ERRORF;
 
-    if (flag_opt != NONE && format[index][0] == 'f')
+    if (flag_opt != NONE && format[index][1] == 'f')
         return TRUE;
 
-    if (flag_f == FALSE && format[index][1] == 'f')
+    if (flag_f == FALSE && format[index][2] == 'f')
         return TRUE;
 
     if (flag_f == TRUE)
         return ERRORF;
+
+    return FALSE;
 }
 
 option_t error_handler(bool_f flag_f, option_t flag_opt)
@@ -55,13 +35,14 @@ option_t error_handler(bool_f flag_f, option_t flag_opt)
         printf(F_NOT_FOUND);
         flag_opt = ERROROPT;
     }
-    if (flag_opt == NONE || flag_opt == ERROROPT)
-        printf(NULL_OPT);
-
     if (flag_f == ERRORF)
     {
         printf(F_ERROR);
         flag_opt = ERROROPT;
+    }
+    if (flag_opt == NONE || flag_opt == ERROROPT)
+    {
+        printf(NULL_OPT);
     }
 
     return flag_opt;
