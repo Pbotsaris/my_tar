@@ -1,4 +1,5 @@
-#include "itoa.h"
+#include "my_itoa.h"
+#include <stdio.h>
 
 void reverse(char str[], int length)
 {
@@ -13,13 +14,14 @@ void reverse(char str[], int length)
     }
 }
 
-char* itoa(char* str, int num, int base)
+void my_itoa(char* str, int num, int base)
 {
+		printf("num going in %i\n", num);
     int idx = 0;
     bool_t isNeg = FALSE;
     if (num == 0){
         str[idx] = '0';
-        return str;
+        return ;
     }
     // negative with base 10 only
     if (num < 0 && base == 10){
@@ -40,6 +42,5 @@ char* itoa(char* str, int num, int base)
 
     reverse(str, idx);
     str[idx] = '\0';
-    return str;
 }
 

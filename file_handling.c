@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "my_tar.h"
-#include "itoa.h"
+#include "my_itoa.h"
 
 #define STAT_ERR "Unable to read"
 
@@ -21,53 +21,39 @@
                /*blkcnt_t  st_blocks;      [> Number of 512B blocks allocated <]*/
 
 
-//printf("File Permissions: \t");
-//    printf( (S_ISDIR(fileStat.st_mode)) ? "d" : "-");
-
+								// S_ISDIR(stats.st_mode);
 
 void add_mode(header_t *header, struct stat stats)
 {
-char *res = itoa(header->mode[0], TUREAD, 8);
+	int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD< TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC };
+	int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-header->mode[0] =	stats.st_mode & S_IRUSR ? TUREAD : NA;
-header->mode[1] =	stats.st_mode & S_IWUSR ? TUWRITE : NA;
-header->mode[2] =	stats.st_mode & S_IXUSR ? TUEXEC : NA;
-header->mode[3] =	stats.st_mode & S_IRGRP ? TGREAD : NA;
-header->mode[4] =	stats.st_mode & S_IWGRP ? TGWRITE : NA;
-header->mode[5] =	stats.st_mode & S_IXGRP ? TGEXEC  : NA ;
-header->mode[6] =	stats.st_mode & S_IROTH ? TOREAD : NA ;
-header->mode[7] =	stats.st_mode & S_IWOTH ? TOWRITE : NA ;
-header->mode[8] =	stats.st_mode & S_IXOTH ? TOEXEC : NA ;
+for (int i = 0;  i < NUM_MODES; ++ i) {
+
+		if(stats.st_mode & stats_modes[i])
+				my_itoa(header->mode[i], modes[i], OCTAL);
+		else
+				my_itoa(header->mode[i], NA, OCTAL);
+}
 
 }
 
 
-
-int  main(void)
+header_t *create_header(char *path)
 {
-		FILE *file;
-		file = fopen("test.txt", "r");
-		if(file == NULL)	
-				return 1;
-
-		char path[] = "text.txt";
-     
-		header_t header;
+		//char path[] = "text.txt";
+		header_t *header;
+		header = (header_t*)malloc(sizeof(header_t));
+		
 		struct stat stats;
     if(stat(path, &stats) == 0){
-		strcpy(header.name, path);
-		add_mode(&header, stats);
-		strcpy(header.gid, stats.st_gid);
-
-    printf("%u\n", stats.st_mode);
-		
-
+		strcpy(header->name, path);
+		add_mode(header, stats);
+	//	strcpy(header.gid, stats.st_gid);
 		} else {
-				printf("%s %s\n", STAT_ERR, path);
+			printf("%s %s\n", STAT_ERR, path);
 		}
-
-
-		return 0;
+		return header;
 }
 
 

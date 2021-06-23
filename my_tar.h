@@ -2,7 +2,7 @@
 typedef struct posix_header
 {                              /* byte offset */
   char name[100];               /*   0 */
-  int  mode[9];                 // changed by PB - 9 modes as described below
+  char  mode[9][8];                 // changed by PB - 9 modes + 9 char each
   char uid[8];                  /* 108 */
   char gid[8];                  /* 116 */
   char size[12];                /* 124 */
@@ -19,6 +19,9 @@ typedef struct posix_header
   char prefix[155];             /* 345 */
                                 /* 500 */
 }header_t;
+
+#define NUM_MODES 9
+#define OCTAL 8
 
 // VALUES IN OCTAL
 #define TUREAD   00400          /* read by owner */
