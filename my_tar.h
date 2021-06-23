@@ -2,7 +2,7 @@
 typedef struct posix_header
 {                              /* byte offset */
   char name[100];               /*   0 */
-  char  mode[9][8];                 // changed by PB - 9 modes + 9 char each
+  char mode[10];                 // changed by PB - 9 modes + 9 char each
   char uid[8];                  /* 108 */
   char gid[8];                  /* 116 */
   char size[12];                /* 124 */
@@ -35,3 +35,6 @@ typedef struct posix_header
 #define TOEXEC   00001          /* execute/search by other */
 
 #define NA 		 	 00000          /* 0 if non applicable */
+
+
+header_t *create_header(char *path);

@@ -16,17 +16,13 @@ void reverse(char str[], int length)
 
 void my_itoa(char* str, int num, int base)
 {
-		printf("num going in %i\n", num);
+		printf("number going in:  %o\n", num);
     int idx = 0;
-    bool_t isNeg = FALSE;
     if (num == 0){
         str[idx] = '0';
         return ;
-    }
+    
     // negative with base 10 only
-    if (num < 0 && base == 10){
-        isNeg = TRUE;
-        num = -num;
     }
 
     while (num != 0){
@@ -35,10 +31,6 @@ void my_itoa(char* str, int num, int base)
         str[idx++] = (remainder > 9) ? (char)((remainder - 10) + 'a') : (char)(remainder + '0');
         num = num/base;
     }
-
-		    if (isNeg) 
-				     str[idx++] = '-';
-    
 
     reverse(str, idx);
     str[idx] = '\0';
