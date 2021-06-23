@@ -27,6 +27,10 @@ void get_size(header_t *header, struct stat stats)
 	my_itoa(header->size, stats.st_size, DECIMAL);
 }
 
+void get_link(header_t *header, struct stat stats)
+{
+	my_itoa(header->linkname, stats.st_nlink, DECIMAL);
+}
 void add_mode(header_t *header, struct stat stats)
 {
 
@@ -55,7 +59,7 @@ header_t *create_header(char *path)
 		add_mode(header, stats);
 		id_management(header, stats);
 		get_size(header, stats);
-		//	strcpy(header.gid, stats.st_gid);
+		get_link(header, stats);
 	}
 	else
 	{
