@@ -17,10 +17,7 @@
  * =====================================================================================
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "my_tar.h"
-#include "option.h"
 
 int main(int argc, char *argv[])
 {
