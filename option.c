@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "string_handling.c"
 
 typedef enum
@@ -31,16 +30,6 @@ option_t check_spam(option_t flag)
         return check_flag;
     else
         return check_flag = ERROROPT;
-}
-
-size_t my_strlen(char *str)
-{
-    int counter = 0;
-
-    while (str[counter])
-        counter++;
-
-    return counter;
 }
 
 bool_f check_f(bool_f flag_f, option_t flag_opt, char **format, int index)
@@ -124,10 +113,8 @@ option_t check_option(char **format)
     return flag_opt;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **format)
 {
-    if (argc > 2)
-        return 0;
-    check_option(argv);
+    check_option(format);
     return 0;
 }
