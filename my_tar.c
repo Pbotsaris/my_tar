@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
     {
         if (i == 0)
             continue;
+				if(argv[i][0] == '-')
+					continue;
+
         header = create_header(argv[i]);
     }
 
