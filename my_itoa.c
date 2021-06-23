@@ -16,7 +16,6 @@ void reverse(char str[], int length)
 
 void my_itoa(char *str, int num, int base)
 {
-    printf("number going in:  %o\n", num);
     int idx = 0;
     if (num == 0)
     {
