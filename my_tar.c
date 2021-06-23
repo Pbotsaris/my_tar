@@ -19,12 +19,26 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "option.c"
-
+#include "my_tar.h"
 
 int main(int argc, char *argv[])
 {
+  
     check_option(argv);
-    return 0;
+  
+  header_t *header;
+  
+		for (int i = 0; i < argc; ++ i) 
+		{
+				if(i == 0)
+						continue;
+		  header =  create_header(argv[i]);
+		}
+
+		printf("mode in char(octal): %s\n", header->mode);
+		free(header);
+		
+		return 0;
+
 }
 
