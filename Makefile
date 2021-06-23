@@ -1,4 +1,4 @@
-SRC =	my_tar.c 		
+SRC =	my_tar.c    \
 
 OBJ = $(SRC:.c=.o)
 
