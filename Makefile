@@ -1,7 +1,7 @@
-SRC =	my_tar.c    		\
-		file_handling.c	 	\
-		my_itoa.c 			\
-		option.c	
+SRC =	src/my_tar.c    		\
+		src/file_handling.c	 	\
+		src/my_itoa.c 			\
+		src/option.c	
 
 OBJ = $(SRC:.c=.o)
 
