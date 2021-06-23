@@ -6,6 +6,7 @@
 #include <string.h>
 #include "my_tar.h"
 #include "my_itoa.h"
+#include "option.h"
 
 #define STAT_ERR "Unable to read"
 
@@ -20,40 +21,39 @@
 /*blksize_t st_blksize;     [> Block size for filesystem I/O <]*/
 /*blkcnt_t  st_blocks;      [> Number of 512B blocks allocated <]*/
 
-
 // S_ISDIR(stats.st_mode);
 
 void add_mode(header_t *header, struct stat stats)
 {
 
-		int mode = 0;
+	int mode = 0;
 
-		int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC };
-		int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+	int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+	int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-		for (int i = 0;  i < NUM_MODES; ++ i) 
-				if(stats.st_mode & stats_modes[i])
-						mode = mode + modes[i];
+	for (int i = 0; i < NUM_MODES; ++i)
+		if (stats.st_mode & stats_modes[i])
+			mode = mode + modes[i];
 
-		my_itoa(header->mode, mode, OCTAL);
+	my_itoa(header->mode, mode, OCTAL);
 }
-
 
 header_t *create_header(char *path)
 {
-		//char path[] = "text.txt";
-		header_t *header;
-		header = (header_t*)malloc(sizeof(header_t));
+	//char path[] = "text.txt";
+	header_t *header;
+	header = (header_t *)malloc(sizeof(header_t));
 
-		struct stat stats;
-		if(stat(path, &stats) == 0){
-				strcpy(header->name, path);
-				add_mode(header, stats);
-				//	strcpy(header.gid, stats.st_gid);
-		} else {
-				printf("%s %s\n", STAT_ERR, path);
-		}
-		return header;
+	struct stat stats;
+	if (stat(path, &stats) == 0)
+	{
+		strcpy(header->name, path);
+		add_mode(header, stats);
+		//	strcpy(header.gid, stats.st_gid);
+	}
+	else
+	{
+		printf("%s %s\n", STAT_ERR, path);
+	}
+	return header;
 }
-
-
