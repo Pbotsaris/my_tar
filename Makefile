@@ -8,7 +8,7 @@ CC = gcc -g -o
 
 NAME = my_tar
 
-RM = rm -f
+RM = rm 
 
 all: $(NAME)
 
@@ -17,8 +17,5 @@ $(NAME): $(OBJ)
 
 clean:
 	$(RM) $(OBJ)
-
-fclean: clean
 	$(RM) $(NAME)
 
-re: fclean all
