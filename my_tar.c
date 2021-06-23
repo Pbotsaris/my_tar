@@ -1,3 +1,4 @@
+
 /*
  * =====================================================================================
  *
@@ -15,26 +16,29 @@
  *
  * =====================================================================================
  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "my_tar.h"
 
 int main(int argc, char *argv[])
 {
-		header_t *header;
+  
+    check_option(argv);
+  
+  header_t *header;
+  
 		for (int i = 0; i < argc; ++ i) 
 		{
 				if(i == 0)
 						continue;
-
 		  header =  create_header(argv[i]);
 		}
 
 		printf("mode in char(octal): %s\n", header->mode);
-
 		free(header);
 		
-		
 		return 0;
+
 }
 
