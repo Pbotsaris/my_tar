@@ -37,6 +37,7 @@ typedef struct posix_header
 
 #define NUM_MODES 9
 #define OCTAL 8
+#define DECIMAL 10
 
 // VALUES IN OCTAL
 #define TUREAD 00400  /* read by owner */
