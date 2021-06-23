@@ -1,3 +1,3 @@
-typedef enum {TRUE, FALSE}bool_t;
+// typedef enum {TRUE, FALSE}bool_t;
 
-void my_itoa(char* str, int num, int base);
+void my_itoa(char *str, int num, int base);
