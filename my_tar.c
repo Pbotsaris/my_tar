@@ -16,10 +16,15 @@
  *
  * =====================================================================================
  */
+
+#include <stdlib.h>
+#include <stdio.h>
 #include "option.c"
+
 
 int main(int argc, char *argv[])
 {
     check_option(argv);
     return 0;
 }
+
