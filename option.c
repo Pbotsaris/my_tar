@@ -60,7 +60,7 @@ option_t check_option(char **format)
         if (format[index][0] == '-')
         {
             if ((flag_opt = check_spam(flag_opt)) == NONE)
-                if (my_strlen(format[index]) == 2 || (my_strlen(format[index]) == 3 && format[index][2] == 'f'))
+                if (strlen(format[index]) == 2 || (strlen(format[index]) == 3 && format[index][2] == 'f'))
                 {
                     switch (format[index][1])
                     {
