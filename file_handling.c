@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "my_tar.h"
+#include "itoa.h"
 
 #define STAT_ERR "Unable to read"
 
@@ -23,9 +24,10 @@
 //printf("File Permissions: \t");
 //    printf( (S_ISDIR(fileStat.st_mode)) ? "d" : "-");
 
+
 void add_mode(header_t *header, struct stat stats)
 {
-itoa(header->mode[0], TUREAD, 8);
+char *res = itoa(header->mode[0], TUREAD, 8);
 
 header->mode[0] =	stats.st_mode & S_IRUSR ? TUREAD : NA;
 header->mode[1] =	stats.st_mode & S_IWUSR ? TUWRITE : NA;
