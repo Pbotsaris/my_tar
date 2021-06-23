@@ -1,3 +1,4 @@
+
 /*
  * =====================================================================================
  *
@@ -15,15 +16,15 @@
  *
  * =====================================================================================
  */
+
 #include <stdlib.h>
 #include <stdio.h>
+#include "option.c"
+
 
 int main(int argc, char *argv[])
 {
-	
-		for (int i = 0; i < argc; ++ i) 
-				printf("%s\n", argv[i]);	
-		
-		return 0;
+    check_option(argv);
+    return 0;
 }
 
