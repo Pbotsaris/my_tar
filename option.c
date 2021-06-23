@@ -112,9 +112,3 @@ option_t check_option(char **format)
 
     return flag_opt;
 }
-
-// int main(int argc, char **format)
-// {
-//     check_option(format);
-//     return 0;
-// }
