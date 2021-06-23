@@ -1,6 +1,6 @@
-SRC =	my_tar.c    	\
-		file_handling.c \
-		my_itoa.c 		\
+SRC =	my_tar.c    		\
+		file_handling.c	 	\
+		my_itoa.c 			\
 		option.c	
 
 OBJ = $(SRC:.c=.o)
