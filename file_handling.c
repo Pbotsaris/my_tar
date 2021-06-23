@@ -1,12 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
+
 #include "my_tar.h"
-#include "my_itoa.h"
-#include "option.h"
 
 #define STAT_ERR "Unable to read"
 
