@@ -15,6 +15,7 @@
 
 // S_ISDIR(stats.st_mode);
 
+
 void file_info(header_t *header, struct stat stats)
 {
 	/* [> User ID of owner <] */
@@ -29,6 +30,18 @@ void file_info(header_t *header, struct stat stats)
 	/* [> Number of hard links <] */
 	my_itoa(header->linkname, stats.st_nlink, DECIMAL);
 }
+
+void add_uname_gname(header_t *header, struct stat stats)
+{
+  struct passwd *pws;
+	struct group *grp;
+  pws = getpwuid(stats.st_uid);
+	grp = getgrgid(stats.st_gid);
+
+	strcpy(header->gname, grp->gr_name);
+	strcpy(header->uname, pws->pw_name);
+}
+
 
 void add_mode(header_t *header, struct stat stats)
 {
@@ -56,6 +69,7 @@ header_t *create_header(char *path)
 	{
 		strcpy(header->name, path);
 		add_mode(header, stats);
+		add_uname_gname(header, stats);
 		file_info(header, stats);
 	}
 	else
