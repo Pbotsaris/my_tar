@@ -31,6 +31,24 @@ void file_info(header_t *header, struct stat stats)
 	my_itoa(header->linkname, stats.st_nlink, DECIMAL);
 }
 
+
+void add_filetype(header_t *header, struct stat stats)
+{
+	if(S_ISDIR(stats.st_mode))
+		 header->typeflag = DIRTYPE; 
+	else if(S_ISREG(stats.st_mode))
+		header->typeflag = REGTYPE;
+	else if(S_ISCHR(stats.st_mode))
+		header->typeflag =CHRTYPE;
+	else if(S_ISBLK(stats.st_mode))
+		header->typeflag = BLKTYPE;
+	else if(S_ISFIFO(stats.st_mode))
+		header->typeflag = FIFOTYPE;
+	else if(S_ISLNK(stats.st_mode))
+		header->typeflag = SYMTYPE;
+
+}
+
 void add_mode(header_t *header, struct stat stats)
 {
 // ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.

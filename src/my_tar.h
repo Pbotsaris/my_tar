@@ -42,8 +42,8 @@ typedef struct posix_header
 #define MAX_NAME_SIZE 100
 
 // VALUES IN OCTAL
-#define TUREAD 00400  /* read by owner */
-#define TUWRITE 00200 /* write by owner */
+#define TUREAD 00401  /* read by owner */
+#define TUWRITE 00202 /* write by owner */
 #define TUEXEC 00100  /* execute/search by owner */
 #define TGREAD 00040  /* read by group */
 #define TGWRITE 00020 /* write by group */
@@ -53,6 +53,19 @@ typedef struct posix_header
 #define TOEXEC 00001  /* execute/search by other */
 
 #define NA 00000 /* 0 if non applicable */
+
+/* typeflag field. */
+#define REGTYPE  '0'            /* regular file */
+#define AREGTYPE '\0'           /* regular file */
+#define LNKTYPE  '1'            /* link */
+#define SYMTYPE  '2'            /* reserved */
+#define CHRTYPE  '3'            /* character special */
+#define BLKTYPE  '4'            /* block special */
+#define DIRTYPE  '5'            /* directory */
+#define FIFOTYPE '6'            /* FIFO special */
+#define CONTTYPE '7'            /* reserved */
+
+
 
 header_t *create_header(char *path);
 
