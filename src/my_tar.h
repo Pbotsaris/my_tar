@@ -37,6 +37,7 @@ typedef struct posix_header
 
 #define NUM_MODES 9
 #define OCTAL 8
+#define DECIMAL 10
 
 // VALUES IN OCTAL
 #define TUREAD 00400  /* read by owner */
@@ -76,7 +77,7 @@ typedef enum
   TRUE,
   FALSE,
   ERRORF
-} bool_f;
+} bool_t;
 
 #define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
 #define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
