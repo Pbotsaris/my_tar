@@ -1,4 +1,3 @@
-
 #include "my_tar.h"
 
 #define STAT_ERR "Unable to read"
@@ -16,21 +15,21 @@
 
 // S_ISDIR(stats.st_mode);
 
-void id_management(header_t *header, struct stat stats)
+void file_info(header_t *header, struct stat stats)
 {
+	/* [> User ID of owner <] */
 	my_itoa(header->uid, stats.st_uid, DECIMAL);
+
+	/* [> Group ID of owner <] */
 	my_itoa(header->gid, stats.st_gid, DECIMAL);
-}
 
-void get_size(header_t *header, struct stat stats)
-{
+	/* [> Total size, in bytes <] */
 	my_itoa(header->size, stats.st_size, DECIMAL);
-}
 
-void get_link(header_t *header, struct stat stats)
-{
+	/* [> Number of hard links <] */
 	my_itoa(header->linkname, stats.st_nlink, DECIMAL);
 }
+
 void add_mode(header_t *header, struct stat stats)
 {
 
@@ -57,9 +56,7 @@ header_t *create_header(char *path)
 	{
 		strcpy(header->name, path);
 		add_mode(header, stats);
-		id_management(header, stats);
-		get_size(header, stats);
-		get_link(header, stats);
+		file_info(header, stats);
 	}
 	else
 	{

@@ -77,7 +77,7 @@ typedef enum
   TRUE,
   FALSE,
   ERRORF
-} bool_f;
+} bool_t;
 
 #define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
 #define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
