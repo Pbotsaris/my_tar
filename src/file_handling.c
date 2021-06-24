@@ -28,6 +28,9 @@ void file_info(header_t *header, struct stat stats)
 
 	/* [> Number of hard links <] */
 	my_itoa(header->linkname, stats.st_nlink, DECIMAL);
+
+	/* [> Modified time in seconds <] */
+	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 }
 
 void add_mode(header_t *header, struct stat stats)
