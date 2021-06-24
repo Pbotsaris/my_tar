@@ -10,7 +10,7 @@ option_t check_spam(option_t flag)
 		return check_flag = ERROROPT;
 }
 
-bool_f check_f(bool_f flag_f, option_t flag_opt, char **format, int index)
+bool_t check_f(bool_t flag_f, option_t flag_opt, char **format, int index)
 {
 	if (flag_opt == NONE)
 		if (format[index][1] == 'f')
@@ -28,7 +28,7 @@ bool_f check_f(bool_f flag_f, option_t flag_opt, char **format, int index)
 	return FALSE;
 }
 
-option_t error_handler(bool_f flag_f, option_t flag_opt)
+option_t error_handler(bool_t flag_f, option_t flag_opt)
 {
 	if (flag_f == FALSE)
 	{
@@ -53,7 +53,7 @@ option_t check_option(char **format)
 	int index = 1;
 
 	option_t flag_opt = NONE;
-	bool_f flag_f = FALSE;
+	bool_t flag_f = FALSE;
 
 	while (format[index])
 	{
