@@ -1,0 +1,6 @@
+my_tar
+src/*.o
+*.dSYM
+file.tar
+source.c
+source.h
