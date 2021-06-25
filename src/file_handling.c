@@ -34,6 +34,7 @@ void file_info(header_t *header, struct stat stats)
 
 void add_filetype(header_t *header, struct stat stats)
 {
+
 	if(S_ISDIR(stats.st_mode))
 		 header->typeflag = DIRTYPE; 
 	else if(S_ISREG(stats.st_mode))
