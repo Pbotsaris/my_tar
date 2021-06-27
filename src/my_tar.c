@@ -37,8 +37,9 @@ int main(int argc, char *argv[])
     }
 
     printf("File name: %s\n", header->name);
-    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\nLink: %s\n", header->mode, header->uid, header->gid, header->size, header->linkname);
+    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\n", header->mode, header->uid, header->gid, header->size);
     printf("Modified time in seconds: %s\n", header->mtime);
+    printf("Link name: %s\n", header->linkname);
     printf("CHKSUM: %s\n", header->chksum);
 
     free(header);
