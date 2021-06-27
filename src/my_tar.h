@@ -85,8 +85,8 @@ typedef enum
 
 typedef enum
 {
-  TRUE,
   FALSE,
+  TRUE,
   ERRORF
 } bool_t;
 
