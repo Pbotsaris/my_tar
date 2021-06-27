@@ -4,3 +4,4 @@ src/*.o
 file.tar
 source.c
 source.h
+source.cc
