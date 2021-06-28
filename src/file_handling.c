@@ -13,33 +13,31 @@ unsigned int checksum_calculator(char *header, size_t size)
 	return check;
 }
 
-
-bool_t symlink_exists(const char* path)
+bool_t symlink_exists(const char *path)
 {
-    struct stat stats;
-    int result;
-    result = lstat(path, &stats);
-    return (result == 0);
+	struct stat stats;
+	int result;
+	result = lstat(path, &stats);
+	return (result == 0);
 }
-
 
 void checksum(header_t *header)
 {
 	unsigned int check = 0;
 
-	check += checksum_calculator(header->name, 100);
-	check += checksum_calculator(header->mode, 10);
-	check += checksum_calculator(header->uid, 8);
-	check += checksum_calculator(header->gid, 8);
-	check += checksum_calculator(header->size, 12);
-	check += checksum_calculator(header->mtime, 12);
+	check += checksum_calculator(header->name, sizeof(header->name));
+	check += checksum_calculator(header->mode, sizeof(header->mode));
+	check += checksum_calculator(header->uid, sizeof(header->uid));
+	check += checksum_calculator(header->gid, sizeof(header->gid));
+	check += checksum_calculator(header->size, sizeof(header->size));
+	check += checksum_calculator(header->mtime, sizeof(header->mtime));
 	check += header->typeflag;
 	check += 8 * 32;
-	check += checksum_calculator(header->linkname, 100);
-	check += checksum_calculator(header->version, 2);
-	check += checksum_calculator(header->uname, 32);
-	check += checksum_calculator(header->gname, 32);
-	check += checksum_calculator(header->prefix, 155);
+	check += checksum_calculator(header->linkname, sizeof(header->linkname));
+	check += checksum_calculator(header->version, sizeof(header->version));
+	check += checksum_calculator(header->uname, sizeof(header->uname));
+	check += checksum_calculator(header->gname, sizeof(header->gname));
+	check += checksum_calculator(header->prefix, sizeof(header->prefix));
 	sprintf(header->chksum, "%0*o ", 8, check);
 }
 
@@ -59,50 +57,52 @@ void file_info(header_t *header, struct stat stats)
 		header->size[0] = '0';
 
 	/* [> Modified time in seconds <] */
-//	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 
 	/* [> Check Sum <] */
-	//checksum(header);
+	checksum(header);
 }
-
 
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-			  my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
-			  my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+	my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
 }
 
-
-void add_filetype(header_t *header, struct stat stats, char * path)
+void add_filetype(header_t *header, struct stat stats, char *path)
 {
 
-	if(S_ISDIR(stats.st_mode))
-		 header->typeflag = DIRTYPE; 
-	else if(S_ISREG(stats.st_mode)){
-		if(symlink_exists(path) == TRUE)
-			header->typeflag =  SYMTYPE;
+	if (S_ISDIR(stats.st_mode))
+		header->typeflag = DIRTYPE;
+	else if (S_ISREG(stats.st_mode))
+	{
+		if (symlink_exists(path) == TRUE)
+			header->typeflag = SYMTYPE;
 		else
 			header->typeflag = REGTYPE;
 	}
-	else if(S_ISCHR(stats.st_mode)){
-		header->typeflag =CHRTYPE;
+	else if (S_ISCHR(stats.st_mode))
+	{
+		header->typeflag = CHRTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if(S_ISBLK(stats.st_mode)){
+	else if (S_ISBLK(stats.st_mode))
+	{
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if(S_ISFIFO(stats.st_mode))
+	else if (S_ISFIFO(stats.st_mode))
 		header->typeflag = FIFOTYPE;
-	else if(S_ISLNK(stats.st_mode)){
-		header->typeflag =  LNKTYPE;
+	else if (S_ISLNK(stats.st_mode))
+	{
+		header->typeflag = LNKTYPE;
 	}
 	// if not none above
-	else{
-					header->typeflag = REGTYPE;
-			printf("%s\n", FLAGTYPE_ERR);
+	else
+	{
+		header->typeflag = REGTYPE;
+		printf("%s\n", FLAGTYPE_ERR);
 	}
-		
 }
 
 void add_uname_gname(header_t *header, struct stat stats)
@@ -132,23 +132,102 @@ void add_mode(header_t *header, struct stat stats)
 
 void add_name(header_t *header, char *path)
 {
-  size_t path_len = strlen(path);
-  if(path_len < MAX_NAME_SIZE){
+	size_t path_len = strlen(path);
+	if (path_len < MAX_NAME_SIZE)
+	{
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
-	else if(path_len < MAX_NAME_SIZE * 2){ 
-		int split_pos = path_len - MAX_NAME_SIZE + 1; 
+	else if (path_len < MAX_NAME_SIZE * 2)
+	{
+		int split_pos = path_len - MAX_NAME_SIZE + 1;
 		printf("split pos %i\n", split_pos);
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
 		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
-		}
+	}
 	else
 		printf("%s", EXC_NAME_SIZE);
+}
+
+int check_byte(int block)
+{
+	if (block == 512)
+		return 0;
+	else
+		return (512 - (block % 512));
+}
+
+void tar(char *path, FILE *dest)
+{
+
+	int fd = open(path, O_APPEND),
+		byte_block;
+
+	header_t header;
+	struct stat stats;
+
+	if (fd)
+	{
+
+		if (stat(path, &stats) == 0)
+		{
+			add_name(&header, path);
+			add_mode(&header, stats);
+			add_filetype(&header, stats, path);
+			add_uname_gname(&header, stats);
+			file_info(&header, stats);
+		}
+		int buff_size = (int)stats.st_size;
+		char *buffer = malloc(sizeof(char) * buff_size);
+
+		read(fd, buffer, sizeof(char) * buff_size);
+
+		fwrite(&header, sizeof(header), 1, dest);
+		fwrite(buffer, atoi(header.size), 1, dest);
+
+		byte_block = check_byte(my_atoi(header.size));
+		if (byte_block != 0)
+		{
+			char *zip = malloc(sizeof(char) * byte_block);
+			fwrite(zip, byte_block, 1, dest);
+			free(zip);
+		}
+		free(buffer);
+		close(fd);
+	}
+	else
+	{
+		printf("ERROR\n");
+		exit(1);
+	}
+
+	printf("File: %s\n", header.name);
+}
+
+void archive(char *path, char **argv, int argc)
+{
+	struct stat stats;
+	FILE *dest = fopen(path, "wb");
+	int fd,
+		index = 2;
+
+	if (dest == NULL)
+	{
+		printf("ERROR\n");
+		exit(1);
+	}
+
+	while (index < argc)
+	{
+		fd = open(argv[index], O_APPEND);
+		lseek(fd, 0, SEEK_END);
+		tar(argv[index], dest);
+		index++;
+	}
 }
 
 header_t *create_header(char *path)
