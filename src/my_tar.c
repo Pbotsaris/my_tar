@@ -1,51 +1,161 @@
-
-/*
- * =====================================================================================
- *
- *       Filename:  my_tar.c
- *
- *    Description:  A naive implementation with the infamous tar
- *
- *        Version:  0.1
- *        Created:  06/22/2021 16:05:36
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Khalil Masri, Pedro Botsaris
- *   Organization:  ELU
- *
- * =====================================================================================
- */
-
 #include "my_tar.h"
 
-int main(int argc, char *argv[])
+unsigned int checksum_calculator(char *header, size_t size)
+{
+    int index = 0,
+        check = 0;
+
+    while (header[index] && index < size)
+    {
+        check += header[index];
+        index++;
+    }
+    return check;
+}
+
+unsigned int checksum(header_t *header)
+{
+    unsigned int check = 0;
+    char checktoStr[100];
+
+    check += checksum_calculator(header->name, 100);
+    check += checksum_calculator(header->mode, 10);
+    check += checksum_calculator(header->uid, 8);
+    check += checksum_calculator(header->gid, 8);
+    check += checksum_calculator(header->size, 12);
+    check += checksum_calculator(header->mtime, 12);
+    check += header->typeflag;
+    check += checksum_calculator(header->linkname, 100);
+    check += checksum_calculator(header->version, 2);
+    check += checksum_calculator(header->uname, 32);
+    check += checksum_calculator(header->gname, 32);
+    check += checksum_calculator(header->prefix, 155);
+    sprintf(header->chksum, "%0*o ", 8, check);
+}
+
+void file_info(header_t *header, struct stat stats)
 {
 
-    // check_option(argv);
+    /* [> User ID of owner <] */
+    my_itoa(header->uid, stats.st_uid, DECIMAL);
 
-    header_t *header;
+    /* [> Group ID of owner <] */
+    my_itoa(header->gid, stats.st_gid, DECIMAL);
 
-    for (int i = 0; i < argc; ++i)
+    /* [> Total size, in bytes <] */
+    if (stats.st_mode != S_IFLNK)
+        my_itoa(header->size, stats.st_size, DECIMAL);
+    else
+        header->size[0] = '0';
+
+    /* [> Modified time in seconds <] */
+    my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+
+    /* [> Check Sum <] */
+    checksum(header);
+}
+
+void add_dev_major_minor(header_t *header, struct stat stats)
+{
+    my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+    my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+}
+
+void add_filetype(header_t *header, struct stat stats)
+{
+
+    if (S_ISDIR(stats.st_mode))
+        header->typeflag = DIRTYPE;
+    else if (S_ISREG(stats.st_mode))
+        header->typeflag = REGTYPE;
+    else if (S_ISCHR(stats.st_mode))
     {
-        if (i == 0)
-            continue;
-        if (argv[i][0] == '-')
-            continue;
+        header->typeflag = CHRTYPE;
+        add_dev_major_minor(header, stats);
+    }
+    else if (S_ISBLK(stats.st_mode))
+    {
+        header->typeflag = BLKTYPE;
+        add_dev_major_minor(header, stats);
+    }
+    else if (S_ISFIFO(stats.st_mode))
+        header->typeflag = FIFOTYPE;
+    else if (S_ISLNK(stats.st_mode))
+        header->typeflag = SYMTYPE;
+    // if not none above
+    else
+    {
+        header->typeflag = REGTYPE;
+        printf("%s\n", FLAGTYPE_ERR);
+    }
+}
 
-        header = create_header(argv[i]);
+void add_uname_gname(header_t *header, struct stat stats)
+{
+    struct passwd *pws;
+    struct group *grp;
+    pws = getpwuid(stats.st_uid);
+    grp = getgrgid(stats.st_gid);
+
+    strcpy(header->gname, grp->gr_name);
+    strcpy(header->uname, pws->pw_name);
+}
+
+void add_mode(header_t *header, struct stat stats)
+{
+    // ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
+    int mode = 0;
+
+    int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+    int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+
+    for (int i = 0; i < NUM_MODES; ++i)
+        if (stats.st_mode & stats_modes[i])
+            mode = mode + modes[i];
+
+    my_itoa(header->mode, mode, OCTAL);
+}
+
+void add_name(header_t *header, char *path)
+{
+    size_t path_len = strlen(path);
+    if (path_len < MAX_NAME_SIZE)
+    {
+        strcpy(header->name, path);
+        header->prefix[0] = '\0';
     }
 
-    printf("name: %s\n prefix: %s\n", header->name, header->prefix);
-    printf("type %c\n", header->typeflag);
-    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\n", header->mode, header->uid, header->gid, header->size);
-    printf("Modified time in seconds: %s\n", header->mtime);
-    printf("Link name: %s\n", header->linkname);
-    printf("CHKSUM: %s\n", header->chksum); 
-    printf("group name: %s\n user name: %s\n", header->gname, header->uname);
-    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\nLink: %s\n", header->mode, header->uid, header->gid, header->size, header->linkname);
+    else if (path_len < MAX_NAME_SIZE * 2)
+    {
+        int split_pos = path_len - MAX_NAME_SIZE + 1;
+        printf("split pos %i\n", split_pos);
+        strncpy(header->prefix, path, split_pos);
+        header->prefix[split_pos] = '\0';
+        strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
+        header->name[MAX_NAME_SIZE - 1] = '\0';
+    }
+    else
+        printf("%s", EXC_NAME_SIZE);
+}
 
-    free(header);
+header_t *create_header(char *path)
+{
+    header_t *header;
+    header = (header_t *)malloc(sizeof(header_t));
 
-    return 0;
+    struct stat stats;
+    if (stat(path, &stats) == 0)
+    {
+
+        add_name(header, path);
+        add_mode(header, stats);
+        add_filetype(header, stats);
+        add_uname_gname(header, stats);
+        file_info(header, stats);
+    }
+    else
+    {
+        printf("%s %s\n", STAT_ERR, path);
+    }
+    return header;
 }
