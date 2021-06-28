@@ -1,19 +1,7 @@
 #include "my_tar.h"
+#include "zlib.h"
 
 #define STAT_ERR "Unable to read"
-
-/*dev_t     st_dev;         [> ID of device containing file <]*/
-/*ino_t     st_ino;         [> Inode number <]*/
-/*mode_t    st_mode;        [> File type and mode <]*/
-/*nlink_t   st_nlink;       [> Number of hard links <]*/
-/*uid_t     st_uid;         [> User ID of owner <]*/
-/*gid_t     st_gid;         [> Group ID of owner <]*/
-/*dev_t     st_rdev;        [> Device ID (if special file) <]*/
-/*off_t     st_size;        [> Total size, in bytes <]*/
-/*blksize_t st_blksize;     [> Block size for filesystem I/O <]*/
-/*blkcnt_t  st_blocks;      [> Number of 512B blocks allocated <]*/
-
-// S_ISDIR(stats.st_mode);
 
 unsigned int checksum_calculator(char *header, size_t size)
 {
@@ -68,6 +56,7 @@ void file_info(header_t *header, struct stat stats)
 
 	/* [> Check Sum <] */
 	checksum(header);
+	lstat(header->name, &stats);
 }
 
 void add_uname_gname(header_t *header, struct stat stats)
@@ -76,7 +65,6 @@ void add_uname_gname(header_t *header, struct stat stats)
 	struct group *grp;
 	pws = getpwuid(stats.st_uid);
 	grp = getgrgid(stats.st_gid);
-
 	strcpy(header->gname, grp->gr_name);
 	strcpy(header->uname, pws->pw_name);
 }
@@ -119,7 +107,38 @@ void add_name(header_t *header, char *path)
 	else
 		printf("%s", EXC_NAME_SIZE);
 }
+void compress_file(char *tar_name, char *zip_name)
+{
+	FILE *tar_file;
+	gzFile zip_file;
+	char buffer[128];
+	int num_read;
 
+	num_read = 0;
+	if ((tar_file = fopen(tar_name, "rb")) == NULL)
+		printf("error\n");
+	if ((zip_file = gzopen(zip_name, "wb")) == NULL)
+		printf("error\n");
+	while ((num_read = fread(buffer, 1, sizeof(buffer), tar_file)) > 0)
+		gzwrite(zip_file, buffer, num_read);
+	fclose(tar_file);
+	gzclose(zip_file);
+}
+
+void compress_tar(char *name)
+{
+	if (rename(name, "tmp.tar") == -1)
+		printf("error\n");
+	compress_file("tmp.tar", name);
+	if (remove("tmp.tar") == -1)
+		printf("error\n");
+}
+
+int archive(int argc, char **av)
+{
+	compress_tar(av[1]);
+	return 0;
+}
 header_t *create_header(char *path)
 {
 	header_t *header;
@@ -133,6 +152,7 @@ header_t *create_header(char *path)
 		add_mode(header, stats);
 		add_uname_gname(header, stats);
 		file_info(header, stats);
+		compress_tar(header->name);
 	}
 	else
 	{
