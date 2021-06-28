@@ -1,13 +1,6 @@
 #include "my_tar.h"
-#include "zlib.h"
 
-<<<<<<< HEAD
-#define STAT_ERR "Unable to read"
-
-=======
->>>>>>> b423701c02c91672f130de7c07d62a7b4ce18782
-	unsigned int
-	checksum_calculator(char *header, size_t size)
+unsigned int checksum_calculator(char *header, size_t size)
 {
 	int index = 0,
 		check = 0;
@@ -60,7 +53,6 @@ void file_info(header_t *header, struct stat stats)
 
 	/* [> Check Sum <] */
 	checksum(header);
-	lstat(header->name, &stats);
 }
 
 void add_dev_major_minor(header_t *header, struct stat stats)
@@ -146,11 +138,6 @@ void add_name(header_t *header, char *path)
 		printf("%s", EXC_NAME_SIZE);
 }
 
-int archive(int argc, char **av)
-{
-	compress_tar(av[1]);
-	return 0;
-}
 header_t *create_header(char *path)
 {
 	header_t *header;

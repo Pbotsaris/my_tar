@@ -53,17 +53,6 @@ typedef struct posix_header
 #define TOWRITE 00002 /* write by other */
 #define TOEXEC 00001  /* execute/search by other */
 
-/* typeflag field. */
-#define REGTYPE '0'   /* regular file */
-#define AREGTYPE '\0' /* regular file */
-#define LNKTYPE '1'   /* link */
-#define SYMTYPE '2'   /* reserved */
-#define CHRTYPE '4'   /* character special */
-#define BLKTYPE '4'   /* block special */
-#define DIRTYPE '5'   /* directory */
-#define FIFOTYPE '6'  /* FIFO special */
-#define CONTTYPE '7'  /* reserved */
-
 /* Values used in typeflag field.  */
 #define REGTYPE '0'   /* regular file */
 #define AREGTYPE '\0' /* regular file */
