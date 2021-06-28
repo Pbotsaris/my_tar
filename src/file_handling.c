@@ -13,10 +13,9 @@ unsigned int checksum_calculator(char *header, size_t size)
 	return check;
 }
 
-unsigned int checksum(header_t *header)
+void checksum(header_t *header)
 {
 	unsigned int check = 0;
-	char checktoStr[100];
 
 	check += checksum_calculator(header->name, 100);
 	check += checksum_calculator(header->mode, 10);
@@ -25,6 +24,7 @@ unsigned int checksum(header_t *header)
 	check += checksum_calculator(header->size, 12);
 	check += checksum_calculator(header->mtime, 12);
 	check += header->typeflag;
+	check += 8 * 32;
 	check += checksum_calculator(header->linkname, 100);
 	check += checksum_calculator(header->version, 2);
 	check += checksum_calculator(header->uname, 32);
@@ -32,7 +32,6 @@ unsigned int checksum(header_t *header)
 	check += checksum_calculator(header->prefix, 155);
 	sprintf(header->chksum, "%0*o ", 8, check);
 }
-
 
 void file_info(header_t *header, struct stat stats)
 {
@@ -89,24 +88,22 @@ void add_filetype(header_t *header, struct stat stats)
 		printf("%s\n", FLAGTYPE_ERR);
 	}
 		
-
 }
 
 void add_uname_gname(header_t *header, struct stat stats)
 {
-  struct passwd *pws;
+	struct passwd *pws;
 	struct group *grp;
-  pws = getpwuid(stats.st_uid);
+	pws = getpwuid(stats.st_uid);
 	grp = getgrgid(stats.st_gid);
 
 	strcpy(header->gname, grp->gr_name);
 	strcpy(header->uname, pws->pw_name);
 }
 
-
 void add_mode(header_t *header, struct stat stats)
 {
-// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
+	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
 
 	int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
@@ -123,6 +120,7 @@ void add_name(header_t *header, char *path)
 {
   size_t path_len = strlen(path);
   if(path_len < MAX_NAME_SIZE){
+
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
@@ -135,9 +133,8 @@ void add_name(header_t *header, char *path)
 		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
 		}
-	 else
-		 printf("%s", EXC_NAME_SIZE);
-
+	else
+		printf("%s", EXC_NAME_SIZE);
 }
 
 header_t *create_header(char *path)
@@ -149,7 +146,7 @@ header_t *create_header(char *path)
 	if (stat(path, &stats) == 0)
 	{
 
-    add_name(header, path);
+		add_name(header, path);
 		add_mode(header, stats);
 		add_filetype(header, stats);
 		add_uname_gname(header, stats);
