@@ -28,10 +28,9 @@ unsigned int checksum_calculator(char *header, size_t size)
 	return check;
 }
 
-unsigned int checksum(header_t *header)
+void checksum(header_t *header)
 {
 	unsigned int check = 0;
-	char checktoStr[100];
 
 	check += checksum_calculator(header->name, 100);
 	check += checksum_calculator(header->mode, 10);
@@ -40,6 +39,7 @@ unsigned int checksum(header_t *header)
 	check += checksum_calculator(header->size, 12);
 	check += checksum_calculator(header->mtime, 12);
 	check += header->typeflag;
+	check += 8 * 32;
 	check += checksum_calculator(header->linkname, 100);
 	check += checksum_calculator(header->version, 2);
 	check += checksum_calculator(header->uname, 32);
