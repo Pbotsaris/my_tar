@@ -35,9 +35,13 @@ int main(int argc, char *argv[])
 
         header = create_header(argv[i]);
     }
-    
-    printf("group name: %s\n user name: %s\n", header->gname, header->uname);
+
     printf("name: %s\n prefix: %s\n", header->name, header->prefix);
+    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\n", header->mode, header->uid, header->gid, header->size);
+    printf("Modified time in seconds: %s\n", header->mtime);
+    printf("Link name: %s\n", header->linkname);
+    printf("CHKSUM: %s\n", header->chksum); 
+    printf("group name: %s\n user name: %s\n", header->gname, header->uname);
     printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\nLink: %s\n", header->mode, header->uid, header->gid, header->size, header->linkname);
 
     free(header);
