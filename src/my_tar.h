@@ -34,7 +34,6 @@ typedef struct posix_header
   char gname[32];     /* 297 */
   char devmajor[8];   /* 329 */
   char devminor[8];   /* 337 */
-  // prefer to alow longer names
   char prefix[155];   /* 345 */
                       /* 500 */
 } header_t;
@@ -45,8 +44,8 @@ typedef struct posix_header
 #define MAX_NAME_SIZE 100
 
 // VALUES IN OCTAL
-#define TUREAD 00400  /* read by owner */
-#define TUWRITE 00200 /* write by owner */
+#define TUREAD 00401  /* read by owner */
+#define TUWRITE 00202 /* write by owner */
 #define TUEXEC 00100  /* execute/search by owner */
 #define TGREAD 00040  /* read by group */
 #define TGWRITE 00020 /* write by group */
@@ -55,7 +54,16 @@ typedef struct posix_header
 #define TOWRITE 00002 /* write by other */
 #define TOEXEC 00001  /* execute/search by other */
 
-#define NA 00000 /* 0 if non applicable */
+/* typeflag field. */
+#define REGTYPE  '0'            /* regular file */
+#define AREGTYPE '\0'           /* regular file */
+#define LNKTYPE  '1'            /* link */
+#define SYMTYPE  '2'            /* reserved */
+#define CHRTYPE  '4'            /* character special */
+#define BLKTYPE  '4'            /* block special */
+#define DIRTYPE  '5'            /* directory */
+#define FIFOTYPE '6'            /* FIFO special */
+#define CONTTYPE '7'            /* reserved */
 
 /* Values used in typeflag field.  */
 #define REGTYPE '0'   /* regular file */
@@ -95,10 +103,13 @@ typedef enum
   ERRORF
 } bool_t;
 
+// ERRS
 #define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
 #define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
 #define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
 #define EXC_NAME_SIZE "my_tar: Filename exceeds maximum length of 200\n"
+#define STAT_ERR "Unable to read"
+#define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
 
 option_t check_option(char **format);
 
