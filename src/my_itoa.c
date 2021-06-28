@@ -1,5 +1,17 @@
 #include "my_tar.h"
 
+int my_atoi(char *str)
+{
+    int i = 0,
+        sum = 0;
+
+    for (i; isdigit(str[i]) == 1; ++i)
+    {
+        sum = (sum * 10) + str[i];
+    }
+    return sum;
+}
+
 void reverse(char str[], int length)
 {
     char temp_str[length];
@@ -21,7 +33,6 @@ void my_itoa(char *str, int num, int base)
     {
         str[idx] = '0';
         return;
-
     }
 
     while (num != 0)
