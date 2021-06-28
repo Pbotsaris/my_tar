@@ -52,20 +52,16 @@ typedef struct posix_header
 #define TOWRITE 00002 /* write by other */
 #define TOEXEC 00001  /* execute/search by other */
 
-#define NA 00000 /* 0 if non applicable */
-
 /* typeflag field. */
 #define REGTYPE  '0'            /* regular file */
 #define AREGTYPE '\0'           /* regular file */
 #define LNKTYPE  '1'            /* link */
 #define SYMTYPE  '2'            /* reserved */
-#define CHRTYPE  '3'            /* character special */
+#define CHRTYPE  '4'            /* character special */
 #define BLKTYPE  '4'            /* block special */
 #define DIRTYPE  '5'            /* directory */
 #define FIFOTYPE '6'            /* FIFO special */
 #define CONTTYPE '7'            /* reserved */
-
-
 
 header_t *create_header(char *path);
 
