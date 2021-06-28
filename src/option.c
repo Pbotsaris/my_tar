@@ -57,33 +57,30 @@ option_t check_option(char **format)
 
 	while (format[index])
 	{
-		if (format[index][0] == '-')
+		if (format[index][0] == '-' && (flag_opt = check_spam(flag_opt)) == NONE)
 		{
-			if ((flag_opt = check_spam(flag_opt)) == NONE)
+			if (strlen(format[index]) == 2 || (strlen(format[index]) == 3 && format[index][2] == 'f'))
 			{
-				if (strlen(format[index]) == 2 || (strlen(format[index]) == 3 && format[index][2] == 'f'))
+				switch (format[index][1])
 				{
-					switch (format[index][1])
-					{
-					case 'c':
-						flag_opt = c;
-						break;
-					case 't':
-						flag_opt = t;
-						break;
-					case 'r':
-						flag_opt = r;
-						break;
-					case 'u':
-						flag_opt = u;
-					case 'x':
-						flag_opt = x;
-						break;
-					}
+				case 'c':
+					flag_opt = c;
+					break;
+				case 't':
+					flag_opt = t;
+					break;
+				case 'r':
+					flag_opt = r;
+					break;
+				case 'u':
+					flag_opt = u;
+				case 'x':
+					flag_opt = x;
+					break;
 				}
-				else
-					flag_opt = ERROROPT;
 			}
+			else
+				flag_opt = ERROROPT;
 		}
 
 		flag_f = check_f(flag_f, flag_opt, format, index);

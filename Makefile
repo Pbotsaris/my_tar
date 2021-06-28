@@ -5,7 +5,7 @@ SRC =	src/my_tar.c    		\
 
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -W -Wno-implicit-fallthrough -g3 
+CFLAGS += -W -g3 
 
 CC = gcc -g -o
 
