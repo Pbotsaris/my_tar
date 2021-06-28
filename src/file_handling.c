@@ -1,4 +1,3 @@
-
 #include "my_tar.h"
 
 unsigned int checksum_calculator(char *header, size_t size)
@@ -14,13 +13,15 @@ unsigned int checksum_calculator(char *header, size_t size)
 	return check;
 }
 
-bool_t symlink_exists(const char *path)
+
+bool_t symlink_exists(const char* path)
 {
-	struct stat stats;
-	int result;
-	result = lstat(path, &stats);
-	return (result == 0);
+    struct stat stats;
+    int result;
+    result = lstat(path, &stats);
+    return (result == 0);
 }
+
 
 void checksum(header_t *header)
 {
@@ -58,52 +59,50 @@ void file_info(header_t *header, struct stat stats)
 		header->size[0] = '0';
 
 	/* [> Modified time in seconds <] */
-	//	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+//	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 
 	/* [> Check Sum <] */
 	//checksum(header);
 }
 
+
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-	my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
-	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+			  my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+			  my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
 }
 
-void add_filetype(header_t *header, struct stat stats, char *path)
+
+void add_filetype(header_t *header, struct stat stats, char * path)
 {
 
-	if (S_ISDIR(stats.st_mode))
-		header->typeflag = DIRTYPE;
-	else if (S_ISREG(stats.st_mode))
-	{
-		if (symlink_exists(path) == TRUE)
-			header->typeflag = SYMTYPE;
+	if(S_ISDIR(stats.st_mode))
+		 header->typeflag = DIRTYPE; 
+	else if(S_ISREG(stats.st_mode)){
+		if(symlink_exists(path) == TRUE)
+			header->typeflag =  SYMTYPE;
 		else
 			header->typeflag = REGTYPE;
 	}
-	else if (S_ISCHR(stats.st_mode))
-	{
-		header->typeflag = CHRTYPE;
+	else if(S_ISCHR(stats.st_mode)){
+		header->typeflag =CHRTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if (S_ISBLK(stats.st_mode))
-	{
+	else if(S_ISBLK(stats.st_mode)){
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if (S_ISFIFO(stats.st_mode))
+	else if(S_ISFIFO(stats.st_mode))
 		header->typeflag = FIFOTYPE;
-	else if (S_ISLNK(stats.st_mode))
-	{
-		header->typeflag = LNKTYPE;
+	else if(S_ISLNK(stats.st_mode)){
+		header->typeflag =  LNKTYPE;
 	}
 	// if not none above
-	else
-	{
-		header->typeflag = REGTYPE;
-		printf("%s\n", FLAGTYPE_ERR);
+	else{
+					header->typeflag = REGTYPE;
+			printf("%s\n", FLAGTYPE_ERR);
 	}
+		
 }
 
 void add_uname_gname(header_t *header, struct stat stats)
@@ -133,23 +132,21 @@ void add_mode(header_t *header, struct stat stats)
 
 void add_name(header_t *header, char *path)
 {
-	size_t path_len = strlen(path);
-	if (path_len < MAX_NAME_SIZE)
-	{
+  size_t path_len = strlen(path);
+  if(path_len < MAX_NAME_SIZE){
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
-	else if (path_len < MAX_NAME_SIZE * 2)
-	{
-		int split_pos = path_len - MAX_NAME_SIZE + 1;
+	else if(path_len < MAX_NAME_SIZE * 2){ 
+		int split_pos = path_len - MAX_NAME_SIZE + 1; 
 		printf("split pos %i\n", split_pos);
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
 		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
-	}
+		}
 	else
 		printf("%s", EXC_NAME_SIZE);
 }
