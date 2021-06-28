@@ -1,9 +1,13 @@
 #include "my_tar.h"
 #include "zlib.h"
 
+<<<<<<< HEAD
 #define STAT_ERR "Unable to read"
 
-unsigned int checksum_calculator(char *header, size_t size)
+=======
+>>>>>>> b423701c02c91672f130de7c07d62a7b4ce18782
+	unsigned int
+	checksum_calculator(char *header, size_t size)
 {
 	int index = 0,
 		check = 0;
@@ -59,6 +63,41 @@ void file_info(header_t *header, struct stat stats)
 	lstat(header->name, &stats);
 }
 
+void add_dev_major_minor(header_t *header, struct stat stats)
+{
+	my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+}
+
+void add_filetype(header_t *header, struct stat stats)
+{
+
+	if (S_ISDIR(stats.st_mode))
+		header->typeflag = DIRTYPE;
+	else if (S_ISREG(stats.st_mode))
+		header->typeflag = REGTYPE;
+	else if (S_ISCHR(stats.st_mode))
+	{
+		header->typeflag = CHRTYPE;
+		add_dev_major_minor(header, stats);
+	}
+	else if (S_ISBLK(stats.st_mode))
+	{
+		header->typeflag = BLKTYPE;
+		add_dev_major_minor(header, stats);
+	}
+	else if (S_ISFIFO(stats.st_mode))
+		header->typeflag = FIFOTYPE;
+	else if (S_ISLNK(stats.st_mode))
+		header->typeflag = SYMTYPE;
+	// if not none above
+	else
+	{
+		header->typeflag = REGTYPE;
+		printf("%s\n", FLAGTYPE_ERR);
+	}
+}
+
 void add_uname_gname(header_t *header, struct stat stats)
 {
 	struct passwd *pws;
@@ -84,54 +123,27 @@ void add_mode(header_t *header, struct stat stats)
 	my_itoa(header->mode, mode, OCTAL);
 }
 
-/* TODO: double check -
-		 * The name field is the file name of the file, with directory names (if any) preceding the file name, separated by slashes. */
 void add_name(header_t *header, char *path)
 {
-	/* name is prefix if more than 100 char */
 	size_t path_len = strlen(path);
 	if (path_len < MAX_NAME_SIZE)
 	{
+
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
 	else if (path_len < MAX_NAME_SIZE * 2)
 	{
-		strncpy(header->prefix, path, MAX_NAME_SIZE);
-		header->prefix[MAX_NAME_SIZE - 1] = '\0';
-		strncpy(header->name, &path[MAX_NAME_SIZE - 1], MAX_NAME_SIZE);
+		int split_pos = path_len - MAX_NAME_SIZE + 1;
+		printf("split pos %i\n", split_pos);
+		strncpy(header->prefix, path, split_pos);
+		header->prefix[split_pos] = '\0';
+		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
 	}
-
 	else
 		printf("%s", EXC_NAME_SIZE);
-}
-void compress_file(char *tar_name, char *zip_name)
-{
-	FILE *tar_file;
-	gzFile zip_file;
-	char buffer[128];
-	int num_read;
-
-	num_read = 0;
-	if ((tar_file = fopen(tar_name, "rb")) == NULL)
-		printf("error\n");
-	if ((zip_file = gzopen(zip_name, "wb")) == NULL)
-		printf("error\n");
-	while ((num_read = fread(buffer, 1, sizeof(buffer), tar_file)) > 0)
-		gzwrite(zip_file, buffer, num_read);
-	fclose(tar_file);
-	gzclose(zip_file);
-}
-
-void compress_tar(char *name)
-{
-	if (rename(name, "tmp.tar") == -1)
-		printf("error\n");
-	compress_file("tmp.tar", name);
-	if (remove("tmp.tar") == -1)
-		printf("error\n");
 }
 
 int archive(int argc, char **av)
@@ -150,9 +162,9 @@ header_t *create_header(char *path)
 
 		add_name(header, path);
 		add_mode(header, stats);
+		add_filetype(header, stats);
 		add_uname_gname(header, stats);
 		file_info(header, stats);
-		compress_tar(header->name);
 	}
 	else
 	{
