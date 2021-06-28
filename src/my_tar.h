@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/sysmacros.h>
+#include <ctype.h>
+#include <fcntl.h>
 
 /* ========================================================================= */
 
@@ -66,6 +68,8 @@ typedef struct posix_header
 #define CONTTYPE '7'  /* reserved */
 
 header_t *create_header(char *path);
+void archive(char *path, char **argv, int argc);
+int ls_tar(char *path);
 
 #endif
 
@@ -110,5 +114,6 @@ option_t check_option(char **format);
 #define MY_ITOA_H
 
 void my_itoa(char *str, int num, int base);
+int my_atoi(char *str);
 
 #endif
