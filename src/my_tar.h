@@ -65,7 +65,6 @@ typedef struct posix_header
 #define FIFOTYPE '6'            /* FIFO special */
 #define CONTTYPE '7'            /* reserved */
 
-
 header_t *create_header(char *path);
 
 #endif
