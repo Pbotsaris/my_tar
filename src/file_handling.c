@@ -49,7 +49,7 @@ void file_info(header_t *header, struct stat stats)
 		header->size[0] = '0';
 
 	/* [> Modified time in seconds <] */
-	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+//	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 
 	/* [> Check Sum <] */
 	checksum(header);
