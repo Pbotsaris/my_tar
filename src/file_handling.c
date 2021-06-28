@@ -1,7 +1,5 @@
 #include "my_tar.h"
 
-#define STAT_ERR "Unable to read"
-
 /*dev_t     st_dev;         [> ID of device containing file <]*/
 /*ino_t     st_ino;         [> Inode number <]*/
 /*mode_t    st_mode;        [> File type and mode <]*/
@@ -12,9 +10,6 @@
 /*off_t     st_size;        [> Total size, in bytes <]*/
 /*blksize_t st_blksize;     [> Block size for filesystem I/O <]*/
 /*blkcnt_t  st_blocks;      [> Number of 512B blocks allocated <]*/
-
-
-// S_ISDIR(stats.st_mode);
 
 void file_info(header_t *header, struct stat stats)
 {
@@ -32,6 +27,13 @@ void file_info(header_t *header, struct stat stats)
 }
 
 
+void add_dev_major_minor(header_t *header, struct  stat stats)
+{
+			  my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+			  my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+}
+
+
 void add_filetype(header_t *header, struct stat stats)
 {
 
@@ -39,14 +41,24 @@ void add_filetype(header_t *header, struct stat stats)
 		 header->typeflag = DIRTYPE; 
 	else if(S_ISREG(stats.st_mode))
 		header->typeflag = REGTYPE;
-	else if(S_ISCHR(stats.st_mode))
+	else if(S_ISCHR(stats.st_mode)){
 		header->typeflag =CHRTYPE;
-	else if(S_ISBLK(stats.st_mode))
+		add_dev_major_minor(header, stats);
+	}
+	else if(S_ISBLK(stats.st_mode)){
 		header->typeflag = BLKTYPE;
+		add_dev_major_minor(header, stats);
+	}
 	else if(S_ISFIFO(stats.st_mode))
 		header->typeflag = FIFOTYPE;
 	else if(S_ISLNK(stats.st_mode))
 		header->typeflag = SYMTYPE;
+	// if not none above
+	else{
+		header->typeflag = REGTYPE;
+		printf("%s\n", FLAGTYPE_ERR);
+	}
+		
 
 }
 
@@ -65,12 +77,8 @@ void add_mode(header_t *header, struct stat stats)
 	my_itoa(header->mode, mode, OCTAL);
 }
 
-
-		/* TODO: double check -
-		 * The name field is the file name of the file, with directory names (if any) preceding the file name, separated by slashes. */
 void add_name(header_t *header, char *path)
 {
-   /* name is prefix if more than 100 char */
   size_t path_len = strlen(path);
   if(path_len < MAX_NAME_SIZE){
 		strcpy(header->name, path);
@@ -78,12 +86,13 @@ void add_name(header_t *header, char *path)
 	}
 
 	else if(path_len < MAX_NAME_SIZE * 2){ 
-		strncpy(header->prefix, path, MAX_NAME_SIZE);
-		header->prefix[MAX_NAME_SIZE - 1] = '\0';
-		strncpy(header->name, &path[MAX_NAME_SIZE - 1], MAX_NAME_SIZE);
+		int split_pos = path_len - MAX_NAME_SIZE + 1; 
+		printf("split pos %i\n", split_pos);
+		strncpy(header->prefix, path, split_pos);
+		header->prefix[split_pos] = '\0';
+		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
 		}
-
 	 else
 		 printf("%s", EXC_NAME_SIZE);
 
@@ -100,7 +109,9 @@ header_t *create_header(char *path)
 
     add_name(header, path);
 		add_mode(header, stats);
+		add_filetype(header, stats);
 		file_info(header, stats);
+		
 	}
 	else
 	{

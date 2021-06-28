@@ -31,7 +31,6 @@ typedef struct posix_header
   char gname[32];     /* 297 */
   char devmajor[8];   /* 329 */
   char devminor[8];   /* 337 */
-  // prefer to alow longer names
   char prefix[155];   /* 345 */
                       /* 500 */
 } header_t;
@@ -90,10 +89,13 @@ typedef enum
   ERRORF
 } bool_t;
 
+// ERRS
 #define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
 #define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
 #define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
 #define EXC_NAME_SIZE "my_tar: Filename exceeds maximum length of 200\n"
+#define STAT_ERR "Unable to read"
+#define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
 
 option_t check_option(char **format);
 

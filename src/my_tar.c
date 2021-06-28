@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     }
 
     printf("name: %s\n prefix: %s\n", header->name, header->prefix);
+    printf("type %c\n", header->typeflag);
     printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\nLink: %s\n", header->mode, header->uid, header->gid, header->size, header->linkname);
 
     free(header);
