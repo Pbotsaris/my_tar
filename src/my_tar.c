@@ -40,15 +40,15 @@ int main(int argc, char *argv[])
     }
 
 
-    printf("name: %s\n prefix: %s\n", header->name, header->prefix);
+    printf("name: %s\nprefix: %s\n", header->name, header->prefix);
     printf("type: %c\n", header->typeflag);
     printf("dev minor: %s , dev major: %s\n", header->devminor, header->devmajor);
-    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\n", header->mode, header->uid, header->gid, header->size);
+    printf("USER ID: %s\nGROUP OWNER ID: %s\nSize: %s\n",  header->uid, header->gid, header->size);
     printf("Modified time in seconds: %s\n", header->mtime);
     printf("Link name: %s\n", header->linkname);
     printf("CHKSUM: %s\n", header->chksum); 
     printf("group name: %s\n user name: %s\n", header->gname, header->uname);
-    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\nSize: %s\nLink: %s\n", header->mode, header->uid, header->gid, header->size, header->linkname);
+    printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\n", header->mode, header->uid, header->gid);
 
     free(header);
 

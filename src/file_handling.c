@@ -13,20 +13,9 @@ unsigned int checksum_calculator(char *header, size_t size)
 	return check;
 }
 
-
-bool_t symlink_exists(const char* path)
-{
-    struct stat stats;
-    int result;
-    result = lstat(path, &stats);
-    return (result == 0);
-}
-
-
 void checksum(header_t *header)
 {
 	unsigned int check = 0;
-
 	check += checksum_calculator(header->name, 100);
 	check += checksum_calculator(header->mode, 10);
 	check += checksum_calculator(header->uid, 8);
@@ -46,25 +35,19 @@ void checksum(header_t *header)
 void file_info(header_t *header, struct stat stats)
 {
 
-	/* [> User ID of owner <] */
 	my_itoa(header->uid, stats.st_uid, DECIMAL);
-
-	/* [> Group ID of owner <] */
 	my_itoa(header->gid, stats.st_gid, DECIMAL);
-
-	/* [> Total size, in bytes <] */
 	if (stats.st_mode != S_IFLNK)
 		my_itoa(header->size, stats.st_size, DECIMAL);
 	else
 		header->size[0] = '0';
+	// OSX
+	//	my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
+	// LINUX
+		my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 
-	/* [> Modified time in seconds <] */
-//	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
-
-	/* [> Check Sum <] */
-	//checksum(header);
+			//	checksum(header);
 }
-
 
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
@@ -73,17 +56,29 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 }
 
 
+void add_link_or_regtype(header_t *header, char *path)
+{
+struct stat lstats;
+		if(lstat(path, &lstats)== 0){
+			header->typeflag =  SYMTYPE;
+			size_t buff_size  = (lstats.st_size /sizeof(char)) + 1;		
+			int num_bytes;
+			num_bytes = readlink(path, header->linkname, buff_size);
+			 header->linkname[buff_size+1] = '\0';
+		}
+		 else
+			header->typeflag = REGTYPE;
+}
+
 void add_filetype(header_t *header, struct stat stats, char * path)
 {
 
 	if(S_ISDIR(stats.st_mode))
 		 header->typeflag = DIRTYPE; 
-	else if(S_ISREG(stats.st_mode)){
-		if(symlink_exists(path) == TRUE)
-			header->typeflag =  SYMTYPE;
-		else
-			header->typeflag = REGTYPE;
-	}
+	else if(S_ISREG(stats.st_mode))
+   // symlink
+	 add_link_or_regtype(header, path);
+	
 	else if(S_ISCHR(stats.st_mode)){
 		header->typeflag =CHRTYPE;
 		add_dev_major_minor(header, stats);
@@ -141,7 +136,6 @@ void add_name(header_t *header, char *path)
 
 	else if(path_len < MAX_NAME_SIZE * 2){ 
 		int split_pos = path_len - MAX_NAME_SIZE + 1; 
-		printf("split pos %i\n", split_pos);
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
 		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
@@ -155,7 +149,6 @@ header_t *create_header(char *path)
 {
 	header_t *header;
 	header = (header_t *)malloc(sizeof(header_t));
-
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
