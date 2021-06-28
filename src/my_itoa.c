@@ -22,7 +22,6 @@ void my_itoa(char *str, int num, int base)
         str[idx] = '0';
         return;
 
-        // negative with base 10 only
     }
 
     while (num != 0)
