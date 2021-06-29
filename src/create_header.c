@@ -50,7 +50,6 @@ void add_link_or_regtype(header_t *header, char *path)
 	struct stat lstats;
 	if (lstat(path, &lstats) == 0 && S_IFLNK == (lstats.st_mode & S_IFMT))
 	{
-		printf("called inside\n");
 		header->typeflag = SYMTYPE;
 
 		size_t buff_size = (lstats.st_size / sizeof(char)) + 1;
@@ -168,9 +167,7 @@ void add_mtime(header_t *header, struct stat stats)
 }
 
 /*!
-
 	- Writes size in bytes to header->size.
-
 */
 void add_size(header_t *header, struct stat stats)
 {
@@ -267,8 +264,9 @@ header_t *create_header(char *path)
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
+		printf("%c\n", header->typeflag);
 		add_size(header, stats);
-		add_checksum(header);
+		// add_checksum(header);
 		strncpy(header->magic, TMAGIC, TMAGLEN);
 		strncpy(header->version, TVERSION, TVERSLEN);
 		add_uid_gid(header, stats);

@@ -27,7 +27,6 @@ void reverse(char str[], int length)
 
 void my_itoa(char *str, int num, int base)
 {
-    printf("Number coming in %d\n", num);
     int idx = 0;
     if (num == 0)
     {
@@ -44,6 +43,5 @@ void my_itoa(char *str, int num, int base)
     }
 
     reverse(str, idx);
-    printf("Number going out %s\n", str);
     str[idx] = '\0';
 }
