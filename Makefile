@@ -1,6 +1,7 @@
 SRC =	src/my_tar.c    		\
-		src/file_handling.c	 	\
+		src/create_header.c	 	\
 		src/my_itoa.c 			\
+		src/interface.c 			\
 		src/option.c	
 
 OBJ = $(SRC:.c=.o)
