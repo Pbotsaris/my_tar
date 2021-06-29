@@ -48,8 +48,11 @@ int main(int argc, char *argv[])
     // printf("CHKSUM: %s\n", header->chksum);
     // printf("group name: %s\n user name: %s\n", header->gname, header->uname);
     // printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\n", header->mode, header->uid, header->gid);
+    //
+
 
     printf("name: %s\nmode: %s\n", header->name, header->mode);
+    printf("size: %s\n", header->size);
     printf("uid:%s\ngid: %s\n", header->uid, header->gid);
     printf("gname: %s\nuname: %s\n", header->gname, header->uname);
     printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
