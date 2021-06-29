@@ -45,6 +45,11 @@ typedef struct posix_header
 #define DECIMAL 10
 #define MAX_NAME_SIZE 100
 
+#define TMAGIC "ustar" /* ustar and a null */
+#define TMAGLEN 6
+#define TVERSION "00" /* 00 and no null */
+#define TVERSLEN 3
+
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
 #define TUWRITE 00202 /* write by owner */
@@ -61,7 +66,7 @@ typedef struct posix_header
 #define AREGTYPE '\0' /* regular file */
 #define LNKTYPE '1'   /* link */
 #define SYMTYPE '2'   /* reserved */
-#define CHRTYPE '4'   /* character special */
+#define CHRTYPE '3'   /* character special */
 #define BLKTYPE '4'   /* block special */
 #define DIRTYPE '5'   /* directory */
 #define FIFOTYPE '6'  /* FIFO special */

@@ -1,10 +1,30 @@
 #include "my_tar.h"
 
+header_t *init(header_t *header)
+{
+	memset(header->name, '\0', sizeof(header->name));
+	memset(header->mode, '\0', sizeof(header->mode));
+	memset(header->uid, '\0', sizeof(header->uid));
+	memset(header->gid, '\0', sizeof(header->gid));
+	memset(header->size, '\0', sizeof(header->size));
+	memset(header->mtime, '\0', sizeof(header->mtime));
+	memset(header->chksum, '\0', sizeof(header->chksum));
+	memset(header->linkname, '\0', sizeof(header->linkname));
+	memset(header->magic, '\0', sizeof(header->magic));
+	memset(header->version, '\0', TVERSLEN);
+	memset(header->uname, '\0', sizeof(header->uname));
+	memset(header->gname, '\0', sizeof(header->gname));
+	memset(header->devmajor, '\0', sizeof(header->devmajor));
+	memset(header->devminor, '\0', sizeof(header->devminor));
+	memset(header->prefix, '\0', sizeof(header->prefix));
+	return header;
+}
+
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
-	 - add devmajor and devminor when file type is a block or char special
- 
+	- add devmajor and devminor when file type is a block or char special
+
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
@@ -15,9 +35,9 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
-	 - check if file is either a symlink or regular file.
-	 - If symlink writes to header->linkname
- 
+	- check if file is either a symlink or regular file.
+	- If symlink writes to header->linkname
+
 */
 void add_link_or_regtype(header_t *header, char *path)
 {
@@ -25,19 +45,22 @@ void add_link_or_regtype(header_t *header, char *path)
 	if (lstat(path, &lstats) == 0)
 	{
 		header->typeflag = SYMTYPE;
+
 		size_t buff_size = (lstats.st_size / sizeof(char)) + 1;
 		int num_bytes;
 		num_bytes = readlink(path, header->linkname, buff_size);
 		header->linkname[buff_size + 1] = '\0';
 	}
 	else
+	{
 		header->typeflag = REGTYPE;
+	}
 }
 
 /*!
 	
-	 - Checks file type and wrties to header->typeflag
- 
+	- Checks file type and wrties to header->typeflag
+
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -75,8 +98,8 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 /*!
 	
 	 HELPER TO: add_checksum(header_t *header);
-	 -  Calculate checksum base on header item size and returns it.
- 
+		-  Calculate checksum base on header item size and returns it.
+
 */
 unsigned int checksum_calculator(char *header, size_t size)
 {
@@ -92,9 +115,9 @@ unsigned int checksum_calculator(char *header, size_t size)
 }
 
 /*!
- 
-	 -  Calculate checksum and writes to  header->chksum
- 
+
+	-  Calculate checksum and writes to  header->chksum
+
 */
 void add_checksum(header_t *header)
 {
@@ -115,17 +138,17 @@ void add_checksum(header_t *header)
 	sprintf(header->chksum, "%0*o ", 8, check);
 }
 
-void add_gid_gid(header_t *header, struct stat stats)
+void add_uid_gid(header_t *header, struct stat stats)
 {
 	my_itoa(header->uid, stats.st_uid, DECIMAL);
 	my_itoa(header->gid, stats.st_gid, DECIMAL);
 }
 
 /*!
- 
-	 - Check OS for relevant mtime field.
-	 - Writes modified time in seconds to header->mtime
- 
+
+	- Check OS for relevant mtime field.
+	- Writes modified time in seconds to header->mtime
+
 */
 void add_mtime(header_t *header, struct stat stats)
 {
@@ -138,9 +161,9 @@ void add_mtime(header_t *header, struct stat stats)
 }
 
 /*!
- 
-	 - Writes size in bytes to header->size.
- 
+
+	- Writes size in bytes to header->size.
+
 */
 void add_size(header_t *header, struct stat stats)
 {
@@ -163,8 +186,8 @@ void add_uname_gname(header_t *header, struct stat stats)
 	pws = getpwuid(stats.st_uid);
 	grp = getgrgid(stats.st_gid);
 
-	strcpy(header->gname, grp->gr_name);
-	strcpy(header->uname, pws->pw_name);
+	strncpy(header->gname, grp->gr_name, sizeof(header->gname));
+	strncpy(header->uname, pws->pw_name, sizeof(header->uname));
 }
 
 /*!
@@ -182,7 +205,8 @@ void add_mode(header_t *header, struct stat stats)
 
 	for (int i = 0; i < NUM_MODES; ++i)
 		if (stats.st_mode & stats_modes[i])
-			mode = mode + modes[i];
+
+			mode += stats_modes[i];
 
 	my_itoa(header->mode, mode, OCTAL);
 }
@@ -214,16 +238,15 @@ void add_name(header_t *header, char *path)
 		printf("%s", EXC_NAME_SIZE);
 }
 
-/********************************************/ /********************************************************************
- *  Create Header																																																	*
- *  																																																							* 
- *   - Using the path passed in as first argument, create_header creates a tar struct following the								*
- *  	 GNU basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html									*
- *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.																*
- *   - This header struct adds a trailing null to every field																											*
- *																																																								*
- ***************************************************************/
-											   /************************************************/
+/********************************************/ /****************************************************************
+ *  Create Header																								*																									*
+ *  																											*																												* 
+ *   - Using the path passed in as first argument, create_header creates a tar struct following the				*				
+ *  	 GNU basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
+ *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.								*							
+ *   - This header struct adds a trailing null to every field													*														
+ *																												*																												*
+ ***************************************************************************************************************/
 
 header_t *create_header(char *path)
 {
@@ -232,14 +255,17 @@ header_t *create_header(char *path)
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
+		header = init(header);
 		add_name(header, path);
-		add_gid_gid(header, stats);
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
-		add_uname_gname(header, stats);
 		add_size(header, stats);
-		//		add_checksum(header);
+		add_checksum(header);
+		strncpy(header->magic, TMAGIC, TMAGLEN);
+		strncpy(header->version, TVERSION, TVERSLEN);
+		add_uid_gid(header, stats);
+		add_uname_gname(header, stats);
 	}
 	else
 	{
