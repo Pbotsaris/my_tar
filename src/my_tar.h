@@ -10,7 +10,7 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-//#include <sys/sysmacros.h>
+#include <sys/sysmacros.h>
 #include <ctype.h>
 #include <fcntl.h>
 
@@ -23,7 +23,7 @@
 #define DECIMAL 10
 
 #define TMAGIC "ustar" /* ustar and a null */
-#define TVERSION "00" /* 00 and no null */
+#define TVERSION "00"  /* 00 and no null */
 
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
@@ -51,7 +51,7 @@
 #define MODELEN 8 
 #define UIDLEN 8
 #define GIDLEN 8
-#define SIZELEN 12 
+#define SIZELEN 12
 #define MTIMELEN 12
 #define CHKSUMLEN 8
 #define LINKNAMELEN 100
@@ -69,23 +69,23 @@
 
 typedef struct posix_header
 {                     /* byte offset */
-  char name[NAMELEN];     /*   0 */
-  char mode[MODELEN];      
-  char uid[UIDLEN];        /* 108 */
-  char gid[GIDLEN];        /* 116 */
-  char size[SIZELEN];      /* 124 */
-  char mtime[MTIMELEN];     /* 136 */
+  char name[NAMELEN]; /*   0 */
+  char mode[MODELEN];
+  char uid[UIDLEN];           /* 108 */
+  char gid[GIDLEN];           /* 116 */
+  char size[SIZELEN];         /* 124 */
+  char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;      /* 156 */
+  char typeflag;              /* 156 */
   char linkname[LINKNAMELEN]; /* 157 */
-  char magic[TMAGLEN];      /* 257 */
-  char version[TVERSLEN];    /* 263 */
-  char uname[UNAMELEN];     /* 265 */
-  char gname[GNAMELEN];     /* 297 */
-  char devmajor[DEVMAJORLEN];   /* 329 */
-  char devminor[DEVMINORLEN];   /* 337 */
-  char prefix[PREFIXLEN];   /* 345 */
-                      /* 500 */
+  char magic[TMAGLEN];        /* 257 */
+  char version[TVERSLEN];     /* 263 */
+  char uname[UNAMELEN];       /* 265 */
+  char gname[GNAMELEN];       /* 297 */
+  char devmajor[DEVMAJORLEN]; /* 329 */
+  char devminor[DEVMINORLEN]; /* 337 */
+  char prefix[PREFIXLEN];     /* 345 */
+                              /* 500 */
 } header_t;
 
 header_t *create_header(char *path);

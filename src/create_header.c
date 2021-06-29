@@ -19,6 +19,7 @@ void fill_zeros(char *field, int len, int total_len)
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- add devmajor and devminor when file type is a block or char special
+
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
@@ -33,6 +34,7 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- check if file is either a symlink or regular file.
 	- If symlink writes to header->linkname
+
 */
 void add_link_or_regtype(header_t *header, char *path)
 {
@@ -94,6 +96,7 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	
 	 HELPER TO: add_checksum(header_t *header);
 		-  Calculate checksum base on header item size and returns it.
+
 */
 unsigned int checksum_calculator(char *header, size_t size)
 {
@@ -109,7 +112,9 @@ unsigned int checksum_calculator(char *header, size_t size)
 }
 
 /*!
+
 	-  Calculate checksum and writes to  header->chksum
+
 */
 void add_checksum(header_t *header)
 {
@@ -139,8 +144,10 @@ void add_uid_gid(header_t *header, struct stat stats)
 }
 
 /*!
+
 	- Check OS for relevant mtime field.
 	- Writes modified time in seconds to header->mtime
+
 */
 void add_mtime(header_t *header, struct stat stats)
 {
@@ -180,7 +187,7 @@ void add_uname_gname(header_t *header, struct stat stats)
 	struct passwd *pws;
 	struct group *grp;
 	pws = getpwuid(stats.st_uid);
-		grp = getgrgid(stats.st_gid);
+	grp = getgrgid(stats.st_gid);
 
 	strcpy(header->gname, grp->gr_name);
 	strcpy(header->uname, pws->pw_name);
@@ -235,10 +242,10 @@ void add_name(header_t *header, char *path)
 
 void add_magic_version(header_t *header)
 {
-		strncpy(header->magic, TMAGIC, TMAGLEN);
-		header->magic[TMAGLEN - 1] = '\0';
-		strncpy(header->version, TVERSION, TVERSLEN);
-	  header->version[TVERSLEN - 1] = '\0';	
+	strncpy(header->magic, TMAGIC, TMAGLEN);
+	header->magic[TMAGLEN - 1] = '\0';
+	strncpy(header->version, TVERSION, TVERSLEN);
+	header->version[TVERSLEN - 1] = '\0';
 }
 
 /********************************************/ /****************************************************************
@@ -263,7 +270,7 @@ header_t *create_header(char *path)
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
-//		add_checksum(header);
+		//	add_checksum(header);
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
