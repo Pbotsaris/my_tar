@@ -48,7 +48,7 @@
 #define CONTTYPE '7'  /* reserved */
 
 #define NAMELEN 100
-#define MODELEN 10
+#define MODELEN 8 
 #define UIDLEN 8
 #define GIDLEN 8
 #define SIZELEN 12
@@ -62,6 +62,7 @@
 #define DEVMAJORLEN 8
 #define DEVMINORLEN 8
 #define PREFIXLEN 155
+
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
@@ -133,7 +134,7 @@ option_t check_option(char **format);
 #ifndef MY_ITOA_H
 #define MY_ITOA_H
 
-void my_itoa(char *str, int num, int base);
+int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
 
 #endif
