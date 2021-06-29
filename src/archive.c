@@ -1,13 +1,5 @@
 #include "my_tar.h"
 
-int check_byte(int block)
-{
-	if (block == 512)
-		return 0;
-	else
-		return (512 - (block % 512));
-}
-
 void tar(char *path, FILE *dest)
 {
 
@@ -36,13 +28,6 @@ void tar(char *path, FILE *dest)
 
 		fwrite(buffer, buff_size, 1, dest);
 
-		byte_block = check_byte(my_atoi(header.size));
-		if (byte_block != 0)
-		{
-			char *zip = malloc(sizeof(char) * byte_block);
-			fwrite(zip, byte_block, 1, dest);
-			free(zip);
-		}
 		free(buffer);
 		close(fd);
 	}
@@ -74,5 +59,8 @@ void archive(char *path, char **argv, int argc)
 		lseek(fd, 0, SEEK_SET);
 		tar(argv[index], dest);
 		index++;
+		close(fd);
 	}
+
+	fclose(dest);
 }
