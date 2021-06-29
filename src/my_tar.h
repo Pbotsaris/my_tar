@@ -53,11 +53,11 @@
 #define GIDLEN 8
 #define SIZELEN 12 
 #define MTIMELEN 12
+#define CHKSUMLEN 8
 #define LINKNAMELEN 100
+#define TMAGLEN 6
 #define UNAMELEN 32
 #define GNAMELEN 32
-#define CHKSUMLEN 8
-#define TMAGLEN 6
 #define TVERSLEN 3
 #define DEVMAJORLEN 8
 #define DEVMINORLEN 8
