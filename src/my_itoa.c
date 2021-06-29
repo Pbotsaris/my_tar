@@ -6,9 +6,8 @@ int my_atoi(char *str)
         sum = 0;
 
     for (i; isdigit(str[i]) == 1; ++i)
-    {
         sum = (sum * 10) + str[i];
-    }
+
     return sum;
 }
 

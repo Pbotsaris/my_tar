@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
     // printf("Link name: %s\n", header->linkname);
     // printf("CHKSUM: %s\n", header->chksum);
     // printf("group name: %s\n user name: %s\n", header->gname, header->uname);
-    // ls_tar(argv[1]);
     free(header);
 
     return 0;
