@@ -10,7 +10,9 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <sys/sysmacros.h>
+#include <ctype.h>
+#include <fcntl.h>
 
 /* ========================================================================= */
 
@@ -43,6 +45,11 @@ typedef struct posix_header
 #define DECIMAL 10
 #define MAX_NAME_SIZE 100
 
+#define TMAGIC "ustar" /* ustar and a null */
+#define TMAGLEN 6
+#define TVERSION "00" /* 00 and no null */
+#define TVERSLEN 3
+
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
 #define TUWRITE 00202 /* write by owner */
@@ -55,17 +62,19 @@ typedef struct posix_header
 #define TOEXEC 00001  /* execute/search by other */
 
 /* typeflag field. */
-#define REGTYPE  '0'            /* regular file */
-#define AREGTYPE '\0'           /* regular file */
-#define LNKTYPE  '1'            /* link */
-#define SYMTYPE  '2'            /* reserved */
-#define CHRTYPE  '3'            /* character special */
-#define BLKTYPE  '4'            /* block special */
-#define DIRTYPE  '5'            /* directory */
-#define FIFOTYPE '6'            /* FIFO special */
-#define CONTTYPE '7'            /* reserved */
+#define REGTYPE '0'   /* regular file */
+#define AREGTYPE '\0' /* regular file */
+#define LNKTYPE '1'   /* link */
+#define SYMTYPE '2'   /* reserved */
+#define CHRTYPE '3'   /* character special */
+#define BLKTYPE '4'   /* block special */
+#define DIRTYPE '5'   /* directory */
+#define FIFOTYPE '6'  /* FIFO special */
+#define CONTTYPE '7'  /* reserved */
 
 header_t *create_header(char *path);
+void archive(char *path, char **argv, int argc);
+int ls_tar(char *path);
 
 #endif
 
@@ -101,7 +110,6 @@ typedef enum
 #define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
 
 option_t check_option(char **format);
-int archive(header_t *header);
 
 #endif
 
@@ -111,5 +119,6 @@ int archive(header_t *header);
 #define MY_ITOA_H
 
 void my_itoa(char *str, int num, int base);
+int my_atoi(char *str);
 
 #endif
