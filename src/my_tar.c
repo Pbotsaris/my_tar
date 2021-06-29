@@ -49,8 +49,10 @@ int main(int argc, char *argv[])
     // printf("group name: %s\n user name: %s\n", header->gname, header->uname);
     // printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\n", header->mode, header->uid, header->gid);
 
-    printf("name: %s\nmode: %s\nuid: ( %s/%s)\ngid: ( %s/%s)\n", header->name, header->mode, header->uid, header->uname, header->gid, header->gname);
-    printf("time modified: %s\nchecksum: %s\ntypeflag: %d\n", header->mtime, header->chksum, header->typeflag);
+    printf("name: %s\nmode: %s\n", header->name, header->mode);
+    printf("uid:%s\ngid: %s\n", header->uid, header->gid);
+    printf("gname: %s\nuname: %s\n", header->gname, header->uname);
+    printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
     printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
     printf("devmajor: %s, devminor %s\n", header->devmajor, header->devminor);
     printf("Prefix: %s\n", header->prefix);

@@ -10,7 +10,7 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/sysmacros.h>
+//#include <sys/sysmacros.h>
 #include <ctype.h>
 #include <fcntl.h>
 
@@ -18,6 +18,10 @@
 
 #ifndef MY_TAR_H
 #define MY_TAR_H
+
+
+#define TMAGLEN 6
+#define TVERSLEN 3
 
 typedef struct posix_header
 {                     /* byte offset */
@@ -30,8 +34,8 @@ typedef struct posix_header
   char chksum[8];     /* 148 */
   char typeflag;      /* 156 */
   char linkname[100]; /* 157 */
-  char magic[6];      /* 257 */
-  char version[2];    /* 263 */
+  char magic[TMAGLEN];      /* 257 */
+  char version[TVERSLEN];    /* 263 */
   char uname[32];     /* 265 */
   char gname[32];     /* 297 */
   char devmajor[8];   /* 329 */
@@ -40,15 +44,14 @@ typedef struct posix_header
                       /* 500 */
 } header_t;
 
+
 #define NUM_MODES 9
 #define OCTAL 8
 #define DECIMAL 10
 #define MAX_NAME_SIZE 100
 
 #define TMAGIC "ustar" /* ustar and a null */
-#define TMAGLEN 6
 #define TVERSION "00" /* 00 and no null */
-#define TVERSLEN 3
 
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
