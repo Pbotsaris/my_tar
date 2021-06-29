@@ -1,5 +1,5 @@
 SRC =	src/my_tar.c    		\
-		src/file_handling.c	 	\
+		src/create_header.c	 	\
 		src/my_itoa.c 			\
 		src/option.c	
 
