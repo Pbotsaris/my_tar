@@ -59,7 +59,7 @@ typedef struct posix_header
 #define AREGTYPE '\0'           /* regular file */
 #define LNKTYPE  '1'            /* link */
 #define SYMTYPE  '2'            /* reserved */
-#define CHRTYPE  '4'            /* character special */
+#define CHRTYPE  '3'            /* character special */
 #define BLKTYPE  '4'            /* block special */
 #define DIRTYPE  '5'            /* directory */
 #define FIFOTYPE '6'            /* FIFO special */
@@ -101,6 +101,7 @@ typedef enum
 #define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
 
 option_t check_option(char **format);
+int archive(header_t *header);
 
 #endif
 
