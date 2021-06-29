@@ -22,8 +22,9 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 void add_link_or_regtype(header_t *header, char *path)
 {
 	struct stat lstats;
-	if (lstat(path, &lstats) == 0)
+	if (lstat(path, &lstats) == 0 && S_IFLNK == (lstats.st_mode & S_IFMT))
 	{
+		printf("called inside\n");
 		header->typeflag = SYMTYPE;
 		size_t buff_size = (lstats.st_size / sizeof(char)) + 1;
 		int num_bytes;
