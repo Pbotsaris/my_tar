@@ -8,10 +8,9 @@
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-			  my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
-			  my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+	my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
 }
-
 
 /*!
 	
@@ -22,16 +21,17 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 */
 void add_link_or_regtype(header_t *header, char *path)
 {
-struct stat lstats;
-		if(lstat(path, &lstats)== 0){
-			header->typeflag =  SYMTYPE;
-			size_t buff_size  = (lstats.st_size /sizeof(char)) + 1;		
-			int num_bytes;
-			num_bytes = readlink(path, header->linkname, buff_size);
-			 header->linkname[buff_size+1] = '\0';
-		}
-		 else
-			header->typeflag = REGTYPE;
+	struct stat lstats;
+	if (lstat(path, &lstats) == 0)
+	{
+		header->typeflag = SYMTYPE;
+		size_t buff_size = (lstats.st_size / sizeof(char)) + 1;
+		int num_bytes;
+		num_bytes = readlink(path, header->linkname, buff_size);
+		header->linkname[buff_size + 1] = '\0';
+	}
+	else
+		header->typeflag = REGTYPE;
 }
 
 /*!
@@ -39,34 +39,37 @@ struct stat lstats;
 	 - Checks file type and wrties to header->typeflag
  
 */
-void add_typeflag(header_t *header, struct stat stats, char * path)
+void add_typeflag(header_t *header, struct stat stats, char *path)
 {
 
-	if(S_ISDIR(stats.st_mode))
-		 header->typeflag = DIRTYPE; 
-	else if(S_ISREG(stats.st_mode))
-   // symlink
-	 add_link_or_regtype(header, path);
-	
-	else if(S_ISCHR(stats.st_mode)){
-		header->typeflag =CHRTYPE;
+	if (S_ISDIR(stats.st_mode))
+		header->typeflag = DIRTYPE;
+	else if (S_ISREG(stats.st_mode))
+		// symlink
+		add_link_or_regtype(header, path);
+
+	else if (S_ISCHR(stats.st_mode))
+	{
+		header->typeflag = CHRTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if(S_ISBLK(stats.st_mode)){
+	else if (S_ISBLK(stats.st_mode))
+	{
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if(S_ISFIFO(stats.st_mode))
+	else if (S_ISFIFO(stats.st_mode))
 		header->typeflag = FIFOTYPE;
-	else if(S_ISLNK(stats.st_mode)){
-		header->typeflag =  LNKTYPE;
+	else if (S_ISLNK(stats.st_mode))
+	{
+		header->typeflag = LNKTYPE;
 	}
 	// if not none above
-	else{
-					header->typeflag = REGTYPE;
-			printf("%s\n", FLAGTYPE_ERR);
+	else
+	{
+		header->typeflag = REGTYPE;
+		printf("%s\n", FLAGTYPE_ERR);
 	}
-		
 }
 
 /*!
@@ -128,9 +131,9 @@ void add_mtime(header_t *header, struct stat stats)
 {
 	// CHECK OS
 #if __APPLE__
-		my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
+	my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
 #elif __linux__
-		my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+	my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 #endif
 }
 
@@ -142,11 +145,10 @@ void add_mtime(header_t *header, struct stat stats)
 void add_size(header_t *header, struct stat stats)
 {
 
-if (stats.st_mode != S_IFLNK)
+	if (stats.st_mode != S_IFLNK)
 		my_itoa(header->size, stats.st_size, DECIMAL);
 	else
 		header->size[0] = '0';
-
 }
 
 /*!
@@ -192,25 +194,27 @@ void add_mode(header_t *header, struct stat stats)
 */
 void add_name(header_t *header, char *path)
 {
-  size_t path_len = strlen(path);
-  if(path_len < MAX_NAME_SIZE){
+	size_t path_len = strlen(path);
+	if (path_len < MAX_NAME_SIZE)
+	{
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
-	else if(path_len < MAX_NAME_SIZE * 2){ 
-		int split_pos = path_len - MAX_NAME_SIZE + 1; 
+	else if (path_len < MAX_NAME_SIZE * 2)
+	{
+		int split_pos = path_len - MAX_NAME_SIZE + 1;
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
 		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
 		header->name[MAX_NAME_SIZE - 1] = '\0';
-		}
+	}
 	else
 		printf("%s", EXC_NAME_SIZE);
 }
 
-/********************************************//********************************************************************
+/********************************************/ /********************************************************************
  *  Create Header																																																	*
  *  																																																							* 
  *   - Using the path passed in as first argument, create_header creates a tar struct following the								*
@@ -218,7 +222,8 @@ void add_name(header_t *header, char *path)
  *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.																*
  *   - This header struct adds a trailing null to every field																											*
  *																																																								*
- ***************************************************************//************************************************/
+ ***************************************************************/
+											   /************************************************/
 
 header_t *create_header(char *path)
 {
@@ -234,8 +239,10 @@ header_t *create_header(char *path)
 		add_typeflag(header, stats, path);
 		add_uname_gname(header, stats);
 		add_size(header, stats);
-//		add_checksum(header);
-	} else {
+		//		add_checksum(header);
+	}
+	else
+	{
 		printf("%s %s\n", STAT_ERR, path);
 	}
 	return header;
