@@ -196,10 +196,10 @@ void add_mode(header_t *header, struct stat stats)
 {
 	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
-	int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
-	int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+	int modes[MODELEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+	int stats_modes[MODELEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < NUM_MODES; ++i)
+	for (int i = 0; i < MODELEN; ++i)
 		if (stats.st_mode & stats_modes[i])
 
 			mode += stats_modes[i];
@@ -215,20 +215,20 @@ void add_mode(header_t *header, struct stat stats)
 void add_name(header_t *header, char *path)
 {
 	size_t path_len = strlen(path);
-	if (path_len < MAX_NAME_SIZE)
+	if (path_len < NAMELEN)
 	{
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
-	else if (path_len < MAX_NAME_SIZE * 2)
+	else if (path_len < NAMELEN * 2)
 	{
-		int split_pos = path_len - MAX_NAME_SIZE + 1;
+		int split_pos = path_len - NAMELEN + 1;
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
-		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
-		header->name[MAX_NAME_SIZE - 1] = '\0';
+		strncpy(header->name, &path[split_pos], NAMELEN);
+		header->name[NAMELEN - 1] = '\0';
 	}
 	else
 		printf("%s", EXC_NAME_SIZE);

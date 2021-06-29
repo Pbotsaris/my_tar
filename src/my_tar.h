@@ -19,39 +19,8 @@
 #ifndef MY_TAR_H
 #define MY_TAR_H
 
-
-#define TMAGLEN 6
-#define TVERSLEN 3
-
-// The name, linkname, magic, uname, and gname are null-terminated
-// All other fields are zero-filled octal numbers in ASCII
-
-typedef struct posix_header
-{                     /* byte offset */
-  char name[100];     /*   0 */
-  char mode[10];      // changed by PB - 9 modes + 9 char each
-  char uid[8];        /* 108 */
-  char gid[8];        /* 116 */
-  char size[12];      /* 124 */
-  char mtime[12];     /* 136 */
-  char chksum[8];     /* 148 */
-  char typeflag;      /* 156 */
-  char linkname[100]; /* 157 */
-  char magic[TMAGLEN];      /* 257 */
-  char version[TVERSLEN];    /* 263 */
-  char uname[32];     /* 265 */
-  char gname[32];     /* 297 */
-  char devmajor[8];   /* 329 */
-  char devminor[8];   /* 337 */
-  char prefix[155];   /* 345 */
-                      /* 500 */
-} header_t;
-
-
-#define NUM_MODES 9
 #define OCTAL 8
 #define DECIMAL 10
-#define MAX_NAME_SIZE 100
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00" /* 00 and no null */
@@ -77,6 +46,46 @@ typedef struct posix_header
 #define DIRTYPE '5'   /* directory */
 #define FIFOTYPE '6'  /* FIFO special */
 #define CONTTYPE '7'  /* reserved */
+
+#define NAMELEN 100
+#define MODELEN 10
+#define UIDLEN 8
+#define GIDLEN 8
+#define SIZELEN 12 
+#define MTIMELEN 12
+#define LINKNAMELEN 100
+#define UNAMELEN 32
+#define GNAMELEN 32
+#define CHKSUMLEN 8
+#define TMAGLEN 6
+#define TVERSLEN 3
+#define DEVMAJORLEN 8
+#define DEVMINORLEN 8
+#define PREFIXLEN 155
+
+// The name, linkname, magic, uname, and gname are null-terminated
+// All other fields are zero-filled octal numbers in ASCII
+
+typedef struct posix_header
+{                     /* byte offset */
+  char name[NAMELEN];     /*   0 */
+  char mode[MODELEN];      
+  char uid[UIDLEN];        /* 108 */
+  char gid[GIDLEN];        /* 116 */
+  char size[SIZELEN];      /* 124 */
+  char mtime[MTIMELEN];     /* 136 */
+  char chksum[CHKSUMLEN];     /* 148 */
+  char typeflag;      /* 156 */
+  char linkname[LINKNAMELEN]; /* 157 */
+  char magic[TMAGLEN];      /* 257 */
+  char version[TVERSLEN];    /* 263 */
+  char uname[UNAMELEN];     /* 265 */
+  char gname[GNAMELEN];     /* 297 */
+  char devmajor[DEVMAJORLEN];   /* 329 */
+  char devminor[DEVMINORLEN];   /* 337 */
+  char prefix[PREFIXLEN];   /* 345 */
+                      /* 500 */
+} header_t;
 
 header_t *create_header(char *path);
 void archive(char *path, char **argv, int argc);
