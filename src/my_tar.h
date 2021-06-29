@@ -23,6 +23,9 @@
 #define TMAGLEN 6
 #define TVERSLEN 3
 
+// The name, linkname, magic, uname, and gname are null-terminated
+// All other fields are zero-filled octal numbers in ASCII
+
 typedef struct posix_header
 {                     /* byte offset */
   char name[100];     /*   0 */

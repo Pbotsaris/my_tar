@@ -180,7 +180,7 @@ void add_uname_gname(header_t *header, struct stat stats)
 	struct passwd *pws;
 	struct group *grp;
 	pws = getpwuid(stats.st_uid);
-	grp = getgrgid(stats.st_gid);
+		grp = getgrgid(stats.st_gid);
 
 	strcpy(header->gname, grp->gr_name);
 	strcpy(header->uname, pws->pw_name);
@@ -269,6 +269,7 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
+		printf("%s", TMAGIC);
 	}
 	else
 	{
