@@ -190,8 +190,8 @@ void add_uname_gname(header_t *header, struct stat stats)
 	pws = getpwuid(stats.st_uid);
 	grp = getgrgid(stats.st_gid);
 
-	strncpy(header->gname, grp->gr_name, sizeof(header->gname));
-	strncpy(header->uname, pws->pw_name, sizeof(header->uname));
+	strcpy(header->gname, grp->gr_name);
+	strcpy(header->uname, pws->pw_name);
 }
 
 /*!
@@ -204,10 +204,10 @@ void add_mode(header_t *header, struct stat stats)
 {
 	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
-	int modes[NUM_MODES] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
-	int stats_modes[NUM_MODES] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+	int modes[MODELEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+	int stats_modes[MODELEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < NUM_MODES; ++i)
+	for (int i = 0; i < MODELEN; ++i)
 		if (stats.st_mode & stats_modes[i])
 
 			mode += stats_modes[i];
@@ -223,23 +223,31 @@ void add_mode(header_t *header, struct stat stats)
 void add_name(header_t *header, char *path)
 {
 	size_t path_len = strlen(path);
-	if (path_len < MAX_NAME_SIZE)
+	if (path_len < NAMELEN)
 	{
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 	}
 
-	else if (path_len < MAX_NAME_SIZE * 2)
+	else if (path_len < NAMELEN * 2)
 	{
-		int split_pos = path_len - MAX_NAME_SIZE + 1;
+		int split_pos = path_len - NAMELEN + 1;
 		strncpy(header->prefix, path, split_pos);
 		header->prefix[split_pos] = '\0';
-		strncpy(header->name, &path[split_pos], MAX_NAME_SIZE);
-		header->name[MAX_NAME_SIZE - 1] = '\0';
+		strncpy(header->name, &path[split_pos], NAMELEN);
+		header->name[NAMELEN - 1] = '\0';
 	}
 	else
 		printf("%s", EXC_NAME_SIZE);
+}
+
+void add_magic_version(header_t *header)
+{
+	strncpy(header->magic, TMAGIC, TMAGLEN);
+	header->magic[TMAGLEN - 1] = '\0';
+	strncpy(header->version, TVERSION, TVERSLEN);
+	header->version[TVERSLEN - 1] = '\0';
 }
 
 /********************************************/ /****************************************************************
@@ -264,11 +272,11 @@ header_t *create_header(char *path)
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
-		printf("%c\n", header->typeflag);
 		add_size(header, stats);
-		// add_checksum(header);
 		strncpy(header->magic, TMAGIC, TMAGLEN);
 		strncpy(header->version, TVERSION, TVERSLEN);
+		//	add_checksum(header);
+		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
 	}

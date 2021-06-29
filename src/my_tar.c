@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         if (argv[i][0] == '-')
             continue;
 
-        header = create_header(argv[i]);
+        // header = create_header(argv[i]);
     }
 
     // printf("name: %s\nprefix: %s\n", header->name, header->prefix);
@@ -48,12 +48,13 @@ int main(int argc, char *argv[])
     // printf("CHKSUM: %s\n", header->chksum);
     // printf("group name: %s\n user name: %s\n", header->gname, header->uname);
     // printf("mode in char(octal): %s\nUSER ID: %s\nGROUP OWNER ID: %s\n", header->mode, header->uid, header->gid);
+    archive(argv[1], argv, argc);
 
-    printf("name: %s\nmode: %s\nuid: ( %s/%s)\ngid: ( %s/%s)\nSize: %s\n", header->name, header->mode, header->uid, header->uname, header->gid, header->gname, header->size);
-    printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
-    printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
-    printf("devmajor: %s,devminor: %s\n", header->devmajor, header->devminor);
-    printf("Prefix: %s\n", header->prefix);
+    // printf("name: %s\nmode: %s\nuid: ( %s/%s)\ngid: ( %s/%s)\nSize: %s\n", header->name, header->mode, header->uid, header->uname, header->gid, header->gname, header->size);
+    // printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
+    // printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
+    // printf("devmajor: %s,devminor: %s\n", header->devmajor, header->devminor);
+    // printf("Prefix: %s\n", header->prefix);
 
     free(header);
 

@@ -20,14 +20,21 @@ void tar(char *path, FILE *dest)
 	if (fd)
 	{
 
-		create_header(path);
+		if (stat(path, &stats) == 0)
+		{
+			header = *create_header(path);
+		}
 		int buff_size = (int)stats.st_size;
-		char *buffer = malloc(sizeof(char) * buff_size);
+		char *buffer = malloc(sizeof(char) * buff_size + 1);
 
-		read(fd, buffer, sizeof(char) * buff_size);
+		read(fd, buffer, buff_size);
+		buffer[buff_size] = '\0';
+
+		printf("size %d\n", buff_size);
 
 		fwrite(&header, sizeof(header), 1, dest);
-		fwrite(buffer, atoi(header.size), 1, dest);
+
+		fwrite(buffer, buff_size, 1, dest);
 
 		byte_block = check_byte(my_atoi(header.size));
 		if (byte_block != 0)
@@ -64,7 +71,7 @@ void archive(char *path, char **argv, int argc)
 	while (index < argc)
 	{
 		fd = open(argv[index], O_APPEND);
-		lseek(fd, 0, SEEK_END);
+		lseek(fd, 0, SEEK_SET);
 		tar(argv[index], dest);
 		index++;
 	}
