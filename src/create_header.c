@@ -135,21 +135,35 @@ unsigned int checksum_calculator(char *header, size_t size)
 */
 void add_checksum(header_t *header)
 {
-	unsigned int check = 0;
-	check += checksum_calculator(header->name, 100);
-	check += checksum_calculator(header->mode, 10);
-	check += checksum_calculator(header->uid, 8);
-	check += checksum_calculator(header->gid, 8);
-	check += checksum_calculator(header->size, 12);
-	check += checksum_calculator(header->mtime, 12);
-	check += header->typeflag;
-	check += 8 * 32;
-	check += checksum_calculator(header->linkname, 100);
-	check += checksum_calculator(header->version, 2);
-	check += checksum_calculator(header->uname, 32);
-	check += checksum_calculator(header->gname, 32);
-	check += checksum_calculator(header->prefix, 155);
-	sprintf(header->chksum, "%0*o ", 8, check);
+	unsigned int chksum = 0;
+
+	chksum += sizeof(header->name);
+	chksum += sizeof(header->mode);
+	chksum += sizeof(header->uid);
+	chksum += sizeof(header->gid);
+	chksum += sizeof(header->size);
+	chksum += sizeof(header->mtime);
+	chksum += sizeof(header->typeflag);
+	chksum +=sizeof(header->version);
+
+	chksum +=sizeof(header->magic);
+	chksum +=sizeof(header->uname);
+	chksum +=sizeof(header->gname);
+	chksum +=sizeof(header->prefix);
+
+	// optional 
+	if(header->linkname[0] != '\0')
+		chksum +=sizeof(header->linkname);
+
+	if(header->devmajor[0] != '\0'){
+	chksum +=sizeof(header->devmajor);
+	chksum +=sizeof(header->devmajor);
+	}
+
+	// TODO: checksum change from 1073 to 1071 when fill with zeros
+	int len = my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
+	fill_zeros(header->chksum, len, CHKSUMLEN);
+	
 }
 
 void add_uid_gid(header_t *header, struct stat stats)
@@ -170,12 +184,13 @@ void add_mtime(header_t *header, struct stat stats)
 	int len;
 #if __APPLE__
 
-	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtimespec.tv_sec), OCTAL);
+			len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtimespec.tv_sec), OCTAL);
+			fill_zeros(header->mtime, len, MTIMELEN);
 #elif __linux__
-	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtim.tv_sec), OCTAL);
+			len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtim.tv_sec), OCTAL);
+			fill_zeros(header->mtime, len, MTIMELEN);
 #endif
 
-	//		fill_zeros(header->mtime, len, MTIMELEN);
 }
 
 /*!
@@ -309,13 +324,11 @@ header_t *create_header(char *path)
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
 
-		//	add_checksum(header);
-		//	TODO:
-		header->chksum[0] = '\0';
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
 		// fill_dev_if_empty(header);
+		 add_checksum(header);
 	}
 	else
 	{

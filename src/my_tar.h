@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <sys/sysmacros.h>
+//#include <sys/sysmacros.h>
 #include <fcntl.h>
 
 /* ========================================================================= */
