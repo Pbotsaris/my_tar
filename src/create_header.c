@@ -45,10 +45,10 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 {
 		int devmajor = decimal_to_octal((int)major(stats.st_rdev));
 		int len = my_itoa(header->devmajor, devmajor, OCTAL);
-//		fill_zeros(header->devmajor, len, DEVMAJORLEN);	
+		fill_zeros(header->devmajor, len, DEVMAJORLEN);	
 		int devminor = decimal_to_octal((int)minor(stats.st_rdev));
 		len =	my_itoa(header->devminor, devminor, DECIMAL);
-//		fill_zeros(header->devminor, len, DEVMINORLEN);	
+		fill_zeros(header->devminor, len, DEVMINORLEN);	
 }
 
 /*!
@@ -279,6 +279,18 @@ void init_optional_fields(header_t *header)
 	header->prefix[0] = '\0';
 }
 
+void fill_dev_if_empty(header_t *header)
+{
+	if(header->devmajor[0] == '\0'){
+		memset(header->devmajor, '0', DEVMAJORLEN);
+		header->devmajor[DEVMAJORLEN-1] = '\0';
+	}
+
+	if(header->devminor[0] == '\0')
+		memset(header->devminor, '0', DEVMINORLEN);
+
+}
+
 /********************************************/ /****************************************************************
  *  Create Header																								*																									*
  *  																											*																												* 
@@ -308,6 +320,7 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
+		fill_dev_if_empty(header);
 	}
 	else
 	{
