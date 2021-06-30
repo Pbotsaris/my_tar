@@ -179,9 +179,9 @@ void add_mtime(header_t *header, struct stat stats)
 	// CHECK OS
 	int len;
 #if __APPLE__
-	len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
+	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtimespec.tv_sec), OCTAL);
 #elif __linux__
-	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtim.tv_sec), OCTAL);
 #endif
 
 //		fill_zeros(header->mtime, len, MTIMELEN);	
