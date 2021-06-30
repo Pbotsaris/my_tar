@@ -13,6 +13,7 @@ void fill_zeros(char *field, int len, int total_len)
 			j--;
 		}
 		memset(field, '0', total_len - len - 1);
+		field[total_len - 1] = '\0';
 }
 
 /*!
@@ -248,6 +249,14 @@ void add_magic_version(header_t *header)
 	header->version[TVERSLEN - 1] = '\0';
 }
 
+void init_optional_fields(header_t *header)
+{
+	header->devmajor[0] = '\0';
+	header->devminor[0] = '\0';
+	header->linkname[0] = '\0';
+	header->prefix[0] = '\0';
+}
+
 /********************************************/ /****************************************************************
  *  Create Header																								*																									*
  *  																											*																												* 
@@ -265,12 +274,15 @@ header_t *create_header(char *path)
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
+		init_optional_fields(header);
 		add_name(header, path);
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
 		//	add_checksum(header);
+		//	TODO:
+		 header->chksum[0] = '\0';
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
