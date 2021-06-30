@@ -6,7 +6,7 @@ SRC =	src/my_tar.c    		\
 
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -W -g3 -pedantic -fsanitize=address
+CFLAGS += -W -g3 
 
 CC = gcc -g -o
 
