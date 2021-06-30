@@ -7,18 +7,18 @@
 
 int decimal_to_octal(int decimal)
 {
-    int octal = 0;
-    int num_digits = 1;
-    int temp = decimal;
-    while(temp != 0){
+	int octal = 0;
+	int num_digits = 1;
+	int temp = decimal;
+	while (temp != 0)
+	{
 
-        octal += (temp % 8) * num_digits;
-        temp /= 8;
-        num_digits *= 10;
-    }
-		return octal;
+		octal += (temp % 8) * num_digits;
+		temp /= 8;
+		num_digits *= 10;
+	}
+	return octal;
 }
-
 
 /*!
 	- HELPER: Fills a buffer with 0 for unused indexes
@@ -26,29 +26,29 @@ int decimal_to_octal(int decimal)
 
 void fill_zeros(char *field, int len, int total_len)
 {
- int j = len;		
-		for(int i = 0; i < len; i++){
-			field[total_len - 1 - j] = field[i];
-			j--;
-		}
-		memset(field, '0', total_len - len - 1);
-		field[total_len - 1] = '\0';
+	int j = len;
+	for (int i = 0; i < len; i++)
+	{
+		field[total_len - 1 - j] = field[i];
+		j--;
+	}
+	memset(field, '0', total_len - len - 1);
+	field[total_len - 1] = '\0';
 }
 
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- add devmajor and devminor when file type is a block or char special
-
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-		int devmajor = decimal_to_octal((int)major(stats.st_rdev));
-		int len = my_itoa(header->devmajor, devmajor, OCTAL);
-		fill_zeros(header->devmajor, len, DEVMAJORLEN);	
-		int devminor = decimal_to_octal((int)minor(stats.st_rdev));
-		len =	my_itoa(header->devminor, devminor, DECIMAL);
-		fill_zeros(header->devminor, len, DEVMINORLEN);	
+	int devmajor = decimal_to_octal((int)major(stats.st_rdev));
+	int len = my_itoa(header->devmajor, devmajor, OCTAL);
+	fill_zeros(header->devmajor, len, DEVMAJORLEN);
+	int devminor = decimal_to_octal((int)minor(stats.st_rdev));
+	len = my_itoa(header->devminor, devminor, DECIMAL);
+	fill_zeros(header->devminor, len, DEVMINORLEN);
 }
 
 /*!
@@ -56,7 +56,6 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- check if file is either a symlink or regular file.
 	- If symlink writes to header->linkname
-
 */
 void add_link_or_regtype(header_t *header, char *path)
 {
@@ -79,7 +78,6 @@ void add_link_or_regtype(header_t *header, char *path)
 /*!
 	
 	- Checks file type and wrties to header->typeflag
-
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -118,7 +116,6 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	
 	 HELPER TO: add_checksum(header_t *header);
 		-  Calculate checksum base on header item size and returns it.
-
 */
 unsigned int checksum_calculator(char *header, size_t size)
 {
@@ -134,9 +131,7 @@ unsigned int checksum_calculator(char *header, size_t size)
 }
 
 /*!
-
 	-  Calculate checksum and writes to  header->chksum
-
 */
 void add_checksum(header_t *header)
 {
@@ -159,30 +154,28 @@ void add_checksum(header_t *header)
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
-	
 	int len = my_itoa(header->uid, decimal_to_octal(stats.st_uid), OCTAL);
-	fill_zeros(header->uid, len,UIDLEN);	
-	len =	my_itoa(header->gid, decimal_to_octal(stats.st_gid), OCTAL);
-	fill_zeros(header->gid, len, GIDLEN);	
+	fill_zeros(header->uid, len, UIDLEN);
+	len = my_itoa(header->gid, decimal_to_octal(stats.st_gid), OCTAL);
+	fill_zeros(header->gid, len, GIDLEN);
 }
 
 /*!
-
 	- Check OS for relevant mtime field.
 	- Writes modified time in seconds to header->mtime
-
 */
 void add_mtime(header_t *header, struct stat stats)
 {
 	// CHECK OS
 	int len;
 #if __APPLE__
+
 	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtimespec.tv_sec), OCTAL);
 #elif __linux__
 	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtim.tv_sec), OCTAL);
 #endif
 
-//		fill_zeros(header->mtime, len, MTIMELEN);	
+	//		fill_zeros(header->mtime, len, MTIMELEN);
 }
 
 /*!
@@ -191,10 +184,11 @@ void add_mtime(header_t *header, struct stat stats)
 void add_size(header_t *header, struct stat stats)
 {
 
-	if (stats.st_mode != S_IFLNK){
+	if (stats.st_mode != S_IFLNK)
+	{
 		int len = my_itoa(header->size, decimal_to_octal(stats.st_size), OCTAL);
 
-		fill_zeros(header->size, len, SIZELEN);	
+		fill_zeros(header->size, len, SIZELEN);
 	}
 	else
 		header->size[0] = '0';
@@ -234,8 +228,8 @@ void add_mode(header_t *header, struct stat stats)
 
 			mode += stats_modes[i];
 
- 		int len =	my_itoa(header->mode, mode, OCTAL);
-		fill_zeros(header->mode, len, MODELEN);	
+	int len = my_itoa(header->mode, mode, OCTAL);
+	fill_zeros(header->mode, len, MODELEN);
 }
 
 /*!
@@ -281,14 +275,14 @@ void init_optional_fields(header_t *header)
 
 void fill_dev_if_empty(header_t *header)
 {
-	if(header->devmajor[0] == '\0'){
+	if (header->devmajor[0] == '\0')
+	{
 		memset(header->devmajor, '0', DEVMAJORLEN);
-		header->devmajor[DEVMAJORLEN-1] = '\0';
+		header->devmajor[DEVMAJORLEN - 1] = '\0';
 	}
 
-	if(header->devminor[0] == '\0')
+	if (header->devminor[0] == '\0')
 		memset(header->devminor, '0', DEVMINORLEN);
-
 }
 
 /********************************************/ /****************************************************************
@@ -314,13 +308,14 @@ header_t *create_header(char *path)
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
+
 		//	add_checksum(header);
 		//	TODO:
-		 header->chksum[0] = '\0';
+		header->chksum[0] = '\0';
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
-		fill_dev_if_empty(header);
+		// fill_dev_if_empty(header);
 	}
 	else
 	{

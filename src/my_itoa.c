@@ -41,9 +41,9 @@ int my_itoa(char *str, int num, int base)
         str[idx++] = (remainder > 9) ? (char)((remainder - 10) + 'a') : (char)(remainder + '0');
         num = num / base;
     }
-     
+
     reverse(str, idx);
-//    str[idx] = '\0';
+    //    str[idx] = '\0';
 
     return idx;
 }

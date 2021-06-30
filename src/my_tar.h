@@ -10,8 +10,8 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-//#include <sys/sysmacros.h>
 #include <ctype.h>
+#include <sys/sysmacros.h>
 #include <fcntl.h>
 
 /* ========================================================================= */
@@ -48,7 +48,7 @@
 #define CONTTYPE '7'  /* reserved */
 
 #define NAMELEN 100
-#define MODELEN 8 
+#define MODELEN 8
 #define UIDLEN 8
 #define GIDLEN 8
 #define SIZELEN 12
@@ -62,7 +62,6 @@
 #define DEVMAJORLEN 8
 #define DEVMINORLEN 8
 #define PREFIXLEN 155
-
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
@@ -89,8 +88,6 @@ typedef struct posix_header
 } header_t;
 
 header_t *create_header(char *path);
-void archive(char *path, char **argv, int argc);
-int ls_tar(char *path);
 
 #endif
 
@@ -136,5 +133,24 @@ option_t check_option(char **format);
 
 int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef ARCHIVE_H
+#define ARCHIVE_H
+
+void archive(char *path, char **argv, int argc);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef LS_TAR_H
+#define LS_TAR_H
+
+int my_ls_tar(char *path);
+int check_byte(int block);
 
 #endif
