@@ -19,14 +19,7 @@ void tar(char *path, FILE *dest)
 
 		fwrite(&header, sizeof(header), 1, dest);
 		fwrite(buffer, buff_size, 1, dest);
-		int block_size = check_byte(my_atoi(header.size));
-		if (block_size != 0)
-		{
-			char *byte_block = malloc(sizeof(char) * block_size);
-			memset(byte_block, '\0', block_size);
-			fwrite(byte_block, block_size, 1, dest);
-			free(byte_block);
-		}
+
 		free(buffer);
 		close(fd);
 	}
