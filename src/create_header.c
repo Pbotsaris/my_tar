@@ -194,7 +194,7 @@ void add_size(header_t *header, struct stat stats)
 {
 
 	if (stats.st_mode != S_IFLNK){
-		int len = my_itoa(header->size, stats.st_size, DECIMAL);
+		int len = my_itoa(header->size, decimal_to_octal(stats.st_size), OCTAL);
 
 		fill_zeros(header->size, len, SIZELEN);	
 	}
