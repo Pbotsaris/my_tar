@@ -9,18 +9,14 @@ int decimal_to_octal(int decimal)
 {
     int octal = 0;
     int num_digits = 1;
-
     int temp = decimal;
     while(temp != 0){
 
         octal += (temp % 8) * num_digits;
         temp /= 8;
         num_digits *= 10;
-
     }
-
 		return octal;
-
 }
 
 
@@ -47,9 +43,11 @@ void fill_zeros(char *field, int len, int total_len)
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-	int len = my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+		int devmajor = decimal_to_octal((int)major(stats.st_rdev));
+		int len = my_itoa(header->devmajor, devmajor, OCTAL);
 //		fill_zeros(header->devmajor, len, DEVMAJORLEN);	
-		len =	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+		int devminor = decimal_to_octal((int)minor(stats.st_rdev));
+		len =	my_itoa(header->devminor, devminor, DECIMAL);
 //		fill_zeros(header->devminor, len, DEVMINORLEN);	
 }
 
