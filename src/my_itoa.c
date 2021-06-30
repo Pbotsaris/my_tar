@@ -31,12 +31,7 @@ int my_itoa(char *str, int num, int base)
     if (num == 0)
     {
         str[idx] = '0';
-<<<<<<< HEAD
-        return;
-=======
         return 1;
-
->>>>>>> main
     }
 
     while (num != 0)

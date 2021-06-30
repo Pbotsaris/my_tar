@@ -10,7 +10,7 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/sysmacros.h>
+//#include <sys/sysmacros.h>
 #include <ctype.h>
 #include <fcntl.h>
 

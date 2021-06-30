@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
          header = create_header(argv[i]);
     }
 
-    archive(argv[1], argv, argc);
+//    archive(argv[1], argv, argc);
 
     printf("name: %s\nmode: %s\n", header->name, header->mode);
     printf("size: %s\n", header->size);
