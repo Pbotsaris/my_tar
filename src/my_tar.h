@@ -20,7 +20,7 @@
 #define MY_TAR_H
 
 #define OCTAL 8
-#define DECIMAL 10
+#define DECIMAL 8
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
@@ -48,7 +48,7 @@
 #define CONTTYPE '7'  /* reserved */
 
 #define NAMELEN 100
-#define MODELEN 8 
+#define MODELEN 8
 #define UIDLEN 8
 #define GIDLEN 8
 #define SIZELEN 12
@@ -62,7 +62,6 @@
 #define DEVMAJORLEN 8
 #define DEVMINORLEN 8
 #define PREFIXLEN 155
-
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII

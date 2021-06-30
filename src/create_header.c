@@ -1,18 +1,29 @@
 #include "my_tar.h"
-#define MODES_ARR_LEN 9
 
-/*!
-	- HELPER: Fills a buffer with 0 for unused indexes
-*/
+/*****************************************************************
+ * 
+ * 					INITIATION										
+ * 
+ * **************************************************************/
 
-void fill_zeros(char *field, int len, int total_len)
+header_t *init(header_t *header)
 {
- int j = len;		
-		for(int i = 0; i < len; i++){
-			field[total_len - 1 - j] = field[i];
-			j--;
-		}
-		memset(field, '0', total_len - len - 1);
+	memset(header->name, '\0', sizeof(header->name));
+	memset(header->mode, '\0', sizeof(header->mode));
+	memset(header->uid, '\0', sizeof(header->uid));
+	memset(header->gid, '\0', sizeof(header->gid));
+	memset(header->size, '\0', sizeof(header->size));
+	memset(header->mtime, '\0', sizeof(header->mtime));
+	memset(header->chksum, '\0', sizeof(header->chksum));
+	memset(header->linkname, '\0', sizeof(header->linkname));
+	memset(header->magic, '\0', sizeof(header->magic));
+	memset(header->version, '\0', TVERSLEN);
+	memset(header->uname, '\0', sizeof(header->uname));
+	memset(header->gname, '\0', sizeof(header->gname));
+	memset(header->devmajor, '\0', sizeof(header->devmajor));
+	memset(header->devminor, '\0', sizeof(header->devminor));
+	memset(header->prefix, '\0', sizeof(header->prefix));
+	return header;
 }
 
 /*!
@@ -23,10 +34,8 @@ void fill_zeros(char *field, int len, int total_len)
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-	int len = my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
-//		fill_zeros(header->devmajor, len, DEVMAJORLEN);	
-		len =	my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
-//		fill_zeros(header->devminor, len, DEVMINORLEN);	
+	my_itoa(header->devmajor, (int)major(stats.st_rdev), OCTAL);
+	my_itoa(header->devminor, (int)minor(stats.st_rdev), OCTAL);
 }
 
 /*!
@@ -137,10 +146,8 @@ void add_checksum(header_t *header)
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
-	int len = my_itoa(header->uid, stats.st_uid, DECIMAL);
-	fill_zeros(header->uid, len,UIDLEN);	
-	len =	my_itoa(header->gid, stats.st_gid, DECIMAL);
-	fill_zeros(header->gid, len, GIDLEN);	
+	my_itoa(header->uid, stats.st_uid, OCTAL);
+	my_itoa(header->gid, stats.st_gid, OCTAL);
 }
 
 /*!
@@ -152,14 +159,11 @@ void add_uid_gid(header_t *header, struct stat stats)
 void add_mtime(header_t *header, struct stat stats)
 {
 	// CHECK OS
-	int len;
 #if __APPLE__
-	len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
+	my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
 #elif __linux__
-	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
+	my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
 #endif
-
-//		fill_zeros(header->mtime, len, MTIMELEN);	
 }
 
 /*!
@@ -168,11 +172,8 @@ void add_mtime(header_t *header, struct stat stats)
 void add_size(header_t *header, struct stat stats)
 {
 
-	if (stats.st_mode != S_IFLNK){
-		int len = my_itoa(header->size, stats.st_size, DECIMAL);
-
-		fill_zeros(header->size, len, SIZELEN);	
-	}
+	if (stats.st_mode != S_IFLNK)
+		my_itoa(header->size, stats.st_size, OCTAL);
 	else
 		header->size[0] = '0';
 }
@@ -203,20 +204,21 @@ void add_mode(header_t *header, struct stat stats)
 {
 	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
-	int modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
-	int stats_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+	int modes[MODELEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+	int stats_modes[MODELEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < MODES_ARR_LEN; ++i)
+	for (int i = 0; i < MODELEN; ++i)
 		if (stats.st_mode & stats_modes[i])
 
 			mode += stats_modes[i];
 
- 		int len =	my_itoa(header->mode, mode, OCTAL);
-		fill_zeros(header->mode, len, MODELEN);	
+	my_itoa(header->mode, mode, OCTAL);
 }
 
 /*!
+ 
 	 - Writes filename to be archieved to header->name
+ 
 */
 void add_name(header_t *header, char *path)
 {
@@ -265,11 +267,14 @@ header_t *create_header(char *path)
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
+		header = init(header);
 		add_name(header, path);
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
+		strncpy(header->magic, TMAGIC, TMAGLEN);
+		strncpy(header->version, TVERSION, TVERSLEN);
 		//	add_checksum(header);
 		add_magic_version(header);
 		add_uid_gid(header, stats);

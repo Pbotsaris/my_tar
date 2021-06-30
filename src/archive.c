@@ -13,16 +13,13 @@ void tar(char *path, FILE *dest)
 	{
 
 		if (stat(path, &stats) == 0)
-		{
 			header = *create_header(path);
-		}
+
 		int buff_size = (int)stats.st_size;
 		char *buffer = malloc(sizeof(char) * buff_size + 1);
 
 		read(fd, buffer, buff_size);
 		buffer[buff_size] = '\0';
-
-		printf("size %d\n", buff_size);
 
 		fwrite(&header, sizeof(header), 1, dest);
 
