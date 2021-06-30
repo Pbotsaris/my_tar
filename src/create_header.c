@@ -2,6 +2,29 @@
 #define MODES_ARR_LEN 9
 
 /*!
+	- HELPER: converts a decimal number to octal base
+*/
+
+int decimal_to_octal(int decimal)
+{
+    int octal = 0;
+    int num_digits = 1;
+
+    int temp = decimal;
+    while(temp != 0){
+
+        octal += (temp % 8) * num_digits;
+        temp /= 8;
+        num_digits *= 10;
+
+    }
+
+		return octal;
+
+}
+
+
+/*!
 	- HELPER: Fills a buffer with 0 for unused indexes
 */
 

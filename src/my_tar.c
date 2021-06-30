@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 //    archive(argv[1], argv, argc);
 
-     printf("name: %s\nmode: %s\n", header->name, header->mode);
+    printf("name: %s\nmode: %s\n", header->name, header->mode);
     printf("size: %s\n", header->size);
     printf("uid:%s\ngid: %s\n", header->uid, header->gid);
     printf("gname: %s\nuname: %s\n", header->gname, header->uname);
