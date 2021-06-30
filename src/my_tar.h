@@ -10,8 +10,8 @@
 #include <grp.h>
 #include <unistd.h>
 #include <string.h>
-//#include <sys/sysmacros.h>
 #include <ctype.h>
+#include <sys/sysmacros.h>
 #include <fcntl.h>
 
 /* ========================================================================= */
@@ -20,7 +20,6 @@
 #define MY_TAR_H
 
 #define OCTAL 8
-#define DECIMAL 8
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
@@ -89,7 +88,6 @@ typedef struct posix_header
 
 header_t *create_header(char *path);
 void archive(char *path, char **argv, int argc);
-int ls_tar(char *path);
 
 #endif
 
@@ -135,5 +133,15 @@ option_t check_option(char **format);
 
 int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef LS_TAR_H
+#define LS_TAR_H
+
+int my_ls_tar(char *path);
+int check_byte(int block);
 
 #endif

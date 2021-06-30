@@ -5,26 +5,28 @@ void tar(char *path, FILE *dest)
 
 	int fd = open(path, O_APPEND),
 		byte_block;
-
 	header_t header;
 	struct stat stats;
-
 	if (fd)
 	{
-
 		if (stat(path, &stats) == 0)
 			header = *create_header(path);
 
 		int buff_size = (int)stats.st_size;
 		char *buffer = malloc(sizeof(char) * buff_size + 1);
-
 		read(fd, buffer, buff_size);
 		buffer[buff_size] = '\0';
 
 		fwrite(&header, sizeof(header), 1, dest);
-
 		fwrite(buffer, buff_size, 1, dest);
-
+		int block_size = check_byte(my_atoi(header.size));
+		if (block_size != 0)
+		{
+			char *byte_block = malloc(sizeof(char) * block_size);
+			memset(byte_block, '\0', block_size);
+			fwrite(byte_block, block_size, 1, dest);
+			free(byte_block);
+		}
 		free(buffer);
 		close(fd);
 	}
@@ -33,23 +35,19 @@ void tar(char *path, FILE *dest)
 		printf("ERROR\n");
 		exit(1);
 	}
-
-	printf("File: %s\n", header.name);
+	printf("File name in archive: %s\n", header.name);
 }
-
 void archive(char *path, char **argv, int argc)
 {
 	struct stat stats;
 	FILE *dest = fopen(path, "wb");
 	int fd,
 		index = 2;
-
 	if (dest == NULL)
 	{
 		printf("ERROR\n");
 		exit(1);
 	}
-
 	while (index < argc)
 	{
 		fd = open(argv[index], O_APPEND);

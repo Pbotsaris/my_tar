@@ -264,7 +264,7 @@ header_t *create_header(char *path)
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
-		//	add_checksum(header);
+		//add_checksum(header);
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
