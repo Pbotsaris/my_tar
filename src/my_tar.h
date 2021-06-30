@@ -20,6 +20,7 @@
 #define MY_TAR_H
 
 #define OCTAL 8
+#define DECIMAL 10
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
@@ -87,7 +88,6 @@ typedef struct posix_header
 } header_t;
 
 header_t *create_header(char *path);
-void archive(char *path, char **argv, int argc);
 
 #endif
 
@@ -133,6 +133,15 @@ option_t check_option(char **format);
 
 int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
+
+#endif
+
+/* ========================================================================= */
+
+#ifndef ARCHIVE_H
+#define ARCHIVE_H
+
+void archive(char *path, char **argv, int argc);
 
 #endif
 

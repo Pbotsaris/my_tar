@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     }
 
     archive(argv[1], argv, argc);
-    my_ls_tar(argv[1]);
+    // my_ls_tar(argv[1]);
 
     printf("name: %s\nmode: %s\n", header->name, header->mode);
     printf("size: %s\n", header->size);
