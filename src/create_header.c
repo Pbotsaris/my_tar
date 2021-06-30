@@ -41,6 +41,7 @@ void fill_zeros(char *field, int len, int total_len)
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- add devmajor and devminor when file type is a block or char special
 */
+
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
 	int devmajor = decimal_to_octal((int)major(stats.st_rdev));
@@ -110,24 +111,6 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 		header->typeflag = REGTYPE;
 		printf("%s\n", FLAGTYPE_ERR);
 	}
-}
-
-/*!
-	
-	 HELPER TO: add_checksum(header_t *header);
-		-  Calculate checksum base on header item size and returns it.
-*/
-unsigned int checksum_calculator(char *header, size_t size)
-{
-	int index = 0,
-		check = 0;
-
-	while (header[index] && index < size)
-	{
-		check += header[index];
-		index++;
-	}
-	return check;
 }
 
 /*!
@@ -288,18 +271,6 @@ void init_optional_fields(header_t *header)
 	header->prefix[0] = '\0';
 }
 
-void fill_dev_if_empty(header_t *header)
-{
-	if (header->devmajor[0] == '\0')
-	{
-		memset(header->devmajor, '0', DEVMAJORLEN);
-		header->devmajor[DEVMAJORLEN - 1] = '\0';
-	}
-
-	if (header->devminor[0] == '\0')
-		memset(header->devminor, '0', DEVMINORLEN);
-}
-
 /********************************************/ /****************************************************************
  *  Create Header																								*																									*
  *  																											*																												* 
@@ -327,7 +298,6 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
-		// fill_dev_if_empty(header);
 		 add_checksum(header);
 	}
 	else
