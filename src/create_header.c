@@ -1,41 +1,32 @@
 #include "my_tar.h"
+#define MODES_ARR_LEN 9
 
-/*****************************************************************
- * 
- * 					INITIATION										
- * 
- * **************************************************************/
+/*!
+	- HELPER: Fills a buffer with 0 for unused indexes
+*/
 
-header_t *init(header_t *header)
+void fill_zeros(char *field, int len, int total_len)
 {
-	memset(header->name, '\0', sizeof(header->name));
-	memset(header->mode, '\0', sizeof(header->mode));
-	memset(header->uid, '\0', sizeof(header->uid));
-	memset(header->gid, '\0', sizeof(header->gid));
-	memset(header->size, '\0', sizeof(header->size));
-	memset(header->mtime, '\0', sizeof(header->mtime));
-	memset(header->chksum, '\0', sizeof(header->chksum));
-	memset(header->linkname, '\0', sizeof(header->linkname));
-	memset(header->magic, '\0', sizeof(header->magic));
-	memset(header->version, '\0', TVERSLEN);
-	memset(header->uname, '\0', sizeof(header->uname));
-	memset(header->gname, '\0', sizeof(header->gname));
-	memset(header->devmajor, '\0', sizeof(header->devmajor));
-	memset(header->devminor, '\0', sizeof(header->devminor));
-	memset(header->prefix, '\0', sizeof(header->prefix));
-	return header;
+	int j = len;
+	for (int i = 0; i < len; i++)
+	{
+		field[total_len - 1 - j] = field[i];
+		j--;
+	}
+	memset(field, '0', total_len - len - 1);
 }
 
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- add devmajor and devminor when file type is a block or char special
-
 */
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-	my_itoa(header->devmajor, (int)major(stats.st_rdev), OCTAL);
-	my_itoa(header->devminor, (int)minor(stats.st_rdev), OCTAL);
+	int len = my_itoa(header->devmajor, (int)major(stats.st_rdev), DECIMAL);
+	//		fill_zeros(header->devmajor, len, DEVMAJORLEN);
+	len = my_itoa(header->devminor, (int)minor(stats.st_rdev), DECIMAL);
+	//		fill_zeros(header->devminor, len, DEVMINORLEN);
 }
 
 /*!
@@ -43,7 +34,6 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- check if file is either a symlink or regular file.
 	- If symlink writes to header->linkname
-
 */
 void add_link_or_regtype(header_t *header, char *path)
 {
@@ -66,7 +56,6 @@ void add_link_or_regtype(header_t *header, char *path)
 /*!
 	
 	- Checks file type and wrties to header->typeflag
-
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -105,7 +94,6 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	
 	 HELPER TO: add_checksum(header_t *header);
 		-  Calculate checksum base on header item size and returns it.
-
 */
 unsigned int checksum_calculator(char *header, size_t size)
 {
@@ -121,9 +109,7 @@ unsigned int checksum_calculator(char *header, size_t size)
 }
 
 /*!
-
 	-  Calculate checksum and writes to  header->chksum
-
 */
 void add_checksum(header_t *header)
 {
@@ -146,24 +132,27 @@ void add_checksum(header_t *header)
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
-	my_itoa(header->uid, stats.st_uid, OCTAL);
-	my_itoa(header->gid, stats.st_gid, OCTAL);
+	int len = my_itoa(header->uid, stats.st_uid, DECIMAL);
+	fill_zeros(header->uid, len, UIDLEN);
+	len = my_itoa(header->gid, stats.st_gid, DECIMAL);
+	fill_zeros(header->gid, len, GIDLEN);
 }
 
 /*!
-
 	- Check OS for relevant mtime field.
 	- Writes modified time in seconds to header->mtime
-
 */
 void add_mtime(header_t *header, struct stat stats)
 {
 	// CHECK OS
+	int len;
 #if __APPLE__
-	my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
+	len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, DECIMAL);
 #elif __linux__
-	my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
+	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, DECIMAL);
 #endif
+
+	//		fill_zeros(header->mtime, len, MTIMELEN);
 }
 
 /*!
@@ -173,7 +162,11 @@ void add_size(header_t *header, struct stat stats)
 {
 
 	if (stats.st_mode != S_IFLNK)
-		my_itoa(header->size, stats.st_size, OCTAL);
+	{
+		int len = my_itoa(header->size, stats.st_size, DECIMAL);
+
+		fill_zeros(header->size, len, SIZELEN);
+	}
 	else
 		header->size[0] = '0';
 }
@@ -204,21 +197,20 @@ void add_mode(header_t *header, struct stat stats)
 {
 	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
-	int modes[MODELEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
-	int stats_modes[MODELEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+	int modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+	int stats_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < MODELEN; ++i)
+	for (int i = 0; i < MODES_ARR_LEN; ++i)
 		if (stats.st_mode & stats_modes[i])
 
 			mode += stats_modes[i];
 
-	my_itoa(header->mode, mode, OCTAL);
+	int len = my_itoa(header->mode, mode, OCTAL);
+	fill_zeros(header->mode, len, MODELEN);
 }
 
 /*!
- 
 	 - Writes filename to be archieved to header->name
- 
 */
 void add_name(header_t *header, char *path)
 {
@@ -267,14 +259,11 @@ header_t *create_header(char *path)
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
-		header = init(header);
 		add_name(header, path);
 		add_mtime(header, stats);
 		add_mode(header, stats);
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
-		strncpy(header->magic, TMAGIC, TMAGLEN);
-		strncpy(header->version, TVERSION, TVERSLEN);
 		//	add_checksum(header);
 		add_magic_version(header);
 		add_uid_gid(header, stats);
