@@ -161,9 +161,10 @@ void add_checksum(header_t *header)
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
-	int len = my_itoa(header->uid, stats.st_uid, DECIMAL);
+	
+	int len = my_itoa(header->uid, decimal_to_octal(stats.st_uid), OCTAL);
 	fill_zeros(header->uid, len,UIDLEN);	
-	len =	my_itoa(header->gid, stats.st_gid, DECIMAL);
+	len =	my_itoa(header->gid, decimal_to_octal(stats.st_gid), OCTAL);
 	fill_zeros(header->gid, len, GIDLEN);	
 }
 
