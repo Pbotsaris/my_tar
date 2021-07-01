@@ -127,33 +127,35 @@ void add_checksum(header_t *header)
 	chksum += sizeof(header->size);
 	chksum += sizeof(header->mtime);
 	chksum += sizeof(header->typeflag);
-	chksum +=sizeof(header->version);
+	chksum += sizeof(header->version);
 
-	chksum +=sizeof(header->magic);
-	chksum +=sizeof(header->uname);
-	chksum +=sizeof(header->gname);
-	chksum +=sizeof(header->prefix);
+	chksum += sizeof(header->magic);
+	chksum += sizeof(header->uname);
+	chksum += sizeof(header->gname);
+	chksum += sizeof(header->prefix);
 
-	// optional 
-	if(header->linkname[0] != '\0')
-		chksum +=sizeof(header->linkname);
+	// optional
+	if (header->linkname[0] != '\0')
+		chksum += sizeof(header->linkname);
 
-	if(header->devmajor[0] != '\0'){
-	chksum +=sizeof(header->devmajor);
-	chksum +=sizeof(header->devmajor);
+	if (header->devmajor[0] != '\0')
+	{
+		chksum += sizeof(header->devmajor);
+		chksum += sizeof(header->devmajor);
 	}
 
 	// TODO: checksum change from 1073 to 1071 when fill with zeros
 	int len = my_itoa(header->chksum, chksum, OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
-	
 }
 //f.txt0000644 0000765 00000240000000005114067333751011045 0ustar  pedrostafftrying tar for khalil. what will happen?
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
 	int len = my_itoa(header->uid, stats.st_uid, OCTAL);
+
 	fill_zeros(header->uid, len, UIDLEN);
+
 	len = my_itoa(header->gid, stats.st_gid, OCTAL);
 	fill_zeros(header->gid, len, GIDLEN);
 }
@@ -173,7 +175,6 @@ void add_mtime(header_t *header, struct stat stats)
 			len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
 			fill_zeros(header->mtime, len, MTIMELEN);
 #endif
-
 }
 
 /*!
@@ -184,7 +185,9 @@ void add_size(header_t *header, struct stat stats)
 
 	if (stats.st_mode != S_IFLNK)
 	{
+
 		int len = my_itoa(header->size,stats.st_size, OCTAL);
+
 
 		fill_zeros(header->size, len, SIZELEN);
 	}
@@ -302,7 +305,9 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
+
 		add_checksum(header);
+
 	}
 	else
 	{

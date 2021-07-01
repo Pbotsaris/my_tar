@@ -62,7 +62,7 @@
 #define GNAMELEN 32
 #define TVERSLEN 3
 #define DEVMAJORLEN 8
-#define DEVMINORLEN 8
+#define DEVMINORLEN 81000
 #define PREFIXLEN 155
 
 // The name, linkname, magic, uname, and gname are null-terminated
@@ -151,6 +151,8 @@ void archive(char *path, char **argv, int argc);
 
 #ifndef LS_TAR_H
 #define LS_TAR_H
+
+#define BLOCKSIZE 512
 
 int my_ls_tar(char *path);
 int check_byte(int block);
