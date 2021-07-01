@@ -1,41 +1,64 @@
 #include "my_tar.h"
 
-int check_byte(int block)
+int d_to_o(int decimal)
 {
-    if (block == 512)
-        return 0;
-    else
-        return (512 - (block % 512));
+    int octal = 0;
+    int num_digits = 1;
+    int temp = decimal;
+    while (temp != 0)
+    {
+        octal += (temp % 8) * num_digits;
+        temp /= 8;
+        num_digits *= 10;
+    }
+    return octal;
 }
 
 int my_ls_tar(char *path)
 {
-    int tar = open(path, O_RDWR);
+    int tar = open(path, O_RDWR),
+        counter = 1,
+        block_size_octal = d_to_o(BLOCKSIZE),
+        index = 0,
+        current_file_position = 0,
+        file_size;
 
-    if (!tar)
+    char buffer[BLOCKSIZE];
+
+    float size;
+
+    if (tar < 0)
         return 1;
 
-    header_t header;
-    lseek(tar, 0, SEEK_SET);
-    int current = 0;
+    struct stat stats;
+    stat(path, &stats);
+    file_size = stats.st_size;
 
-    struct stat statbuf;
-
-    if (stat(path, &statbuf) == -1)
+    while (current_file_position <= file_size)
     {
-        return 1;
-    }
-    printf("%ld\n", statbuf.st_size);
-    //     // while (current <= statbuf.st_size)
-    //     // {
+        read(tar, buffer, NAMELEN); // READ THE NAME
 
-    //     //     read(tar, &header, sizeof(header));
-    //     //     if (current < 0)
-    //     //         return 1;
-    //     //     printf("FILE NAME TAR: %s\n", header.name);
-    //     //     current += atoi(header.size);
-    //     //     printf("%d header size \n", current);
-    //     //     lseek(tar, current, SEEK_CUR); // header.name[0] = '\0';
-    // }
+        if (buffer[0] != '\0') // CHECKS IF BUFFER ISN'T EMPTY TO PRINT HEADER NAME
+            printf("%s\n", buffer);
+
+        lseek(tar, 24, SEEK_CUR);   // LOOKS FOR THE SIZE OF THE FILE
+        read(tar, buffer, SIZELEN); // READS THE SIZE OF THE FILE
+
+        size = atoi(buffer);       // SIZE TO INT
+        lseek(tar, 376, SEEK_CUR); // SEEKS THE END OF THE HEADER BLOCK
+
+        if (size > block_size_octal)
+        {
+
+            size /= block_size_octal; // COUNTING HOW MANY BLOCKS ARE SAVED FOR CONTENT
+            for (int i = 0; size - i > 1; i++)
+                counter++;
+        }
+        current_file_position = lseek(tar, sizeof(buffer) * (counter), SEEK_CUR); // SEEKS THE NEXT HEADER AND SAVES THAT TO SEE IF WE ARRIVED TO THE END OF THE FILE
+
+        counter = 1;
+        index++;
+    }
+
     close(tar);
 }
