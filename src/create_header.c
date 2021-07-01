@@ -113,39 +113,44 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	}
 }
 
+unsigned int checksum8b(char *field, size_t len)
+{
+//	size_t len = strlen(field);
+	unsigned int sum = 0;
+	for(int i = 0; i < len; i++)
+		++sum; 
+
+	return sum;
+
+}
+
 /*!
 	-  Calculate checksum and writes to  header->chksum
 */
 void add_checksum(header_t *header)
 {
 	unsigned int chksum = 0;
-
-	chksum += sizeof(header->name);
-	chksum += sizeof(header->mode);
-	chksum += sizeof(header->uid);
-	chksum += sizeof(header->gid);
-	chksum += sizeof(header->size);
-	chksum += sizeof(header->mtime);
-	chksum += sizeof(header->typeflag);
-	chksum +=sizeof(header->version);
-
-	chksum +=sizeof(header->magic);
-	chksum +=sizeof(header->uname);
-	chksum +=sizeof(header->gname);
-	chksum +=sizeof(header->prefix);
-
-	// optional 
-	if(header->linkname[0] != '\0')
-		chksum +=sizeof(header->linkname);
-
-	if(header->devmajor[0] != '\0'){
-	chksum +=sizeof(header->devmajor);
-	chksum +=sizeof(header->devmajor);
-	}
+ 	chksum += checksum8b(header->name, NAMELEN);
+ 	chksum += checksum8b(header->mode, MODELEN);
+ 	chksum += checksum8b(header->uid, UIDLEN);
+ 	chksum += checksum8b(header->gid, GIDLEN);
+ 	chksum += checksum8b(header->size, SIZELEN);
+ 	chksum += checksum8b(header->mtime, MTIMELEN);
+ 	chksum += checksum8b(header->linkname, LINKNAMELEN);
+ 	chksum += checksum8b(header->magic, TMAGLEN);
+ 	chksum += checksum8b(header->version, TVERSLEN);
+ 	chksum += checksum8b(header->uname, UNAMELEN);
+ 	chksum += checksum8b(header->gname, GNAMELEN);
+ 	chksum += checksum8b(header->devmajor, DEVMAJORLEN);
+ 	chksum += checksum8b(header->devmajor, DEVMAJORLEN);
+ 	chksum += checksum8b(header->prefix, PREFIXLEN);
+ 	chksum += checksum8b(header->prefix, PREFIXLEN);
+	chksum += 1;
 
 	// TODO: checksum change from 1073 to 1071 when fill with zeros
-	int len = my_itoa(header->chksum, chksum, OCTAL);
-	fill_zeros(header->chksum, len, CHKSUMLEN);
+	int len = my_itoa(header->chksum, decimal_to_octal(chksum), DECIMAL);
+	header->chksum[CHKSUMLEN -1] = '\0';
+//	fill_zeros(header->chksum, len, CHKSUMLEN);
 	
 }
 //f.txt0000644 0000765 00000240000000005114067333751011045 0ustar  pedrostafftrying tar for khalil. what will happen?

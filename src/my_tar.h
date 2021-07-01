@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 #if __linux__
 #include <sys/sysmacros.h>
 #endif
