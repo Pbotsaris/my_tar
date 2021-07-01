@@ -44,11 +44,11 @@ void fill_zeros(char *field, int len, int total_len)
 
 void add_dev_major_minor(header_t *header, struct stat stats)
 {
-	int devmajor = decimal_to_octal((int)major(stats.st_rdev));
+	int devmajor = (int)major(stats.st_rdev);
 	int len = my_itoa(header->devmajor, devmajor, OCTAL);
 	fill_zeros(header->devmajor, len, DEVMAJORLEN);
-	int devminor = decimal_to_octal((int)minor(stats.st_rdev));
-	len = my_itoa(header->devminor, devminor, DECIMAL);
+	int devminor = (int)minor(stats.st_rdev);
+	len = my_itoa(header->devminor, devminor, OCTAL);
 	fill_zeros(header->devminor, len, DEVMINORLEN);
 }
 
@@ -148,11 +148,14 @@ void add_checksum(header_t *header)
 	int len = my_itoa(header->chksum, chksum, OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 }
+//f.txt0000644 0000765 00000240000000005114067333751011045 0ustar  pedrostafftrying tar for khalil. what will happen?
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
 	int len = my_itoa(header->uid, stats.st_uid, OCTAL);
-	// fill_zeros(header->uid, len, UIDLEN);
+
+	fill_zeros(header->uid, len, UIDLEN);
+
 	len = my_itoa(header->gid, stats.st_gid, OCTAL);
 	fill_zeros(header->gid, len, GIDLEN);
 }
@@ -166,12 +169,11 @@ void add_mtime(header_t *header, struct stat stats)
 	// CHECK OS
 	int len;
 #if __APPLE__
-
-	len = my_itoa(header->mtime, decimal_to_octal(stats.st_mtimespec.tv_sec), OCTAL);
-	fill_zeros(header->mtime, len, MTIMELEN);
+			len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
+			fill_zeros(header->mtime, len, MTIMELEN);
 #elif __linux__
-	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
-	fill_zeros(header->mtime, len, MTIMELEN);
+			len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
+			fill_zeros(header->mtime, len, MTIMELEN);
 #endif
 }
 
@@ -183,7 +185,9 @@ void add_size(header_t *header, struct stat stats)
 
 	if (stats.st_mode != S_IFLNK)
 	{
-		int len = my_itoa(header->size, stats.st_size, OCTAL);
+
+		int len = my_itoa(header->size,stats.st_size, OCTAL);
+
 
 		fill_zeros(header->size, len, SIZELEN);
 	}
@@ -258,15 +262,19 @@ void add_magic_version(header_t *header)
 {
 	strncpy(header->magic, TMAGIC, TMAGLEN);
 	header->magic[TMAGLEN - 1] = '\0';
-	strncpy(header->version, TVERSION, TVERSLEN);
-	header->version[TVERSLEN - 1] = '\0';
+
+	for(int i = 0; i < TVERSLEN; ++i)
+			header->version[i] = ' ';
+
+	header->version[TVERSLEN -1] = '\0';	
 }
 
 void init_optional_fields(header_t *header)
 {
 	header->devmajor[0] = '\0';
 	header->devminor[0] = '\0';
-	header->linkname[0] = '\0';
+	header->linkname[0] = ' ';
+	header->linkname[1] = '\0';
 	header->prefix[0] = '\0';
 }
 
@@ -274,7 +282,7 @@ void init_optional_fields(header_t *header)
  *  Create Header																								*																									*
  *  																											*																												* 
  *   - Using the path passed in as first argument, create_header creates a tar struct following the				*				
- *  	 GNU basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
+  basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
  *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.								*							
  *   - This header struct adds a trailing null to every field													*														
  *																												*																												*
@@ -297,7 +305,9 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
-		// add_checksum(header);
+
+		add_checksum(header);
+
 	}
 	else
 	{
