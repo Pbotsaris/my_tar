@@ -32,6 +32,7 @@ void tar(char *path, FILE *dest)
 }
 void archive(char *path, char **argv, int argc)
 {
+//	printf("%s\n", )
 	struct stat stats;
 	FILE *dest = fopen(path, "wb");
 	int fd,
