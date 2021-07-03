@@ -36,22 +36,25 @@ int main(int argc, char *argv[])
         if (argv[i][0] == '-')
             continue;
 
-        header = create_header(argv[i]);
+
+//        header = create_header(argv[i]);
+ //       break;
     }
 
-    // archive(argv[1], argv, argc);
-    my_ls_tar(argv[1]);
+
+     archive(argv[1], argv, argc);
+//    my_ls_tar(argv[1]);
 
     // printf("name: %s\nmode: %s\n", header->name, header->mode);
     // printf("size: %s\n", header->size);
     // printf("uid:%s\ngid: %s\n", header->uid, header->gid);
     // printf("gname: %s\nuname: %s\n", header->gname, header->uname);
-    // printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
-    // printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
+//     printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
+//    // printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
     // printf("devmajor: %s, devminor %s\n", header->devmajor, header->devminor);
     // printf("Prefix: %s\n", header->prefix);
 
-    free(header);
+//    free(header);
 
     return 0;
 }

@@ -24,16 +24,21 @@ int decimal_to_octal(int decimal)
 	- HELPER: Fills a buffer with 0 for unused indexes
 */
 
+	 
+
 void fill_zeros(char *field, int len, int total_len)
 {
 	int j = len;
+	 char buff[total_len];
+		memset(buff, '0', total_len - 1);
+
 	for (int i = 0; i < len; i++)
 	{
-		field[total_len - 1 - j] = field[i];
+		buff[(total_len - 1) - j] = field[i];
 		j--;
 	}
-	memset(field, '0', total_len - len - 1);
-	field[total_len - 1] = '\0';
+	buff[total_len - 1] = '\0';
+	strcpy(field, buff);
 }
 
 /*!
@@ -114,41 +119,49 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 }
 
 /*!
+	-  HELPER: Calculate checksum of a field in the header-struct
+*/
+
+
+unsigned int checksum(char *field, size_t len)
+{
+	unsigned int sum = 0;
+	for(int i = len; i != 0; i--)
+			sum+= (unsigned char) (*field++);
+	return sum;
+}
+
+
+/*!
 	-  Calculate checksum and writes to  header->chksum
 */
+		
 void add_checksum(header_t *header)
 {
 	unsigned int chksum = 0;
+	char *temp = header->name;
+	int i;
 
-	chksum += sizeof(header->name);
-	chksum += sizeof(header->mode);
-	chksum += sizeof(header->uid);
-	chksum += sizeof(header->gid);
-	chksum += sizeof(header->size);
-	chksum += sizeof(header->mtime);
-	chksum += sizeof(header->typeflag);
-	chksum += sizeof(header->version);
+	for (i = 0; i < BYTOFFLEN; ++i) {
+		temp += bytes_offset[i]; // increment pointer by field len
 
-	chksum += sizeof(header->magic);
-	chksum += sizeof(header->uname);
-	chksum += sizeof(header->gname);
-	chksum += sizeof(header->prefix);
-
-	// optional
-	if (header->linkname[0] != '\0')
-		chksum += sizeof(header->linkname);
-
-	if (header->devmajor[0] != '\0')
-	{
-		chksum += sizeof(header->devmajor);
-		chksum += sizeof(header->devmajor);
+		if(i != BYTOFFLEN - 1)
+				chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
 	}
 
-	// TODO: checksum change from 1073 to 1071 when fill with zeros
-	int len = my_itoa(header->chksum, chksum, OCTAL);
+	// remove chksum field from calculation
+  for (i = sizeof(header->chksum); i-- != 0;)
+      chksum -= (unsigned char) header->chksum[i];
+
+	// add 1 blank space instead
+ 	 chksum += ' ' * sizeof header->chksum;
+
+	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
+
+	printf("checksume: %s\n", header->chksum);
+	
 }
-//f.txt0000644 0000765 00000240000000005114067333751011045 0ustar  pedrostafftrying tar for khalil. what will happen?
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
@@ -182,13 +195,10 @@ void add_mtime(header_t *header, struct stat stats)
 */
 void add_size(header_t *header, struct stat stats)
 {
-
 	if (stats.st_mode != S_IFLNK)
 	{
 
 		int len = my_itoa(header->size,stats.st_size, OCTAL);
-
-
 		fill_zeros(header->size, len, SIZELEN);
 	}
 	else

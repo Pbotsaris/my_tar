@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 #if __linux__
 #include <sys/sysmacros.h>
 #endif
@@ -26,6 +27,11 @@
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
+
+// USER FOR MODE
+#define TSUID    04000		/* set UID on execution */
+#define TSGID    02000		/* set GID on execution */
+#define TSVTX    01000		/* reserved */
 
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
@@ -65,20 +71,23 @@
 #define DEVMINORLEN 81000
 #define PREFIXLEN 155
 
+#define BLOCKSIZE 512
+#define BYTOFFLEN 17 
+
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
 
 typedef struct posix_header
-{                     /* byte offset */
-  char name[NAMELEN]; /*   0 */
-  char mode[MODELEN];
+      {                     /* byte offset */
+  char name[NAMELEN];         /*   0 */
+  char mode[MODELEN];         /* 100 */
   char uid[UIDLEN];           /* 108 */
   char gid[GIDLEN];           /* 116 */
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;              /* 156 */
-  char linkname[LINKNAMELEN]; /* 157 */
+  char linkname[LINKNAMELEN]; /* 156 */
+  char typeflag;              /* 157 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
@@ -88,6 +97,15 @@ typedef struct posix_header
   char prefix[PREFIXLEN];     /* 345 */
                               /* 500 */
 } header_t;
+
+
+
+int bytes_offset[BYTOFFLEN] = {
+ 0, 100, 108, 116, 124,
+136, 148, 156, 157, 257,
+263, 265, 297, 329, 337,
+345, 500,
+};
 
 header_t *create_header(char *path);
 
