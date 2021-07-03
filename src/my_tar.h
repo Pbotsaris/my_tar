@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 #if __linux__
 #include <sys/sysmacros.h>
 #endif
@@ -26,6 +27,11 @@
 
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
+
+// USER FOR MODE
+#define TSUID 04000 /* set UID on execution */
+#define TSGID 02000 /* set GID on execution */
+#define TSVTX 01000 /* reserved */
 
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
@@ -62,23 +68,28 @@
 #define GNAMELEN 32
 #define TVERSLEN 3
 #define DEVMAJORLEN 8
-#define DEVMINORLEN 8
+#define DEVMINORLEN 81000
 #define PREFIXLEN 155
+
+#define BLOCKSIZE 512
+#define BYTOFFLEN 17
+#define JMPSIZE 24
+#define ENDBLK 376
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
 
 typedef struct posix_header
-{                     /* byte offset */
-  char name[NAMELEN]; /*   0 */
-  char mode[MODELEN];
+{                             /* byte offset */
+  char name[NAMELEN];         /*   0 */
+  char mode[MODELEN];         /* 100 */
   char uid[UIDLEN];           /* 108 */
   char gid[GIDLEN];           /* 116 */
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;              /* 156 */
-  char linkname[LINKNAMELEN]; /* 157 */
+  char linkname[LINKNAMELEN]; /* 156 */
+  char typeflag;              /* 157 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
@@ -135,6 +146,7 @@ option_t check_option(char **format);
 
 int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
+int decimal_to_octal(int decimal);
 
 #endif
 

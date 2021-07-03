@@ -2,38 +2,22 @@
 #define MODES_ARR_LEN 9
 
 /*!
-	- HELPER: converts a decimal number to octal base
-*/
-
-int decimal_to_octal(int decimal)
-{
-	int octal = 0;
-	int num_digits = 1;
-	int temp = decimal;
-	while (temp != 0)
-	{
-
-		octal += (temp % 8) * num_digits;
-		temp /= 8;
-		num_digits *= 10;
-	}
-	return octal;
-}
-
-/*!
 	- HELPER: Fills a buffer with 0 for unused indexes
 */
 
 void fill_zeros(char *field, int len, int total_len)
 {
 	int j = len;
+	char buff[total_len];
+	memset(buff, '0', total_len - 1);
+
 	for (int i = 0; i < len; i++)
 	{
-		field[total_len - 1 - j] = field[i];
+		buff[(total_len - 1) - j] = field[i];
 		j--;
 	}
-	memset(field, '0', total_len - len - 1);
-	field[total_len - 1] = '\0';
+	buff[total_len - 1] = '\0';
+	strcpy(field, buff);
 }
 
 /*!
@@ -78,7 +62,7 @@ void add_link_or_regtype(header_t *header, char *path)
 
 /*!
 	
-	- Checks file type and wrties to header->typeflag
+	- Checks file type and wrties tomy_itoa header->typeflag
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -99,12 +83,6 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
-	else if (S_ISFIFO(stats.st_mode))
-		header->typeflag = FIFOTYPE;
-	else if (S_ISLNK(stats.st_mode))
-	{
-		header->typeflag = LNKTYPE;
-	}
 	// if not none above
 	else
 	{
@@ -114,45 +92,65 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 }
 
 /*!
+	-  HELPER: Calculate checksum of a field in the header-struct
+*/
+
+unsigned int checksum(char *field, size_t len)
+{
+	unsigned int sum = 0;
+	for (int i = len; i != 0; i--)
+		sum += (unsigned char)(*field++);
+	return sum;
+}
+
+/*!
 	-  Calculate checksum and writes to  header->chksum
 */
+
 void add_checksum(header_t *header)
 {
+	//TODO: CREARE ENUM WITH THIS
+const int bytes_offset[BYTOFFLEN] = {
+ 0, 100, 108, 116, 124,
+136, 148, 156, 157, 257,
+263, 265, 297, 329, 337,
+345, 500,
+};
+
 	unsigned int chksum = 0;
+	char *temp = header->name;
+	int i;
 
-	chksum += sizeof(header->name);
-	chksum += sizeof(header->mode);
-	chksum += sizeof(header->uid);
-	chksum += sizeof(header->gid);
-	chksum += sizeof(header->size);
-	chksum += sizeof(header->mtime);
-	chksum += sizeof(header->typeflag);
-	chksum +=sizeof(header->version);
+	for (i = 0; i < BYTOFFLEN; ++i) {
+		if(i == 0)
+			temp += bytes_offset[i];
+		else
+			temp += bytes_offset[i] - bytes_offset[i-1]; // increment pointer by field len
 
-	chksum +=sizeof(header->magic);
-	chksum +=sizeof(header->uname);
-	chksum +=sizeof(header->gname);
-	chksum +=sizeof(header->prefix);
-
-	// optional 
-	if(header->linkname[0] != '\0')
-		chksum +=sizeof(header->linkname);
-
-	if(header->devmajor[0] != '\0'){
-	chksum +=sizeof(header->devmajor);
-	chksum +=sizeof(header->devmajor);
+		if(i != BYTOFFLEN - 1)
+				chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
 	}
 
-	// TODO: checksum change from 1073 to 1071 when fill with zeros
-	int len = my_itoa(header->chksum, chksum, OCTAL);
+	// remove chksum field from calculation
+  for (i = sizeof(header->chksum); i-- != 0;)
+      chksum -= (unsigned char) header->chksum[i];
+
+	// add 1 blank space instead
+ 	 chksum += ' ' * sizeof header->chksum;
+
+	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
+
+	printf("checksume: %s\n", header->chksum);
 	
 }
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
 	int len = my_itoa(header->uid, stats.st_uid, OCTAL);
+
 	fill_zeros(header->uid, len, UIDLEN);
+
 	len = my_itoa(header->gid, stats.st_gid, OCTAL);
 	fill_zeros(header->gid, len, GIDLEN);
 }
@@ -166,13 +164,12 @@ void add_mtime(header_t *header, struct stat stats)
 	// CHECK OS
 	int len;
 #if __APPLE__
-			len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
-			fill_zeros(header->mtime, len, MTIMELEN);
+	len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
+	fill_zeros(header->mtime, len, MTIMELEN);
 #elif __linux__
-			len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
-			fill_zeros(header->mtime, len, MTIMELEN);
+	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
+	fill_zeros(header->mtime, len, MTIMELEN);
 #endif
-
 }
 
 /*!
@@ -180,11 +177,10 @@ void add_mtime(header_t *header, struct stat stats)
 */
 void add_size(header_t *header, struct stat stats)
 {
-
 	if (stats.st_mode != S_IFLNK)
 	{
-		int len = my_itoa(header->size,stats.st_size, OCTAL);
 
+		int len = my_itoa(header->size, stats.st_size, OCTAL);
 		fill_zeros(header->size, len, SIZELEN);
 	}
 	else
@@ -259,10 +255,10 @@ void add_magic_version(header_t *header)
 	strncpy(header->magic, TMAGIC, TMAGLEN);
 	header->magic[TMAGLEN - 1] = '\0';
 
-	for(int i = 0; i < TVERSLEN; ++i)
-			header->version[i] = ' ';
+	for (int i = 0; i < TVERSLEN; ++i)
+		header->version[i] = ' ';
 
-	header->version[TVERSLEN -1] = '\0';	
+	header->version[TVERSLEN - 1] = '\0';
 }
 
 void init_optional_fields(header_t *header)
@@ -301,11 +297,13 @@ header_t *create_header(char *path)
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
-		add_checksum(header);
+
+		// add_checksum(header);
 	}
 	else
 	{
 		printf("%s %s\n", STAT_ERR, path);
+		// add_checksum(header);
 	}
 	return header;
 }

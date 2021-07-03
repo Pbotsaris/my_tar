@@ -1,14 +1,22 @@
 #include "my_tar.h"
 
-int my_atoi(char *str)
+/*!
+	- HELPER: converts a decimal number to octal base
+*/
+
+int decimal_to_octal(int decimal)
 {
-    int i = 0,
-        sum = 0;
+    int octal = 0;
+    int num_digits = 1;
+    int temp = decimal;
+    while (temp != 0)
+    {
 
-    for (i; isdigit(str[i]) == 1; ++i)
-        sum = (sum * 10) + str[i];
-
-    return sum;
+        octal += (temp % 8) * num_digits;
+        temp /= 8;
+        num_digits *= 10;
+    }
+    return octal;
 }
 
 void reverse(char str[], int length)
