@@ -148,7 +148,6 @@ void add_checksum(header_t *header)
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 	
 }
-//f.txt0000644 0000765 00000240000000005114067333751011045 0ustar  pedrostafftrying tar for khalil. what will happen?
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
