@@ -1,9 +1,9 @@
 SRC =	src/my_tar.c    		\
 		src/create_header.c	 	\
-		src/my_itoa.c 			\
+		src/convert.c 			\
 		src/archive.c			\
 		src/option.c			\
-		src/lstar.c
+		src/ls_tar.c
 
 OBJ = $(SRC:.c=.o)
 

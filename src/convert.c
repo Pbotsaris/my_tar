@@ -1,5 +1,24 @@
 #include "my_tar.h"
 
+/*!
+	- HELPER: converts a decimal number to octal base
+*/
+
+int decimal_to_octal(int decimal)
+{
+    int octal = 0;
+    int num_digits = 1;
+    int temp = decimal;
+    while (temp != 0)
+    {
+
+        octal += (temp % 8) * num_digits;
+        temp /= 8;
+        num_digits *= 10;
+    }
+    return octal;
+}
+
 void reverse(char str[], int length)
 {
     char temp_str[length];
