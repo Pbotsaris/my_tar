@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
     if (argc < 2)
         return 0;
 
-    header_t *header;
 
     for (int i = 0; i < argc; ++i)
     {
@@ -36,12 +35,14 @@ int main(int argc, char *argv[])
         if (argv[i][0] == '-')
             continue;
 
-        //        header = create_header(argv[i]);
         //       break;
     }
 
-    //  archive(argv[1], argv, argc);
-    my_ls_tar(argv[1]);
+    header_t *header;
+    header =  archive(argv[1], argv, argc);
+    debug_header(header);
+
+    //    my_ls_tar(argv[1]);
 
     // printf("name: %s\nmode: %s\n", header->name, header->mode);
     // printf("size: %s\n", header->size);
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
     // printf("devmajor: %s, devminor %s\n", header->devmajor, header->devminor);
     // printf("Prefix: %s\n", header->prefix);
 
-    //    free(header);
+     free(header);
 
     return 0;
 }

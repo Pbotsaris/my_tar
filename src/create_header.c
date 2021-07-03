@@ -91,74 +91,83 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	}
 }
 
-/*!
+/*
+ * 
+ *
 	-  HELPER: Calculate checksum of a field in the header-struct
 */
 
+
 unsigned int checksum(char *field, size_t len)
 {
+	char *temp = field;
 	unsigned int sum = 0;
-	for (int i = len; i != 0; i--)
-		sum += (unsigned char)(*field++);
+	for (int i = len - 1; i >= 0; i--){
+		sum += (unsigned char)*temp;
+		temp++;
+	}
 	return sum;
 }
 
-/*!
+/*
+ *
+ *
 	-  Calculate checksum and writes to  header->chksum
-*/
+																											*/
 
 void add_checksum(header_t *header)
 {
-	//TODO: CREARE ENUM WITH THIS
-const int bytes_offset[BYTOFFLEN] = {
- 0, 100, 108, 116, 124,
-136, 148, 156, 157, 257,
-263, 265, 297, 329, 337,
-345, 500,
-};
+
+	int *bytes_offset = create_bytes_offset();
+
+//int bytes_offset[BYTOFFLEN] = {
+//		0, NAMELEN, MODELEN, UIDLEN, GIDLEN,
+//		SIZELEN, MTIMELEN, CHKSUMLEN, LINKNAMELEN,
+//		TYPFLAGLEN, TMAGLEN, TVERSLEN, UNAMELEN,
+//		GNAMELEN, DEVMAJORLEN, DEVMINORLEN,
+//		PREFIXLEN
+//	};
+//
 
 	unsigned int chksum = 0;
 	char *temp = header->name;
 	int i;
 
-	for (i = 0; i < BYTOFFLEN; ++i) {
-		if(i == 0)
+	for (i = 0; i < BYTOFFLEN - 1; ++i) {
 			temp += bytes_offset[i];
-		else
-			temp += bytes_offset[i] - bytes_offset[i-1]; // increment pointer by field len
-
-		if(i != BYTOFFLEN - 1)
-				chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
+			chksum += checksum(temp, bytes_offset[i + 1]);
 	}
 
-	// remove chksum field from calculation
-  for (i = sizeof(header->chksum); i-- != 0;)
-      chksum -= (unsigned char) header->chksum[i];
-
-	// add 1 blank space instead
- 	 chksum += ' ' * sizeof header->chksum;
+	/*	 remove chksum field from calculation   */
+	for (i = sizeof(header->chksum); i-- != 0;)
+		chksum -= (unsigned char) header->chksum[i];
+	chksum += ' ' * sizeof header->chksum;
 
 	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 
 	printf("checksume: %s\n", header->chksum);
-	
+
+free(bytes_offset);
+
+
 }
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
 	int len = my_itoa(header->uid, stats.st_uid, OCTAL);
-
 	fill_zeros(header->uid, len, UIDLEN);
-
 	len = my_itoa(header->gid, stats.st_gid, OCTAL);
 	fill_zeros(header->gid, len, GIDLEN);
 }
 
-/*!
+/*
+ *
+ *
 	- Check OS for relevant mtime field.
 	- Writes modified time in seconds to header->mtime
-*/
+	*/
+
 void add_mtime(header_t *header, struct stat stats)
 {
 	// CHECK OS
@@ -172,9 +181,12 @@ void add_mtime(header_t *header, struct stat stats)
 #endif
 }
 
-/*!
+/*
+ * 
+ *
 	- Writes size in bytes to header->size.
-*/
+																								*/
+
 void add_size(header_t *header, struct stat stats)
 {
 	if (stats.st_mode != S_IFLNK)
@@ -188,9 +200,9 @@ void add_size(header_t *header, struct stat stats)
 }
 
 /*!
- 
-	 - Writes user id and group id to header->gname and header->uname respectively.
- 
+
+	- Writes user id and group id to header->gname and header->uname respectively.
+
 */
 void add_uname_gname(header_t *header, struct stat stats)
 {
@@ -204,14 +216,13 @@ void add_uname_gname(header_t *header, struct stat stats)
 }
 
 /*!
- 
-	 - read mode, gid, and uid from stat struct and sum them together.
-	 - write mode in octal to header->mode
- 
+
+	- read mode, gid, and uid from stat struct and sum them together.
+	- write mode in octal to header->mode
+
 */
 void add_mode(header_t *header, struct stat stats)
 {
-	// ->  TODO:	The mode field provides nine bits specifying file permissions and three bits to specify the Set UID, Set GID, and Save Text (sticky) modes.
 	int mode = 0;
 	int modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
 	int stats_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
@@ -226,8 +237,8 @@ void add_mode(header_t *header, struct stat stats)
 }
 
 /*!
-	 - Writes filename to be archieved to header->name
-*/
+	- Writes filename to be archieved to header->name
+	*/
 void add_name(header_t *header, char *path)
 {
 	size_t path_len = strlen(path);
@@ -274,11 +285,11 @@ void init_optional_fields(header_t *header)
  *  Create Header																								*																									*
  *  																											*																												* 
  *   - Using the path passed in as first argument, create_header creates a tar struct following the				*				
-  basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
- *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.								*							
- *   - This header struct adds a trailing null to every field													*														
- *																												*																												*
- ***************************************************************************************************************/
+ basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
+																								*   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.								*							
+																								*   - This header struct adds a trailing null to every field													*														
+																								*																												*																												*
+																								***************************************************************************************************************/
 
 header_t *create_header(char *path)
 {
@@ -298,12 +309,11 @@ header_t *create_header(char *path)
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
 
-		// add_checksum(header);
+		 add_checksum(header);
 	}
 	else
 	{
 		printf("%s %s\n", STAT_ERR, path);
-		// add_checksum(header);
 	}
 	return header;
 }

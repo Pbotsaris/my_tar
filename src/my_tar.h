@@ -63,12 +63,13 @@
 #define MTIMELEN 12
 #define CHKSUMLEN 8
 #define LINKNAMELEN 100
+#define TYPFLAGLEN 1
 #define TMAGLEN 6
 #define UNAMELEN 32
 #define GNAMELEN 32
-#define TVERSLEN 3
+#define TVERSLEN 2
 #define DEVMAJORLEN 8
-#define DEVMINORLEN 81000
+#define DEVMINORLEN 8
 #define PREFIXLEN 155
 
 #define BLOCKSIZE 512
@@ -89,7 +90,7 @@ typedef struct posix_header
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
   char linkname[LINKNAMELEN]; /* 156 */
-  char typeflag;              /* 157 */
+  char typeflag;              /* 256 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
@@ -97,10 +98,12 @@ typedef struct posix_header
   char devmajor[DEVMAJORLEN]; /* 329 */
   char devminor[DEVMINORLEN]; /* 337 */
   char prefix[PREFIXLEN];     /* 345 */
-                              /* 500 */
+  /* 500 */
 } header_t;
 
 header_t *create_header(char *path);
+int *create_bytes_offset(void);
+void debug_header(header_t *header);
 
 #endif
 
@@ -155,7 +158,7 @@ int decimal_to_octal(int decimal);
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 
-void archive(char *path, char **argv, int argc);
+header_t *archive(char *path, char **argv, int argc);
 
 #endif
 
