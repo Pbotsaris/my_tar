@@ -100,28 +100,7 @@ typedef struct posix_header
                               /* 500 */
 } header_t;
 
-int bytes_offset[BYTOFFLEN] = {
-    0,
-    100,
-    108,
-    116,
-    124,
-    136,
-    148,
-    156,
-    157,
-    257,
-    263,
-    265,
-    297,
-    329,
-    337,
-    345,
-    500,
-};
-
 header_t *create_header(char *path);
-int decimal_to_octal(int decimal);
 
 #endif
 
@@ -167,6 +146,7 @@ option_t check_option(char **format);
 
 int my_itoa(char *str, int num, int base);
 int my_atoi(char *str);
+int decimal_to_octal(int decimal);
 
 #endif
 
