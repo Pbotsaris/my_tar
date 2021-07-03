@@ -2,25 +2,6 @@
 #define MODES_ARR_LEN 9
 
 /*!
-	- HELPER: converts a decimal number to octal base
-*/
-
-int decimal_to_octal(int decimal)
-{
-	int octal = 0;
-	int num_digits = 1;
-	int temp = decimal;
-	while (temp != 0)
-	{
-
-		octal += (temp % 8) * num_digits;
-		temp /= 8;
-		num_digits *= 10;
-	}
-	return octal;
-}
-
-/*!
 	- HELPER: Fills a buffer with 0 for unused indexes
 */
 
@@ -81,7 +62,7 @@ void add_link_or_regtype(header_t *header, char *path)
 
 /*!
 	
-	- Checks file type and wrties to header->typeflag
+	- Checks file type and wrties tomy_itoa header->typeflag
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -101,12 +82,6 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	{
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
-	}
-	else if (S_ISFIFO(stats.st_mode))
-		header->typeflag = FIFOTYPE;
-	else if (S_ISLNK(stats.st_mode))
-	{
-		header->typeflag = LNKTYPE;
 	}
 	// if not none above
 	else
@@ -132,32 +107,32 @@ unsigned int checksum(char *field, size_t len)
 	-  Calculate checksum and writes to  header->chksum
 */
 
-void add_checksum(header_t *header)
-{
-	unsigned int chksum = 0;
-	char *temp = header->name;
-	int i;
+// void add_checksum(header_t *header)
+// {
+// 	unsigned int chksum = 0;
+// 	char *temp = header->name;
+// 	int i;
 
-	for (i = 0; i < BYTOFFLEN; ++i)
-	{
-		temp += bytes_offset[i]; // increment pointer by field len
+// 	for (i = 0; i < BYTOFFLEN; ++i)
+// 	{
+// 		temp += bytes_offset[i]; // increment pointer by field len
 
-		if (i != BYTOFFLEN - 1)
-			chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
-	}
+// 		if (i != BYTOFFLEN - 1)
+// 			chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
+// 	}
 
-	// remove chksum field from calculation
-	for (i = sizeof(header->chksum); i-- != 0;)
-		chksum -= (unsigned char)header->chksum[i];
+// 	// remove chksum field from calculation
+// 	for (i = sizeof(header->chksum); i-- != 0;)
+// 		chksum -= (unsigned char)header->chksum[i];
 
-	// add 1 blank space instead
-	chksum += ' ' * sizeof header->chksum;
+// 	// add 1 blank space instead
+// 	chksum += ' ' * sizeof header->chksum;
 
-	int len = my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
-	fill_zeros(header->chksum, len, CHKSUMLEN);
+// 	int len = my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
+// 	fill_zeros(header->chksum, len, CHKSUMLEN);
 
-	printf("checksume: %s\n", header->chksum);
-}
+// 	printf("checksume: %s\n", header->chksum);
+// }
 
 void add_uid_gid(header_t *header, struct stat stats)
 {
@@ -312,11 +287,12 @@ header_t *create_header(char *path)
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
 
-		add_checksum(header);
+		// add_checksum(header);
 	}
 	else
 	{
 		printf("%s %s\n", STAT_ERR, path);
+		// add_checksum(header);
 	}
 	return header;
 }
