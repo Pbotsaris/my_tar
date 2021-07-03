@@ -29,9 +29,9 @@
 #define TVERSION "00"  /* 00 and no null */
 
 // USER FOR MODE
-#define TSUID    04000		/* set UID on execution */
-#define TSGID    02000		/* set GID on execution */
-#define TSVTX    01000		/* reserved */
+#define TSUID 04000 /* set UID on execution */
+#define TSGID 02000 /* set GID on execution */
+#define TSVTX 01000 /* reserved */
 
 // VALUES IN OCTAL
 #define TUREAD 00401  /* read by owner */
@@ -72,13 +72,15 @@
 #define PREFIXLEN 155
 
 #define BLOCKSIZE 512
-#define BYTOFFLEN 17 
+#define BYTOFFLEN 17
+#define JMPSIZE 24
+#define ENDBLK 376
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
 
 typedef struct posix_header
-      {                     /* byte offset */
+{                             /* byte offset */
   char name[NAMELEN];         /*   0 */
   char mode[MODELEN];         /* 100 */
   char uid[UIDLEN];           /* 108 */
@@ -98,16 +100,28 @@ typedef struct posix_header
                               /* 500 */
 } header_t;
 
-
-
 int bytes_offset[BYTOFFLEN] = {
- 0, 100, 108, 116, 124,
-136, 148, 156, 157, 257,
-263, 265, 297, 329, 337,
-345, 500,
+    0,
+    100,
+    108,
+    116,
+    124,
+    136,
+    148,
+    156,
+    157,
+    257,
+    263,
+    265,
+    297,
+    329,
+    337,
+    345,
+    500,
 };
 
 header_t *create_header(char *path);
+int decimal_to_octal(int decimal);
 
 #endif
 
@@ -169,8 +183,6 @@ void archive(char *path, char **argv, int argc);
 
 #ifndef LS_TAR_H
 #define LS_TAR_H
-
-#define BLOCKSIZE 512
 
 int my_ls_tar(char *path);
 int check_byte(int block);
