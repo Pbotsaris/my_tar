@@ -24,13 +24,11 @@ int decimal_to_octal(int decimal)
 	- HELPER: Fills a buffer with 0 for unused indexes
 */
 
-	 
-
 void fill_zeros(char *field, int len, int total_len)
 {
 	int j = len;
-	 char buff[total_len];
-		memset(buff, '0', total_len - 1);
+	char buff[total_len];
+	memset(buff, '0', total_len - 1);
 
 	for (int i = 0; i < len; i++)
 	{
@@ -122,45 +120,43 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 	-  HELPER: Calculate checksum of a field in the header-struct
 */
 
-
 unsigned int checksum(char *field, size_t len)
 {
 	unsigned int sum = 0;
-	for(int i = len; i != 0; i--)
-			sum+= (unsigned char) (*field++);
+	for (int i = len; i != 0; i--)
+		sum += (unsigned char)(*field++);
 	return sum;
 }
-
 
 /*!
 	-  Calculate checksum and writes to  header->chksum
 */
-		
+
 void add_checksum(header_t *header)
 {
 	unsigned int chksum = 0;
 	char *temp = header->name;
 	int i;
 
-	for (i = 0; i < BYTOFFLEN; ++i) {
+	for (i = 0; i < BYTOFFLEN; ++i)
+	{
 		temp += bytes_offset[i]; // increment pointer by field len
 
-		if(i != BYTOFFLEN - 1)
-				chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
+		if (i != BYTOFFLEN - 1)
+			chksum += checksum(temp, bytes_offset[i + 1] - bytes_offset[i]);
 	}
 
 	// remove chksum field from calculation
-  for (i = sizeof(header->chksum); i-- != 0;)
-      chksum -= (unsigned char) header->chksum[i];
+	for (i = sizeof(header->chksum); i-- != 0;)
+		chksum -= (unsigned char)header->chksum[i];
 
 	// add 1 blank space instead
- 	 chksum += ' ' * sizeof header->chksum;
+	chksum += ' ' * sizeof header->chksum;
 
-	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
+	int len = my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 
 	printf("checksume: %s\n", header->chksum);
-	
 }
 
 void add_uid_gid(header_t *header, struct stat stats)
@@ -182,11 +178,11 @@ void add_mtime(header_t *header, struct stat stats)
 	// CHECK OS
 	int len;
 #if __APPLE__
-			len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
-			fill_zeros(header->mtime, len, MTIMELEN);
+	len = my_itoa(header->mtime, stats.st_mtimespec.tv_sec, OCTAL);
+	fill_zeros(header->mtime, len, MTIMELEN);
 #elif __linux__
-			len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
-			fill_zeros(header->mtime, len, MTIMELEN);
+	len = my_itoa(header->mtime, stats.st_mtim.tv_sec, OCTAL);
+	fill_zeros(header->mtime, len, MTIMELEN);
 #endif
 }
 
@@ -198,7 +194,7 @@ void add_size(header_t *header, struct stat stats)
 	if (stats.st_mode != S_IFLNK)
 	{
 
-		int len = my_itoa(header->size,stats.st_size, OCTAL);
+		int len = my_itoa(header->size, stats.st_size, OCTAL);
 		fill_zeros(header->size, len, SIZELEN);
 	}
 	else
@@ -273,10 +269,10 @@ void add_magic_version(header_t *header)
 	strncpy(header->magic, TMAGIC, TMAGLEN);
 	header->magic[TMAGLEN - 1] = '\0';
 
-	for(int i = 0; i < TVERSLEN; ++i)
-			header->version[i] = ' ';
+	for (int i = 0; i < TVERSLEN; ++i)
+		header->version[i] = ' ';
 
-	header->version[TVERSLEN -1] = '\0';	
+	header->version[TVERSLEN - 1] = '\0';
 }
 
 void init_optional_fields(header_t *header)
@@ -317,7 +313,6 @@ header_t *create_header(char *path)
 		add_uname_gname(header, stats);
 
 		add_checksum(header);
-
 	}
 	else
 	{
