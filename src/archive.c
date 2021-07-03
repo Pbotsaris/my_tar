@@ -34,13 +34,14 @@ header_t *tar(char *path, FILE *dest)
 
 }
 
+// TODO: alternatively we can just pass in the header
 header_t *archive(char *path, char **argv, int argc)
 {
 	header_t *header;
 	struct stat stats;
 	FILE *dest = fopen(path, "wb");
 	int fd,
-		index = 2;
+		index = argv[1][0] == '-' ? 3 :  2;
 	if (dest == NULL)
 	{
 		printf("ERROR\n");
@@ -48,6 +49,7 @@ header_t *archive(char *path, char **argv, int argc)
 	}
 	while (index < argc)
 	{
+		// TODO: need to fix this to prevent multiple headers. We only need 1 header
 		fd = open(argv[index], O_APPEND);
 		lseek(fd, 0, SEEK_SET);
     header = tar(argv[index], dest);

@@ -23,37 +23,25 @@ int main(int argc, char *argv[])
 {
 
     // check_option(argv);
-
     if (argc < 2)
         return 0;
 
 
-    for (int i = 0; i < argc; ++i)
-    {
-        if (i == 0)
-            continue;
-        if (argv[i][0] == '-')
-            continue;
-
-        //       break;
-    }
-
     header_t *header;
-    header =  archive(argv[1], argv, argc);
-    debug_header(header);
 
-    //    my_ls_tar(argv[1]);
+    if(argv[1][0] == '-' && argv[1][1] == 'd'){ 
+        header =  archive(argv[3], argv, argc);
+        debug_header(header);
+    }
+    else if(argv[1][0] == '-') {
+        printf("invalid option\n");
+        return 0;
+    }
+    else
+        header =  archive(argv[2], argv, argc);
 
-    // printf("name: %s\nmode: %s\n", header->name, header->mode);
-    // printf("size: %s\n", header->size);
-    // printf("uid:%s\ngid: %s\n", header->uid, header->gid);
-    // printf("gname: %s\nuname: %s\n", header->gname, header->uname);
-    //     printf("time modified: %s\nchecksum: %s\ntypeflag: %c\n", header->mtime, header->chksum, header->typeflag);
-    //    // printf("linkname: %s\nMagic: %s\nversion: %s\n", header->linkname, header->magic, header->version);
-    // printf("devmajor: %s, devminor %s\n", header->devmajor, header->devminor);
-    // printf("Prefix: %s\n", header->prefix);
 
-     free(header);
+    free(header);
 
     return 0;
 }
