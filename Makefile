@@ -1,27 +1,24 @@
-SRC =	src/my_tar.c    		\
-		src/create_header.c	 	\
-		src/utils.c          \
-		src/debug.c          \
-		src/archive.c			\
-		src/option.c			\
-		src/ls_tar.c
+OBJ=obj/my_tar.o    	   	\
+		obj/create_header.o	 	\
+		obj/utils.o           \
+		obj/debug.o           \
+		obj/archive.o		    	\
+		obj/option.o	    		\
+		obj/ls_tar.o
 
-OBJ = $(SRC:.c=.o)
+CFLAGS=-W -g 
+CC=gcc 
+BIN=bin/my_tar
+RM=rm -r
 
-CFLAGS += -W -g3 
+all: $(BIN)
 
-CC = gcc -g -o
+$(BIN): $(OBJ)
+	$(CC) -o $(BIN) $(OBJ) $(CFLAGS)
 
-NAME = my_tar
-
-RM = rm 
-
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	$(CC) $(NAME) $(OBJ) $(CFLAGS)
+obj/%.o: src/%.c
+	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
-	$(RM) $(OBJ)
-	$(RM) $(NAME)
+	$(RM) bin/* obj/*
 

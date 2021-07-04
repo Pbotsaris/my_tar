@@ -281,7 +281,7 @@ void init_optional_fields(header_t *header)
  *   CREATE HEADER																																										     
  *   																									                     													 
  *    - Using the path passed in as first argument, create_header creates a tar struct following the	   
- *    -  basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html		     
+ *      basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html		     
  *    - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.							       
  *    - This header struct adds a trailing null to every field											                    
  *    
