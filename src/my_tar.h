@@ -112,6 +112,7 @@ typedef enum
   u,
   x,
   NONE,
+  MISSING_F,
   ERROROPT
 } option_t;
 
@@ -123,8 +124,8 @@ typedef enum
 } bool_t;
 
 // ERRS
-#define F_NOT_FOUND "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
-#define F_ERROR "You must specify one of the the following options -c -r -t -u -x\n"
+#define MISSING_F_ERR "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
+#define MISSING_OPT_ERR "You must specify one of the the following options -c -r -t -u -x\n"
 #define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
 #define EXC_NAME_SIZE "my_tar: Filename exceeds maximum length of 200\n"
 #define STAT_ERR "Unable to read"

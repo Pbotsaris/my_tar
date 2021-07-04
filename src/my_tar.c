@@ -22,11 +22,11 @@
 int main(int argc, char *argv[])
 {
 
-    // check_option(argv);
+     check_option(argv);
     //
     if (argc < 2)
         return 0;
-
+/*
     header_t *header;
 
     if(argv[1][0] == '-' && argv[1][1] == 'd'){ 
@@ -41,10 +41,9 @@ int main(int argc, char *argv[])
         header =  archive(argv[1], argv, argc);
     }
 
-
     //  archive(argv[1], argv, argc);
 
     free(header);
-
+*/
     return 0;
 }
