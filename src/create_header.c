@@ -1,29 +1,10 @@
 #include "my_tar.h"
-#define MODES_ARR_LEN 9
-
-/*!
-	- HELPER: Fills a buffer with 0 for unused indexes
-*/
-
-void fill_zeros(char *field, int len, int total_len)
-{
-	int j = len;
-	char buff[total_len];
-	memset(buff, '0', total_len - 1);
-
-	for (int i = 0; i < len; i++)
-	{
-		buff[(total_len - 1) - j] = field[i];
-		j--;
-	}
-	buff[total_len - 1] = '\0';
-	strcpy(field, buff);
-}
 
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- add devmajor and devminor when file type is a block or char special
+
 */
 
 void add_dev_major_minor(header_t *header, struct stat stats)
@@ -36,12 +17,15 @@ void add_dev_major_minor(header_t *header, struct stat stats)
 	fill_zeros(header->devminor, len, DEVMINORLEN);
 }
 
-/*!
+/*
+ *
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
 	- check if file is either a symlink or regular file.
 	- If symlink writes to header->linkname
+
 */
+
 void add_link_or_regtype(header_t *header, char *path)
 {
 	struct stat lstats;
@@ -60,9 +44,12 @@ void add_link_or_regtype(header_t *header, char *path)
 	}
 }
 
-/*!
-	
+/*
+ * 
+ 
 	- Checks file type and wrties tomy_itoa header->typeflag
+
+
 */
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
@@ -93,9 +80,10 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 
 /*
  * 
- *
+ 
 	-  HELPER: Calculate checksum of a field in the header-struct
-*/
+
+																												*/
 
 
 unsigned int checksum(char *field, size_t len)
@@ -111,23 +99,15 @@ unsigned int checksum(char *field, size_t len)
 
 /*
  *
- *
+ 
 	-  Calculate checksum and writes to  header->chksum
+
 																											*/
 
 void add_checksum(header_t *header)
 {
 
 	int *bytes_offset = create_bytes_offset();
-
-//int bytes_offset[BYTOFFLEN] = {
-//		0, NAMELEN, MODELEN, UIDLEN, GIDLEN,
-//		SIZELEN, MTIMELEN, CHKSUMLEN, LINKNAMELEN,
-//		TYPFLAGLEN, TMAGLEN, TVERSLEN, UNAMELEN,
-//		GNAMELEN, DEVMAJORLEN, DEVMINORLEN,
-//		PREFIXLEN
-//	};
-//
 
 	unsigned int chksum = 0;
 	char *temp = header->name;
@@ -163,9 +143,10 @@ void add_uid_gid(header_t *header, struct stat stats)
 
 /*
  *
- *
+ 
 	- Check OS for relevant mtime field.
 	- Writes modified time in seconds to header->mtime
+
 	*/
 
 void add_mtime(header_t *header, struct stat stats)
@@ -183,15 +164,15 @@ void add_mtime(header_t *header, struct stat stats)
 
 /*
  * 
- *
+ 
 	- Writes size in bytes to header->size.
+
 																								*/
 
 void add_size(header_t *header, struct stat stats)
 {
 	if (stats.st_mode != S_IFLNK)
 	{
-
 		int len = my_itoa(header->size, stats.st_size, OCTAL);
 		fill_zeros(header->size, len, SIZELEN);
 	}
@@ -199,11 +180,13 @@ void add_size(header_t *header, struct stat stats)
 		header->size[0] = '0';
 }
 
-/*!
+/*
+ *
 
 	- Writes user id and group id to header->gname and header->uname respectively.
 
-*/
+																									*/
+
 void add_uname_gname(header_t *header, struct stat stats)
 {
 	struct passwd *pws;
@@ -215,30 +198,40 @@ void add_uname_gname(header_t *header, struct stat stats)
 	strcpy(header->uname, pws->pw_name);
 }
 
-/*!
+/*
+ *
 
 	- read mode, gid, and uid from stat struct and sum them together.
 	- write mode in octal to header->mode
 
-*/
+																									*/
+
 void add_mode(header_t *header, struct stat stats)
 {
 	int mode = 0;
-	int modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC, TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
-	int stats_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < MODES_ARR_LEN; ++i)
-		if (stats.st_mode & stats_modes[i])
+//	int *tar_modes = create_modes(tar_mode);
+	int *stat_modes = create_modes(stat_mode);
 
-			mode += stats_modes[i];
+		for (int i = 0; i < MODES_ARR_LEN; ++i)
+		if (stats.st_mode & stat_modes[i])
+
+			mode += stat_modes[i];
 
 	int len = my_itoa(header->mode, mode, OCTAL);
 	fill_zeros(header->mode, len, MODELEN);
+
+//	free(tar_modes);
+	free(stat_modes);
 }
 
-/*!
+/*
+ *
+ 
 	- Writes filename to be archieved to header->name
-	*/
+
+																									*/
+
 void add_name(header_t *header, char *path)
 {
 	size_t path_len = strlen(path);

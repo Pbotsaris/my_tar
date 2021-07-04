@@ -1,7 +1,4 @@
 /* ========================================================================= */
-
-// LIBRARIES
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -102,7 +99,6 @@ typedef struct posix_header
 } header_t;
 
 header_t *create_header(char *path);
-int *create_bytes_offset(void);
 void debug_header(header_t *header);
 
 #endif
@@ -144,14 +140,23 @@ option_t check_option(char **format);
 
 /* ========================================================================= */
 
-#ifndef MY_ITOA_H
-#define MY_ITOA_H
+#ifndef UTILS_H
+#define UTILS_H
 
+#define MODES_ARR_LEN 9
+typedef enum {tar_mode, stat_mode}modes_t;
+
+int *create_bytes_offset(void);
+int *create_modes(modes_t type);
+void fill_zeros(char *field, int len, int total_len) ;
 int my_itoa(char *str, int num, int base);
-int my_atoi(char *str);
 int decimal_to_octal(int decimal);
 
+
 #endif
+
+/* ========================================================================= */
+
 
 /* ========================================================================= */
 
