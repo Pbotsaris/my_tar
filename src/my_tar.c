@@ -26,20 +26,20 @@ int main(int argc, char *argv[])
     if (argc < 2)
         return 0;
 
-
     header_t *header;
 
     if(argv[1][0] == '-' && argv[1][1] == 'd'){ 
-        header =  archive(argv[3], argv, argc);
+        printf("%s\n", argv[2]);
+        header =  archive(argv[2], argv, argc);
         debug_header(header);
     }
     else if(argv[1][0] == '-') {
         printf("invalid option\n");
         return 0;
     }
-    else
-        header =  archive(argv[2], argv, argc);
-
+    else {
+        header =  archive(argv[1], argv, argc);
+    }
 
     free(header);
 

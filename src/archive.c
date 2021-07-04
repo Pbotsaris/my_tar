@@ -27,7 +27,8 @@ header_t *tar(char *path, FILE *dest)
 	else
 	{
 		printf("ERROR\n");
-		exit(1);
+	//	exit(1);
+	return header;
 	}
 	printf("File name in archive: %s\n", header->name);
 	return header;
@@ -45,11 +46,12 @@ header_t *archive(char *path, char **argv, int argc)
 	if (dest == NULL)
 	{
 		printf("ERROR\n");
-		exit(1);
+	//	exit(1);
+	return header;
 	}
 	while (index < argc)
 	{
-		// TODO: need to fix this to prevent multiple headers. We only need 1 header
+		// TODO: need to look into creating multiple headers and free them. maybe the logic ouside this function.
 		fd = open(argv[index], O_APPEND);
 		lseek(fd, 0, SEEK_SET);
     header = tar(argv[index], dest);

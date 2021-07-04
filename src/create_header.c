@@ -126,10 +126,10 @@ void add_checksum(header_t *header)
 
 	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
+	// remove extra 0 from chksum
+	header->chksum[CHKSUMLEN - 2] = '\0';
 
-	printf("checksume: %s\n", header->chksum);
-
-free(bytes_offset);
+	free(bytes_offset);
 
 
 }
