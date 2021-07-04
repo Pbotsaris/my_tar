@@ -1,1 +1,1 @@
-46 is the number i want in this file
+hello world! this is a test file to see how tar works. goodbye :)

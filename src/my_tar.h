@@ -1,7 +1,3 @@
-/* ========================================================================= */
-
-// LIBRARIES
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -22,18 +18,16 @@
 #ifndef MY_TAR_H
 #define MY_TAR_H
 
-#define OCTAL 8
-#define DECIMAL 10
-
 #define TMAGIC "ustar" /* ustar and a null */
 #define TVERSION "00"  /* 00 and no null */
 
-// USER FOR MODE
+/* USERS - values in octal */
 #define TSUID 04000 /* set UID on execution */
 #define TSGID 02000 /* set GID on execution */
 #define TSVTX 01000 /* reserved */
 
-// VALUES IN OCTAL
+
+/* MODES - values in octal */
 #define TUREAD 00401  /* read by owner */
 #define TUWRITE 00202 /* write by owner */
 #define TUEXEC 00100  /* execute/search by owner */
@@ -55,6 +49,7 @@
 #define FIFOTYPE '6'  /* FIFO special */
 #define CONTTYPE '7'  /* reserved */
 
+/* field length */
 #define NAMELEN 100
 #define MODELEN 8
 #define UIDLEN 8
@@ -63,14 +58,18 @@
 #define MTIMELEN 12
 #define CHKSUMLEN 8
 #define LINKNAMELEN 100
+#define TYPFLAGLEN 1
 #define TMAGLEN 6
 #define UNAMELEN 32
 #define GNAMELEN 32
-#define TVERSLEN 3
+#define TVERSLEN 2
 #define DEVMAJORLEN 8
-#define DEVMINORLEN 81000
+#define DEVMINORLEN 8
 #define PREFIXLEN 155
 
+/* Other macros  */
+#define OCTAL 8
+#define DECIMAL 10
 #define BLOCKSIZE 512
 #define BYTOFFLEN 17
 #define JMPSIZE 24
@@ -78,7 +77,6 @@
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
-
 typedef struct posix_header
 {                             /* byte offset */
   char name[NAMELEN];         /*   0 */
@@ -89,7 +87,7 @@ typedef struct posix_header
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
   char linkname[LINKNAMELEN]; /* 156 */
-  char typeflag;              /* 157 */
+  char typeflag;              /* 256 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
@@ -101,13 +99,10 @@ typedef struct posix_header
 } header_t;
 
 header_t *create_header(char *path);
+void debug_header(header_t *header);
 
-#endif
 
 /* ========================================================================= */
-
-#ifndef OPTION_H
-#define OPTION_H
 
 typedef enum
 {
@@ -137,32 +132,25 @@ typedef enum
 
 option_t check_option(char **format);
 
-#endif
 
 /* ========================================================================= */
 
-#ifndef MY_ITOA_H
-#define MY_ITOA_H
+#define MODES_ARR_LEN 9
+typedef enum {tar_mode, stat_mode}modes_t;
 
+int *create_bytes_offset(void);
+int *create_modes(modes_t type);
+void fill_zeros(char *field, int len, int total_len) ;
 int my_itoa(char *str, int num, int base);
-int my_atoi(char *str);
 int decimal_to_octal(int decimal);
 
-#endif
 
 /* ========================================================================= */
 
-#ifndef ARCHIVE_H
-#define ARCHIVE_H
+header_t *archive(char *path, char **argv, int argc);
 
-void archive(char *path, char **argv, int argc);
-
-#endif
 
 /* ========================================================================= */
-
-#ifndef LS_TAR_H
-#define LS_TAR_H
 
 int my_ls_tar(char *path);
 int check_byte(int block);

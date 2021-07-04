@@ -1,55 +1,65 @@
 #include "my_tar.h"
 
-void tar(char *path, FILE *dest)
+header_t *tar(char *path, FILE *dest)
 {
 
 	int fd = open(path, O_APPEND),
 		byte_block;
-	header_t header;
+	header_t *header;
 	struct stat stats;
 	if (fd)
 	{
 		if (stat(path, &stats) == 0)
-			header = *create_header(path);
+			header = create_header(path);
 
 		int buff_size = (int)stats.st_size;
 		char *buffer = malloc(sizeof(char) * buff_size + 1);
 		read(fd, buffer, buff_size);
 		buffer[buff_size] = '\0';
 
-		fwrite(&header, sizeof(header), 1, dest);
+		fwrite(header, sizeof(header_t), 1, dest);
 		fwrite(buffer, buff_size, 1, dest);
 
 		free(buffer);
 		close(fd);
+		return header;
 	}
 	else
 	{
 		printf("ERROR\n");
-		exit(1);
+	//	exit(1);
+	return header;
 	}
-	printf("File name in archive: %s\n", header.name);
+	printf("File name in archive: %s\n", header->name);
+	return header;
+
 }
-void archive(char *path, char **argv, int argc)
+
+// TODO: alternatively we can just pass in the header
+header_t *archive(char *path, char **argv, int argc)
 {
-//	printf("%s\n", )
+	header_t *header;
 	struct stat stats;
 	FILE *dest = fopen(path, "wb");
 	int fd,
-		index = 2;
+		index = argv[1][0] == '-' ? 3 :  2;
 	if (dest == NULL)
 	{
 		printf("ERROR\n");
-		exit(1);
+	//	exit(1);
+	return header;
 	}
 	while (index < argc)
 	{
+		// TODO: need to look into creating multiple headers and free them. maybe the logic ouside this function.
 		fd = open(argv[index], O_APPEND);
 		lseek(fd, 0, SEEK_SET);
-		tar(argv[index], dest);
+    header = tar(argv[index], dest);
 		index++;
 		close(fd);
 	}
 
 	fclose(dest);
+
+	return header;
 }
