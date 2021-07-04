@@ -1,5 +1,4 @@
-my_tar
-obj/
+obj/*
 *.dSYM
 file.tar
 source.c
