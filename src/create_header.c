@@ -51,6 +51,7 @@ void add_link_or_regtype(header_t *header, char *path)
 
 
 */
+
 void add_typeflag(header_t *header, struct stat stats, char *path)
 {
 
@@ -274,15 +275,18 @@ void init_optional_fields(header_t *header)
 	header->prefix[0] = '\0';
 }
 
-/********************************************/ /****************************************************************
- *  Create Header																								*																									*
- *  																											*																												* 
- *   - Using the path passed in as first argument, create_header creates a tar struct following the				*				
- basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html				*					
-																								*   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.								*							
-																								*   - This header struct adds a trailing null to every field													*														
-																								*																												*																												*
-																								***************************************************************************************************************/
+
+/********************************************/ /*****************************************************************
+ *                                                                                                              *
+ *  CREATE HEADER																																														  	*
+ *  																									                     																	  	* 
+ *   - Using the path passed in as first argument, create_header creates a tar struct following the			      	*				
+ *	 -  basic tar convention: https://www.gnu.org/software/tar/manual/html_node/Standard.html		            		*					
+ *   - This header struct is based on the Tar Header Block, from POSIX 1003.1-1990.							              	*							
+ *   - This header struct adds a trailing null to every field											                          		*														
+ *																																																							*
+ ***************************************************************************************************************/
+
 
 header_t *create_header(char *path)
 {

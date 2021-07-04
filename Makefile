@@ -1,6 +1,5 @@
 SRC =	src/my_tar.c    		\
 		src/create_header.c	 	\
-		src/convert.c 			\
 		src/utils.c          \
 		src/debug.c          \
 		src/archive.c			\
