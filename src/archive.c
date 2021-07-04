@@ -35,31 +35,31 @@ header_t *tar(char *path, FILE *dest)
 
 }
 
-// TODO: alternatively we can just pass in the header
-header_t *archive(char *path, char **argv, int argc)
+int archive(char **paths, size_t paths_len, header_t *headers[])
 {
-	header_t *header;
 	struct stat stats;
-	FILE *dest = fopen(path, "wb");
-	int fd,
-		index = argv[1][0] == '-' ? 3 :  2;
+	FILE *dest = fopen(paths[0], "wb");
+	int fd; 
+	size_t index = 1;
 	if (dest == NULL)
 	{
-		printf("ERROR\n");
+		printf("Error creating archive file\n");
 	//	exit(1);
-	return header;
+	return -1;
 	}
-	while (index < argc)
+
+	while (index < paths_len)
 	{
-		// TODO: need to look into creating multiple headers and free them. maybe the logic ouside this function.
-		fd = open(argv[index], O_APPEND);
+		fd = open(paths[index], O_APPEND);
 		lseek(fd, 0, SEEK_SET);
-    header = tar(argv[index], dest);
+		// header per file
+		headers[index - 1] = tar(paths[index], dest);
 		index++;
 		close(fd);
 	}
 
 	fclose(dest);
 
-	return header;
+	return index - 1;
+
 }

@@ -98,11 +98,6 @@ typedef struct posix_header
                               /* 500 */
 } header_t;
 
-header_t *create_header(char *path);
-void debug_header(header_t *header);
-
-
-/* ========================================================================= */
 
 typedef enum
 {
@@ -111,6 +106,7 @@ typedef enum
   t,
   u,
   x,
+  d,
   NONE,
   MISSING_F,
   ERROROPT
@@ -120,8 +116,9 @@ typedef enum
 {
   FALSE,
   TRUE,
-  ERRORF
 } bool_t;
+
+typedef enum {tar_mode, stat_mode}modes_t;
 
 // ERRS
 #define MISSING_F_ERR "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
@@ -131,29 +128,27 @@ typedef enum
 #define STAT_ERR "Unable to read"
 #define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
 
-option_t check_option(char **format);
-
-
-/* ========================================================================= */
 
 #define MODES_ARR_LEN 9
-typedef enum {tar_mode, stat_mode}modes_t;
 
+
+// Helpers
 int *create_bytes_offset(void);
 int *create_modes(modes_t type);
 void fill_zeros(char *field, int len, int total_len) ;
 int my_itoa(char *str, int num, int base);
 int decimal_to_octal(int decimal);
-
-
-/* ========================================================================= */
-
-header_t *archive(char *path, char **argv, int argc);
-
-
-/* ========================================================================= */
-
 int my_ls_tar(char *path);
 int check_byte(int block);
+void debug_header(header_t *header);
+
+// main calbacks
+header_t *create_header(char *path);
+int archive(char **paths, size_t paths_len, header_t *headers[]);
+option_t check_option(char **format);
+
+bool_t search_flag(char **argv, char flag);
+int find_paths_start_index(char **argv);
+bool_t validate_tar_extention(char *path);
 
 #endif

@@ -11,6 +11,9 @@ int search_dash(char *str)
 			has_dash = TRUE;
 			break;
 		}
+		// if not a space then not an option
+		else if(str[index] != ' ')
+			break;
 		else
 			index++;
 	}
@@ -80,6 +83,10 @@ void print_error(option_t flag_opt)
 		printf("%s", NULL_OPT);
 }
 
+
+
+
+
 /*
  * =====================================================================================
  *
@@ -94,8 +101,6 @@ void print_error(option_t flag_opt)
  *    
  * =====================================================================================
  */
-
-
 
 option_t check_option(char **argv)
 {
@@ -116,7 +121,7 @@ option_t check_option(char **argv)
 				flag_opt = select_option(argv[index][pos + 1], flag_opt);
 			}
 			else {
-			// split options: -c -f	
+				// split options: -c -f	
 				flag_opt = select_option(argv[index][pos + 1], flag_opt);
 				if(flag_opt != ERROROPT){
 					char *argv_temp = argv[index];
@@ -127,7 +132,67 @@ option_t check_option(char **argv)
 		index++;
 	}
 
-	 print_error(flag_opt);
-
+	print_error(flag_opt);
 	return flag_opt;
 }
+
+/*
+ * =====================================================================================
+ *
+ *   SEARCH FLAG																																										     
+ *   																									                     													 
+ *    -  Searches for an specifc flag starting with a dash. E.G -d, -s.
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+bool_t search_flag(char **argv, char flag)
+{
+	int index = 1;
+	bool_t found_flag = FALSE;
+
+	while(argv[index]){
+		int pos =	search_dash(argv[index]);
+		if(pos >= 0 && argv[index][pos + 1] == flag)
+			found_flag = TRUE;
+
+		index++;
+	}
+	return found_flag;
+}
+
+int find_paths_start_index(char **argv)
+{
+
+	int index = 1;
+	while(argv[index]){
+		int pos =	search_dash(argv[index]);
+		//  not an option
+		if(pos < 0)
+			break;
+
+		index++;
+	}
+	return index;
+}
+
+bool_t validate_tar_extention(char *path)
+{
+	size_t len = strlen(path);
+	bool_t is_valid = TRUE;
+	int ext_index = 3;
+	char ext[5] = ".tar";
+
+	for(int path_index = len - 1; path_index >= (int)len - ext_index; path_index--)
+	{
+		if(path[path_index] != ext[ext_index])
+			is_valid = FALSE;
+
+		ext_index--;	
+	}
+	return is_valid;
+}
+
+
