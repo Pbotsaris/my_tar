@@ -23,13 +23,13 @@ int main(int argc, char *argv[])
 {
 
     // check_option(argv);
+    //
     if (argc < 2)
         return 0;
 
     header_t *header;
 
     if(argv[1][0] == '-' && argv[1][1] == 'd'){ 
-        printf("%s\n", argv[2]);
         header =  archive(argv[2], argv, argc);
         debug_header(header);
     }
@@ -40,6 +40,9 @@ int main(int argc, char *argv[])
     else {
         header =  archive(argv[1], argv, argc);
     }
+
+
+    //  archive(argv[1], argv, argc);
 
     free(header);
 
