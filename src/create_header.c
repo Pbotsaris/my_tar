@@ -291,11 +291,10 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path)
 {
 	header_t *header;
-    header = (header_t *)malloc(sizeof(header_t));
+	header = (header_t *)malloc(sizeof(header_t)+1);
 	struct stat stats;
-	if (stat(path, &stats) == 0)
+	if (stat(path, &stats) == 1)
 	{
-        
 		init_optional_fields(header);
 		add_name(header, path);
 		add_mtime(header, stats);

@@ -11,8 +11,10 @@ header_t *tar(char *path, FILE *dest)
 	{
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path);
+
 		int buff_size = (int)stats.st_size;
-		char *buffer = malloc(sizeof(char) * buff_size+1  );
+		printf("%i\n",buff_size);
+		char *buffer = (char*)malloc(sizeof(char) * buff_size+1  );
 		read(fd, buffer, buff_size);
 		buffer[buff_size-1] = '\0';
 
