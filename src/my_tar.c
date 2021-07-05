@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     if(is_debug == TRUE)
         debug_header(headers[0]);
 
-//    for(int i = 0; i < num_headers; i++) 
-  //      free(headers[i]);
+    for(int i = 0; i < num_headers; i++) 
+        free(headers[i]);
 
     return 0;
 }
