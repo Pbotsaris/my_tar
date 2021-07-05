@@ -63,6 +63,12 @@ int main(int argc, char *argv[])
     if(is_debug == TRUE)
         debug_header(headers[0]);
 
+    // search for 'l' for listing
+    bool_t is_ls = search_flag(argv, 'l');
+    if(is_ls == TRUE){
+        my_ls_tar(argv[3]);
+    }
+
     for(int i = 0; i < num_headers; i++) 
         free(headers[i]);
 

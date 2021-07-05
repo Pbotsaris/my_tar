@@ -15,7 +15,7 @@ int my_ls_tar(char *path)
     if (tar < 0)
         return 1;
 
-    end_file = lseek(tar, 0, SEEK_END);
+    end_file = (lseek(tar, 0, SEEK_END) - BLOCKSIZE);
     lseek(tar, 0, SEEK_SET);
 
     while (current_file_position <= end_file)
@@ -27,7 +27,6 @@ int my_ls_tar(char *path)
 
         lseek(tar, JMPSIZE, SEEK_CUR); // LOOKS FOR THE SIZE OF THE FILE
         read(tar, buffer, SIZELEN);    // READS THE SIZE OF THE FILE
-
         size = atoi(buffer);          // SIZE TO INT
         lseek(tar, ENDBLK, SEEK_CUR); // SEEKS THE END OF THE HEADER BLOCK
 

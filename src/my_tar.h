@@ -141,9 +141,10 @@ int decimal_to_octal(int decimal);
 int my_ls_tar(char *path);
 int check_byte(int block);
 void debug_header(header_t *header);
+void *my_memset(void* str, int c, int len);
 
 // main calbacks
-header_t *create_header(char *path);
+header_t *create_header(char *path, struct stat stats);
 int archive(char **paths, size_t paths_len, header_t *headers[]);
 option_t check_option(char **format);
 
