@@ -97,7 +97,7 @@ int *create_modes(modes_t type)
 	int stat_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR,
 		S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < BYTOFFLEN; ++i) 
+	for (int i = 0; i < MODES_ARR_LEN ; ++i) 
 		modes[i] =  type == tar_mode ? tar_modes[i] : stat_modes[i];
 
 	return modes;
@@ -136,7 +136,8 @@ int decimal_to_octal(int decimal)
 {
     int octal = 0;
     int num_digits = 1;
-    int temp = decimal;
+    int temp = 0;
+	  temp	= decimal;
     while (temp != 0)
     {
 
