@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 rm *.tar
 if [[ "$OSTYPE" == "darwin"* ]]; then
   gtar -cf real.tar test_files/f.txt
