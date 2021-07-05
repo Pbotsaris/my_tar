@@ -20,5 +20,5 @@ obj/%.o: src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
-	$(RM) bin/* obj/*
+	$(RM)  obj/*
 
