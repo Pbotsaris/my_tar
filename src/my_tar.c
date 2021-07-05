@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
     }
-
     // archive returns the number of headers it create
     header_t *headers[paths_len - 1];
     int num_headers = archive(paths, paths_len, headers);
@@ -64,8 +63,8 @@ int main(int argc, char *argv[])
     if(is_debug == TRUE)
         debug_header(headers[0]);
 
-    for(int i = 0; i < num_headers; i++) 
-        free(headers[i]);
+//    for(int i = 0; i < num_headers; i++) 
+  //      free(headers[i]);
 
     return 0;
 }
