@@ -291,18 +291,16 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path, struct stat stats)
 {
 	header_t *header;
-	header = (header_t *)malloc(sizeof(header_t)+1);
-		init_optional_fields(header);
-		add_name(header, path);
-		add_mtime(header, stats);
-		add_mode(header, stats);
-		add_typeflag(header, stats, path);
-		add_size(header, stats);
-
-		add_magic_version(header);
-		add_uid_gid(header, stats);
-		add_uname_gname(header, stats);
-
-		 add_checksum(header);
+    header = (header_t *)calloc(1, sizeof(header_t)+1);
+    init_optional_fields(header);
+	add_name(header, path);
+	add_mtime(header, stats);
+	add_mode(header, stats);
+	add_typeflag(header, stats, path);
+	add_size(header, stats);
+	add_magic_version(header);
+	add_uid_gid(header, stats);
+	add_uname_gname(header, stats);
+	add_checksum(header);
 	return header;
 }
