@@ -127,7 +127,17 @@ void add_checksum(header_t *header)
 	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 	// remove extra 0 from chksum
-	header->chksum[CHKSUMLEN - 2] = '\0';
+	
+		for(int i = 0; i < - CHKSUMLEN; i++)
+		{
+		if(i == 0)
+			continue;
+
+		header->chksum[i] = header->chksum[i + 1] ;
+
+		}
+	header->chksum[CHKSUMLEN - 2] = ' ';
+	header->chksum[CHKSUMLEN - 1] = '\0';
 
 	free(bytes_offset);
 
