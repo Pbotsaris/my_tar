@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
     // get the actual length of the paths array.
-    size_t paths_len = argc  - path_start_index;
+    size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
 
     // return error with wrong extention
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     // didn't provide a path to archive
     if(paths_len == 1){
-        printf("You must provide a ,tar file and a path to file to archive.\n");
+        printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
     }
 
