@@ -20,6 +20,5 @@ obj/%.o: src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
-	$(RM)  obj/*
 	$(RM) /bin/my_tar obj/*
 
