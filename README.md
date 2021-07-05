@@ -18,7 +18,7 @@ Both:
 
     ./bin/my_tar -d -s
 
-## Tesing
+## Testing
 
 The testing script will run `my_tar` in skip mode and the real `tar` then cat the outputs for comparison. First, update permissions:
 
