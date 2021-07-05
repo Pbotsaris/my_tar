@@ -22,7 +22,7 @@ header_t *tar(char *path, FILE *dest)
 
 		free(buffer);
 		close(fd);
-		return header;
+		return NULL;
 	}
 	else
 	{

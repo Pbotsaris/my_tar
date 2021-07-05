@@ -20,5 +20,9 @@ obj/%.o: src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
+<<<<<<< HEAD
 	$(RM)  obj/*
+=======
+	$(RM) /bin/my_tar obj/*
+>>>>>>> baead7d624729c190c2c7bb259ca0a492feea447
 
