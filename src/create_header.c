@@ -98,6 +98,28 @@ unsigned int checksum(char *field, size_t len)
 	return sum;
 }
 
+
+void add_space_checksum(header_t *header)
+{
+
+/*
+ *
+ 
+	-  Add an empty space in the end of checksum field then null terminate it
+
+																											*/
+
+
+for(int i = 0; i < - CHKSUMLEN; i++)
+	{
+		if(i == 0)
+			continue;
+		header->chksum[i] = header->chksum[i + 1] ;
+	}
+	header->chksum[CHKSUMLEN - 2] = ' ';
+	header->chksum[CHKSUMLEN - 1] = '\0';
+}
+
 /*
  *
  
@@ -115,8 +137,8 @@ void add_checksum(header_t *header)
 	int i;
 
 	for (i = 0; i < BYTOFFLEN - 1; ++i) {
-			temp += bytes_offset[i];
-			chksum += checksum(temp, bytes_offset[i + 1]);
+		temp += bytes_offset[i];
+		chksum += checksum(temp, bytes_offset[i + 1]);
 	}
 
 	/*	 remove chksum field from calculation   */
@@ -124,20 +146,10 @@ void add_checksum(header_t *header)
 		chksum -= (unsigned char) header->chksum[i];
 	chksum += ' ' * sizeof header->chksum;
 
-	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
+	int len =	my_itoa(header->chksum, chksum * 8, OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
-	// remove extra 0 from chksum
-	
-		for(int i = 0; i < - CHKSUMLEN; i++)
-		{
-		if(i == 0)
-			continue;
-
-		header->chksum[i] = header->chksum[i + 1] ;
-
-		}
-	header->chksum[CHKSUMLEN - 2] = ' ';
-	header->chksum[CHKSUMLEN - 1] = '\0';
+	// add extra space end of chksum
+  add_space_checksum(header);
 
 	free(bytes_offset);
 
@@ -154,11 +166,11 @@ void add_uid_gid(header_t *header, struct stat stats)
 
 /*
  *
- 
-	- Check OS for relevant mtime field.
-	- Writes modified time in seconds to header->mtime
 
-	*/
+ - Check OS for relevant mtime field.
+ - Writes modified time in seconds to header->mtime
+
+*/
 
 void add_mtime(header_t *header, struct stat stats)
 {
@@ -175,10 +187,10 @@ void add_mtime(header_t *header, struct stat stats)
 
 /*
  * 
- 
-	- Writes size in bytes to header->size.
 
-																								*/
+ - Writes size in bytes to header->size.
+
+*/
 
 void add_size(header_t *header, struct stat stats)
 {
@@ -194,9 +206,9 @@ void add_size(header_t *header, struct stat stats)
 /*
  *
 
-	- Writes user id and group id to header->gname and header->uname respectively.
+ - Writes user id and group id to header->gname and header->uname respectively.
 
-																									*/
+*/
 
 void add_uname_gname(header_t *header, struct stat stats)
 {
@@ -212,19 +224,19 @@ void add_uname_gname(header_t *header, struct stat stats)
 /*
  *
 
-	- read mode, gid, and uid from stat struct and sum them together.
-	- write mode in octal to header->mode
+ - read mode, gid, and uid from stat struct and sum them together.
+ - write mode in octal to header->mode
 
-																									*/
+*/
 
 void add_mode(header_t *header, struct stat stats)
 {
 	int mode = 0;
 
-//	int *tar_modes = create_modes(tar_mode);
+	//	int *tar_modes = create_modes(tar_mode);
 	int *stat_modes = create_modes(stat_mode);
 
-		for (int i = 0; i < MODES_ARR_LEN; ++i)
+	for (int i = 0; i < MODES_ARR_LEN; ++i)
 		if (stats.st_mode & stat_modes[i])
 
 			mode += stat_modes[i];
@@ -232,16 +244,16 @@ void add_mode(header_t *header, struct stat stats)
 	int len = my_itoa(header->mode, mode, OCTAL);
 	fill_zeros(header->mode, len, MODELEN);
 
-//	free(tar_modes);
+	//	free(tar_modes);
 	free(stat_modes);
 }
 
 /*
  *
- 
-	- Writes filename to be archieved to header->name
 
-																									*/
+ - Writes filename to be archieved to header->name
+
+*/
 
 void add_name(header_t *header, char *path)
 {
@@ -301,8 +313,8 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path, struct stat stats)
 {
 	header_t *header;
-    header = (header_t *)calloc(1, sizeof(header_t)+1);
-    init_optional_fields(header);
+	header = (header_t *)calloc(1, sizeof(header_t)+1);
+	init_optional_fields(header);
 	add_name(header, path);
 	add_mtime(header, stats);
 	add_mode(header, stats);
