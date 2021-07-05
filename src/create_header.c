@@ -193,6 +193,7 @@ void add_uname_gname(header_t *header, struct stat stats)
 	struct passwd *pws;
 	struct group *grp;
 	pws = getpwuid(stats.st_uid);
+    printf("here\n");
 	grp = getgrgid(stats.st_gid);
 
 	strcpy(header->gname, grp->gr_name);
@@ -291,10 +292,11 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path)
 {
 	header_t *header;
-	header = (header_t *)malloc(sizeof(header_t));
+    header = (header_t *)malloc(sizeof(header_t));
 	struct stat stats;
 	if (stat(path, &stats) == 0)
 	{
+        
 		init_optional_fields(header);
 		add_name(header, path);
 		add_mtime(header, stats);
@@ -302,10 +304,12 @@ header_t *create_header(char *path)
 		add_typeflag(header, stats, path);
 		add_size(header, stats);
 
+    printf("size %ld\n", sizeof(header));
 		add_magic_version(header);
 		add_uid_gid(header, stats);
 		add_uname_gname(header, stats);
 
+    printf("name: %s\n", header->name);
 		 add_checksum(header);
 	}
 	else

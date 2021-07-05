@@ -2,27 +2,26 @@
 
 header_t *tar(char *path, FILE *dest)
 {
-
 	int fd = open(path, O_APPEND),
 		byte_block;
 	header_t *header;
 	struct stat stats;
+
 	if (fd)
 	{
-		if (stat(path, &stats) == 0)
+		if ( stat(path, &stats)  == 0)
 			header = create_header(path);
-
+        printf("Hello\n");
 		int buff_size = (int)stats.st_size;
-		char *buffer = malloc(sizeof(char) * buff_size + 1);
+		char *buffer = malloc(sizeof(char) * buff_size+1  );
 		read(fd, buffer, buff_size);
-		buffer[buff_size] = '\0';
+		buffer[buff_size-1] = '\0';
 
 		fwrite(header, sizeof(header_t), 1, dest);
 		fwrite(buffer, buff_size, 1, dest);
 
 		free(buffer);
 		close(fd);
-		return NULL;
 	}
 	else
 	{
@@ -30,7 +29,7 @@ header_t *tar(char *path, FILE *dest)
 	//	exit(1);
 	return NULL;
 	}
-	printf("File name in archive: %s\n", header->name);
+    printf("File name in archive: %s\n", header->name);
 	return header;
 
 }
