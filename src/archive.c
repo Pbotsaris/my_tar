@@ -11,7 +11,7 @@ header_t *tar(char *path, FILE *dest)
 	if (fd)
 	{
 		if ( stat(path, &stats)  == 0)
-		header = create_header(path, stats);
+			header = create_header(path, stats);
 
 		long long buff_size = stats.st_size;
 		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
@@ -19,9 +19,9 @@ header_t *tar(char *path, FILE *dest)
 		buffer[buff_size-1] = '\0';
 
 		fwrite(header, BLOCKSIZE, 1, dest);
-		// don't write if link
+		// don't writeif symlink
 		if(header->typeflag != SYMTYPE)
-				fwrite(buffer, buff_size, 1, dest);
+			fwrite(buffer, buff_size, 1, dest);
 
 		remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
 
@@ -38,15 +38,21 @@ header_t *tar(char *path, FILE *dest)
 		return header;
 
 	}	else {
-
-	
 		printf("ERROR\n");
 		//	exit(1);
 		return NULL;
 	}
 }
 
-int archive(char **paths, size_t paths_len, header_t *headers[])
+ bool_t is_dir(char *path)
+{
+		struct stat stats;
+	    stat(path, &stats);
+ 		   return S_ISREG(stats.st_mode);
+
+}
+
+int archive_file(char **paths, size_t paths_len, header_t *headers[])
 {
 	struct stat stats;
 	FILE *dest = fopen(paths[0], "wb");
@@ -60,16 +66,24 @@ int archive(char **paths, size_t paths_len, header_t *headers[])
 
 	while (index < paths_len)
 	{
-		fd = open(paths[index], O_APPEND);
-		lseek(fd, 0, SEEK_SET);
-		// header per file
-		headers[index - 1] = tar(paths[index], dest);
-		index++;
-		close(fd);
+		if ( stat(paths[index], &stats)  == 0){
+			{
+				fd = open(paths[index], O_APPEND);
+				lseek(fd, 0, SEEK_SET);
+				// speak dir
+				if(!is_dir(paths[index]))
+				// header per file
+					headers[index - 1] = tar(paths[index], dest);
+				index++;
+				close(fd);
+			}
+
+			fclose(dest);
+		}
+		else {
+			printf("file not found. exiting...\n");
+			return -1;
+		}
 	}
-
-	fclose(dest);
-
 	return index - 1;
-
 }

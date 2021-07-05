@@ -267,9 +267,18 @@ void add_mode(header_t *header, struct stat stats)
 	free(stat_modes);
 }
 
+
+/*
+ *
+
+ -  Remove slash from absolute path following tar convention
+
+*/
+
+
 void remove_slash(char *field, size_t len)
 {
-  printf("my_tar: Removing leading `/' from member names \n");
+  printf("my_tar: Removing leading `/' from member names\n");
 
 	size_t i;
 	for (i = 0; i < len - 1; ++i){
@@ -329,7 +338,6 @@ void init_optional_fields(header_t *header)
 {
 	header->devmajor[0] = '\0';
 	header->devminor[0] = '\0';
-//	header->linkname[0] = ' ';
 	header->linkname[0] = '\0';
 	header->prefix[0] = '\0';
 }

@@ -144,7 +144,7 @@ void *my_memset(void* str, int c, int len);
 
 // main calbacks
 header_t *create_header(char *path, struct stat stats);
-int archive(char **paths, size_t paths_len, header_t *headers[]);
+int archive_file(char **paths, size_t paths_len, header_t *headers[]);
 option_t check_option(char **format);
 
 bool_t search_flag(char **argv, char flag);
