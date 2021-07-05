@@ -1,5 +1,11 @@
 #include "my_tar.h"
 
+/*
+ *
+ *
+ 		- HELPER: Looks for the dash char(-) in a string.
+																																			*/
+
 int search_dash(char *str)
 {
 	bool_t has_dash = FALSE;
@@ -19,6 +25,13 @@ int search_dash(char *str)
 	}
 	return has_dash ? index : -1;
 }
+
+/*
+ *
+ *
+ 		- HELPER: select option. Returns ERROROPT if option is not found.
+
+																																		*/
 
 option_t select_option(char flag, option_t flag_opt)
 {
@@ -45,6 +58,12 @@ option_t select_option(char flag, option_t flag_opt)
 	return flag_opt;
 }
 
+/*
+ *
+ *
+ 		- HELPER: searches for a -f flag. flag_opt to missing_f in case of failure
+
+																																	*/
 
 
 option_t search_flag_f(option_t flag_opt, char *str)
@@ -82,8 +101,6 @@ void print_error(option_t flag_opt)
 	if(flag_opt == NONE)
 		printf("%s", NULL_OPT);
 }
-
-
 
 
 
@@ -163,6 +180,20 @@ bool_t search_flag(char **argv, char flag)
 	return found_flag;
 }
 
+/*
+ * =====================================================================================
+ *
+ *   FIND PATHS START INDEX
+ *   																									                     													 
+ *    - looks for the starting position of the paths arguments in relation to argv. 
+ *    - If function returns 3, the first path passed in starts at argv[3]
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+
 int find_paths_start_index(char **argv)
 {
 
@@ -177,6 +208,19 @@ int find_paths_start_index(char **argv)
 	}
 	return index;
 }
+
+/*
+ * =====================================================================================
+ *
+ *   VALIDATE EXTENTION
+ *   																									                     													 
+ *    -  searchs for an ending .tar extention in the first path passed in
+ *    -  returns FALSE if function fails to validate extention
+ *
+ *    
+ * =====================================================================================
+ */
+
 
 bool_t validate_tar_extention(char *path)
 {
