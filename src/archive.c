@@ -28,7 +28,7 @@ header_t *tar(char *path, FILE *dest)
 	{
 		printf("ERROR\n");
 	//	exit(1);
-	return header;
+	return NULL;
 	}
 	printf("File name in archive: %s\n", header->name);
 	return header;
