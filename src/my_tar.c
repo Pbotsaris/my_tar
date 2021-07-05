@@ -22,29 +22,50 @@
 int main(int argc, char *argv[])
 {
 
-    // check_option(argv);
-    //
-    if (argc < 2)
+    // search for -s  for skipping options
+    char **paths;
+    option_t options;
+    bool_t is_skip_options = search_flag(argv, 's');
+    if(is_skip_options == FALSE){
+        // check for options
+        options = check_option(argv);
+        if(options == ERROROPT || options == MISSING_F || options == NONE)
+            return 0;
+    }
+    else
+        printf("skipping options for debug.\n");
+
+    // prepare paths for ingest
+    int path_start_index = find_paths_start_index(argv);
+    // offset argv to path_start_index. Store in paths pointer.
+    paths = argv + path_start_index;
+    // get the actual length of the paths array.
+    size_t paths_len = argc  - path_start_index;
+    bool_t is_tar_valid = validate_tar_extention(paths[0]);
+
+    // return error with wrong extention
+    if(is_tar_valid == FALSE){
+        printf("Archives must have a .tar extention.\n");
         return 0;
-
-    header_t *header;
-
-    if(argv[1][0] == '-' && argv[1][1] == 'd'){ 
-        header =  archive(argv[2], argv, argc);
-        debug_header(header);
     }
-    else if(argv[1][0] == '-') {
-        printf("invalid option\n");
+
+    // didn't provide a path to archive
+    if(paths_len == 1){
+        printf("You must provide a ,tar file and a path to file to archive.\n");
         return 0;
     }
-    else {
-        header =  archive(argv[1], argv, argc);
-    }
 
+    // archive returns the number of headers it created
+    header_t *headers[paths_len - 1];
+    int num_headers = archive(paths, paths_len, headers);
 
-    //  archive(argv[1], argv, argc);
+    // search fo 'd' for debug mode
+    bool_t is_debug = search_flag(argv, 'd');
+    if(is_debug == TRUE)
+        debug_header(headers[0]);
 
-    free(header);
+    for(int i = 0; i < num_headers; i++) 
+        free(headers[i]);
 
     return 0;
 }

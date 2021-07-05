@@ -1,94 +1,249 @@
 #include "my_tar.h"
 
-option_t check_spam(option_t flag)
-{
-	option_t check_flag = NONE;
+/*
+ *
+ *
+ 		- HELPER: Looks for the dash char(-) in a string.
+																																			*/
 
-	if (flag == NONE)
-		return check_flag;
-	else
-		return check_flag = ERROROPT;
+int search_dash(char *str)
+{
+	bool_t has_dash = FALSE;
+	int index = 0;
+
+	while(str[index] != '\0'){
+		if(str[index] == '-')	
+		{
+			has_dash = TRUE;
+			break;
+		}
+		// if not a space then not an option
+		else if(str[index] != ' ')
+			break;
+		else
+			index++;
+	}
+	return has_dash ? index : -1;
 }
 
-bool_t check_f(bool_t flag_f, option_t flag_opt, char **format, int index)
+/*
+ *
+ *
+ 		- HELPER: select option. Returns ERROROPT if option is not found.
+
+																																		*/
+
+option_t select_option(char flag, option_t flag_opt)
 {
-	if (flag_opt == NONE)
-		if (format[index][1] == 'f')
-			return ERRORF;
-
-	if (flag_opt != NONE && format[index][1] == 'f')
-		return TRUE;
-
-	if (flag_f == FALSE && format[index][2] == 'f')
-		return TRUE;
-
-	if (flag_f == TRUE)
-		return ERRORF;
-
-	return FALSE;
-}
-
-option_t error_handler(bool_t flag_f, option_t flag_opt)
-{
-	if (flag_f == FALSE)
+	switch (flag)
 	{
-		printf(F_NOT_FOUND);
-		flag_opt = ERROROPT;
+		case 'c':
+			flag_opt = c;
+			break;
+		case 't':
+			flag_opt = t;
+			break;
+		case 'r':
+			flag_opt = r;
+			break;
+		case 'u':
+			flag_opt = u;
+			break;
+		case 'x':
+			flag_opt = x;
+			break;
+		default:
+			flag_opt = ERROROPT;
 	}
-	if (flag_f == ERRORF)
-	{
-		printf(F_ERROR);
-		flag_opt = ERROROPT;
-	}
-	if (flag_opt == NONE || flag_opt == ERROROPT)
-	{
-		printf(NULL_OPT);
-	}
-
 	return flag_opt;
 }
 
-option_t check_option(char **format)
+/*
+ *
+ *
+ 		- HELPER: searches for a -f flag. flag_opt to missing_f in case of failure
+
+																																	*/
+
+
+option_t search_flag_f(option_t flag_opt, char *str)
+{
+	bool_t has_flag_f = FALSE;
+	int pos = search_dash(str);
+
+	if(pos >= 0)
+	{
+		int i = pos;
+		while(str[i] != '\0'){
+
+			if (str[i] == 'f'){
+				has_flag_f = TRUE;
+				break;
+			}
+			i++;
+		}
+	}
+	else 
+		return MISSING_F;
+
+	return has_flag_f ? flag_opt :  MISSING_F;
+}
+
+/*
+ *
+ *
+ 		- HELPER: Prints error depending on error type in flag_opt
+
+																																	*/
+
+
+
+void print_error(option_t flag_opt)
+{
+	if(flag_opt == MISSING_F)
+		printf("%s", MISSING_F_ERR);
+
+	if(flag_opt == ERROROPT)
+		printf("%s", MISSING_OPT_ERR);
+
+	if(flag_opt == NONE)
+		printf("%s", NULL_OPT);
+}
+
+
+/*
+ * =====================================================================================
+ *
+ *   CHECK OPTION																																										     
+ *   																									                     													 
+ *    - Parses trough argv for options and return the select options 
+ *    - there is not default options. User must select one of the following otheise an error will be returned
+ *    *** [-c] [-u] [-t] [-x]
+ *    - Options must be accompanied by [-f] otherwise program will return an error.
+ *    - ERROR: function will print error message but return error type to be handled outside this function
+ *
+ *    
+ * =====================================================================================
+ */
+
+option_t check_option(char **argv)
 {
 	int index = 1;
-
 	option_t flag_opt = NONE;
-	bool_t flag_f = FALSE;
 
-	while (format[index])
+	while (argv[index])
 	{
-		if (format[index][0] == '-' && (flag_opt = check_spam(flag_opt)) == NONE)
+		if(flag_opt != NONE)
+			break;
+		// returns -1 if not found
+		int pos = search_dash(argv[index]);
+		if (pos >= 0) 
 		{
-			if (strlen(format[index]) == 2 || (strlen(format[index]) == 3 && format[index][2] == 'f'))
-			{
-				switch (format[index][1])
-				{
-				case 'c':
-					flag_opt = c;
-					break;
-				case 't':
-					flag_opt = t;
-					break;
-				case 'r':
-					flag_opt = r;
-					break;
-				case 'u':
-					flag_opt = u;
-				case 'x':
-					flag_opt = x;
-					break;
+			size_t len = strlen(argv[index]); 
+			// options together: -cf, -uf 	
+			if (len >= 2 && argv[index][pos + 2] == 'f'){
+				flag_opt = select_option(argv[index][pos + 1], flag_opt);
+			}
+			else {
+				// split options: -c -f	
+				flag_opt = select_option(argv[index][pos + 1], flag_opt);
+				if(flag_opt != ERROROPT){
+					char *argv_temp = argv[index];
+					flag_opt = search_flag_f(flag_opt, argv_temp + pos);
 				}
 			}
-			else
-				flag_opt = ERROROPT;
 		}
-
-		flag_f = check_f(flag_f, flag_opt, format, index);
-
 		index++;
 	}
 
-	flag_opt = error_handler(flag_f, flag_opt);
-
+	print_error(flag_opt);
 	return flag_opt;
 }
+
+/*
+ * =====================================================================================
+ *
+ *   SEARCH FLAG																																										     
+ *   																									                     													 
+ *    -  Searches for an specifc flag starting with a dash. E.G -d, -s.
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+bool_t search_flag(char **argv, char flag)
+{
+	int index = 1;
+	bool_t found_flag = FALSE;
+
+	while(argv[index]){
+		int pos =	search_dash(argv[index]);
+		if(pos >= 0 && argv[index][pos + 1] == flag)
+			found_flag = TRUE;
+
+		index++;
+	}
+	return found_flag;
+}
+
+/*
+ * =====================================================================================
+ *
+ *   FIND PATHS START INDEX
+ *   																									                     													 
+ *    - looks for the starting position of the paths arguments in relation to argv. 
+ *    - If function returns 3, the first path passed in starts at argv[3]
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+
+int find_paths_start_index(char **argv)
+{
+
+	int index = 1;
+	while(argv[index]){
+		int pos =	search_dash(argv[index]);
+		//  not an option
+		if(pos < 0)
+			break;
+
+		index++;
+	}
+	return index;
+}
+
+/*
+ * =====================================================================================
+ *
+ *   VALIDATE EXTENTION
+ *   																									                     													 
+ *    -  searchs for an ending .tar extention in the first path passed in
+ *    -  returns FALSE if function fails to validate extention
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+bool_t validate_tar_extention(char *path)
+{
+	size_t len = strlen(path);
+	bool_t is_valid = TRUE;
+	int ext_index = 3;
+	char ext[5] = ".tar";
+
+	for(int path_index = len - 1; path_index >= (int)len - ext_index; path_index--)
+	{
+		if(path[path_index] != ext[ext_index])
+			is_valid = FALSE;
+
+		ext_index--;	
+	}
+	return is_valid;
+}
+
+
