@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    // archive returns the number of headers it created
+    // archive returns the number of headers it create
     header_t *headers[paths_len - 1];
     int num_headers = archive(paths, paths_len, headers);
 
