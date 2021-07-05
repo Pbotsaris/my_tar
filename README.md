@@ -20,7 +20,11 @@ Both:
 
 ## Tesing
 
-The testing script will run `my_tar` in skip mode and the real `tar` then cat the outputs for comparison.  
+The testing script will run `my_tar` in skip mode and the real `tar` then cat the outputs for comparison. First, update permissions:
+
+    $ chmod u+x bin/test.sh
+
+Run the script:
 
     $ ./bin/test.sh
 
