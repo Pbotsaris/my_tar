@@ -37,7 +37,9 @@ int main(int argc, char *argv[])
 
     // prepare paths for ingest
     int path_start_index = find_paths_start_index(argv);
+    // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
+    // get the actual length of the paths array.
     size_t paths_len = argc  - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
 
@@ -53,9 +55,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    // archive returns the number of headers it created
     header_t *headers[paths_len - 1];
     int num_headers = archive(paths, paths_len, headers);
-
 
     // search fo 'd' for debug mode
     bool_t is_debug = search_flag(argv, 'd');
