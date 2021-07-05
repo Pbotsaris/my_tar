@@ -89,6 +89,14 @@ option_t search_flag_f(option_t flag_opt, char *str)
 	return has_flag_f ? flag_opt :  MISSING_F;
 }
 
+/*
+ *
+ *
+ 		- HELPER: Prints error depending on error type in flag_opt
+
+																																	*/
+
+
 
 void print_error(option_t flag_opt)
 {
@@ -101,7 +109,6 @@ void print_error(option_t flag_opt)
 	if(flag_opt == NONE)
 		printf("%s", NULL_OPT);
 }
-
 
 
 /*
