@@ -3,7 +3,8 @@
 header_t *tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
-		byte_block = 0;
+		remain_fill_block;
+    
 	header_t *header;
 	struct stat stats;
 
@@ -11,19 +12,23 @@ header_t *tar(char *path, FILE *dest)
 	{
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
-	
-		fwrite(header, BLOCKSIZE, 1, dest);
 
-        int buff_size = (int)stats.st_size;
-		char *buffer = (char*)malloc(sizeof(char) * buff_size+1);
-        
-        while(byte_block <= buff_size){
-		    read(fd, buffer, BLOCKSIZE);
-		    fwrite(buffer, buff_size, 1, dest);
-            byte_block += BLOCKSIZE;
-            printf("byte now: %d\n", byte_block);
-        }
+		int buff_size = (int)stats.st_size;
+		char *buffer = (char*)malloc(sizeof(char) * buff_size+1  );
+		read(fd, buffer, buff_size);
 		buffer[buff_size-1] = '\0';
+		
+        fwrite(header, BLOCKSIZE, 1, dest);
+		fwrite(buffer, buff_size, 1, dest);
+        
+        remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
+        
+        if(remain_fill_block != 0){
+            char* fill_block = malloc(sizeof(char)*remain_fill_block);
+            my_memset(fill_block, '\0', remain_fill_block);
+            fwrite(fill_block, remain_fill_block, 1, dest);
+            free(fill_block);
+        }
 
 		free(buffer);
 		close(fd);

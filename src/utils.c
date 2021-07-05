@@ -148,4 +148,15 @@ int decimal_to_octal(int decimal)
     return octal;
 }
 
+/*  
+ *
+    -memsets
+ */
 
+void *my_memset(void *str, int c, int len){
+    unsigned char* p = str;
+    while(len--){
+        *p++ = (unsigned char)c;
+    }
+    return str;
+}
