@@ -1,5 +1,7 @@
 #include "my_tar.h"
 
+
+//Needs to add directory
 int my_ls_tar(char *path)
 {
     int tar = open(path, O_RDWR),
