@@ -3,7 +3,7 @@
 header_t *tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
-		byte_block;
+			byte_block;
 	header_t *header;
 	struct stat stats;
 
@@ -13,8 +13,7 @@ header_t *tar(char *path, FILE *dest)
 			header = create_header(path);
 
 		int buff_size = (int)stats.st_size;
-		printf("%i\n",buff_size);
-		char *buffer = (char*)malloc(sizeof(char) * buff_size+1  );
+		char *buffer = (char*)malloc(sizeof(char) * buff_size+ 1);
 		read(fd, buffer, buff_size);
 		buffer[buff_size-1] = '\0';
 
@@ -23,15 +22,16 @@ header_t *tar(char *path, FILE *dest)
 
 		free(buffer);
 		close(fd);
+
+		printf("File name in archive: %s\n", header->name);
+		return header;
 	}
 	else
 	{
 		printf("ERROR\n");
-	//	exit(1);
-	return NULL;
+		//	exit(1);
+		return NULL;
 	}
-    printf("File name in archive: %s\n", header->name);
-	return header;
 
 }
 
@@ -44,8 +44,8 @@ int archive(char **paths, size_t paths_len, header_t *headers[])
 	if (dest == NULL)
 	{
 		printf("Error creating archive file\n");
-	//	exit(1);
-	return -1;
+		//	exit(1);
+		return -1;
 	}
 
 	while (index < paths_len)

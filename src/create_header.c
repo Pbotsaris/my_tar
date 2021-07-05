@@ -124,7 +124,7 @@ void add_checksum(header_t *header)
 		chksum -= (unsigned char) header->chksum[i];
 	chksum += ' ' * sizeof header->chksum;
 
-	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), DECIMAL);
+	int len =	my_itoa(header->chksum, decimal_to_octal(chksum), OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 	// remove extra 0 from chksum
 	header->chksum[CHKSUMLEN - 2] = '\0';
@@ -291,9 +291,9 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path)
 {
 	header_t *header;
-	header = (header_t *)malloc(sizeof(header_t)+1);
+	header = (header_t *)calloc(1, sizeof(header_t)+1);
 	struct stat stats;
-	if (stat(path, &stats) == 1)
+	if (stat(path, &stats) == 0)
 	{
 		init_optional_fields(header);
 		add_name(header, path);
