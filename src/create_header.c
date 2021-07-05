@@ -288,13 +288,10 @@ void init_optional_fields(header_t *header)
  * =====================================================================================
  */
 
-header_t *create_header(char *path)
+header_t *create_header(char *path, struct stat stats)
 {
 	header_t *header;
 	header = (header_t *)malloc(sizeof(header_t)+1);
-	struct stat stats;
-	if (stat(path, &stats) == 1)
-	{
 		init_optional_fields(header);
 		add_name(header, path);
 		add_mtime(header, stats);
@@ -307,10 +304,5 @@ header_t *create_header(char *path)
 		add_uname_gname(header, stats);
 
 		 add_checksum(header);
-	}
-	else
-	{
-		printf("%s %s\n", STAT_ERR, path);
-	}
 	return header;
 }

@@ -38,7 +38,7 @@ int my_ls_tar(char *path)
                 counter++;
         }
         current_file_position = lseek(tar, sizeof(buffer) * (counter), SEEK_CUR); // SEEKS THE NEXT HEADER AND SAVES THAT TO SEE IF WE ARRIVED TO THE END OF THE FILE
-
+        printf("File pos%d\n", current_file_position);
         counter = 1;
     }
 

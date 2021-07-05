@@ -3,23 +3,27 @@
 header_t *tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
-		byte_block;
+		byte_block = 0;
 	header_t *header;
 	struct stat stats;
 
 	if (fd)
 	{
 		if ( stat(path, &stats)  == 0)
-			header = create_header(path);
+			header = create_header(path, stats);
+	
+		fwrite(header, BLOCKSIZE, 1, dest);
 
-		int buff_size = (int)stats.st_size;
-		printf("%i\n",buff_size);
-		char *buffer = (char*)malloc(sizeof(char) * buff_size+1  );
-		read(fd, buffer, buff_size);
+        int buff_size = (int)stats.st_size;
+		char *buffer = (char*)malloc(sizeof(char) * buff_size+1);
+        
+        while(byte_block <= buff_size){
+		    read(fd, buffer, BLOCKSIZE);
+		    fwrite(buffer, buff_size, 1, dest);
+            byte_block += BLOCKSIZE;
+            printf("byte now: %d\n", byte_block);
+        }
 		buffer[buff_size-1] = '\0';
-
-		fwrite(header, sizeof(header_t), 1, dest);
-		fwrite(buffer, buff_size, 1, dest);
 
 		free(buffer);
 		close(fd);
