@@ -4,7 +4,7 @@ run_tar(){
   if [[ "$OSTYPE" == "darwin"* ]]; then
     gtar -cf real.tar $1
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    tar -cf real.tar $1 
+    gtar -cf real.tar $1 
   fi
 }
 
@@ -23,6 +23,7 @@ else
 
   echo "real"
   cat real.tar
+  echo " "
   echo "fake"
   cat fake.tar
 

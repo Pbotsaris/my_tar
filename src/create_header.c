@@ -206,6 +206,25 @@ void add_size(header_t *header, struct stat stats)
 /*
  *
 
+ -  HELPER: Custom strcpy function do add extra space in name
+
+*/
+
+
+void copy_name(char *field, char *name, size_t len)
+{
+	size_t i;
+   field[0] = ' ';
+	for (i = 0; i < len; ++i) 
+			field[i + 1] = name[i];
+
+    field[len + 1] = '\0';
+
+}
+
+/*
+ *
+
  - Writes user id and group id to header->gname and header->uname respectively.
 
 */
@@ -218,7 +237,7 @@ void add_uname_gname(header_t *header, struct stat stats)
 	grp = getgrgid(stats.st_gid);
 
 	strcpy(header->gname, grp->gr_name);
-	strcpy(header->uname, pws->pw_name);
+	copy_name(header->uname, pws->pw_name, strlen(pws->pw_name));
 }
 
 /*
@@ -248,6 +267,17 @@ void add_mode(header_t *header, struct stat stats)
 	free(stat_modes);
 }
 
+void remove_slash(char *field, size_t len)
+{
+  printf("my_tar: Removing leading `/' from member names \n");
+
+	size_t i;
+	for (i = 0; i < len - 1; ++i){
+		field[i] = field[i +1];}
+
+	field[len - 2] = '\0';
+}
+
 /*
  *
 
@@ -263,6 +293,10 @@ void add_name(header_t *header, char *path)
 
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
+
+		if(header->name[0]== '/')
+			remove_slash(header->name, strlen(header->name));
+		
 	}
 
 	else if (path_len < NAMELEN * 2)
@@ -272,6 +306,9 @@ void add_name(header_t *header, char *path)
 		header->prefix[split_pos] = '\0';
 		strncpy(header->name, &path[split_pos], NAMELEN);
 		header->name[NAMELEN - 1] = '\0';
+
+		if(header->name[0]== '/')
+			remove_slash(header->name, strlen(header->name));
 	}
 	else
 		printf("%s", EXC_NAME_SIZE);
@@ -292,8 +329,8 @@ void init_optional_fields(header_t *header)
 {
 	header->devmajor[0] = '\0';
 	header->devminor[0] = '\0';
-	header->linkname[0] = ' ';
-	header->linkname[1] = '\0';
+//	header->linkname[0] = ' ';
+	header->linkname[0] = '\0';
 	header->prefix[0] = '\0';
 }
 

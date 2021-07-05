@@ -11,15 +11,17 @@ header_t *tar(char *path, FILE *dest)
 	if (fd)
 	{
 		if ( stat(path, &stats)  == 0)
-			header = create_header(path, stats);
+		header = create_header(path, stats);
 
-		int buff_size = (int)stats.st_size;
-		char *buffer = (char*)malloc(sizeof(char) * buff_size+1  );
+		long long buff_size = stats.st_size;
+		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
 		read(fd, buffer, buff_size);
 		buffer[buff_size-1] = '\0';
 
 		fwrite(header, BLOCKSIZE, 1, dest);
-		fwrite(buffer, buff_size, 1, dest);
+		// don't write if link
+		if(header->typeflag != SYMTYPE)
+				fwrite(buffer, buff_size, 1, dest);
 
 		remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
 
@@ -35,14 +37,13 @@ header_t *tar(char *path, FILE *dest)
 		printf("File name in archive: %s\n", header->name);
 		return header;
 
-	}
-	else
-	{
+	}	else {
+
+	
 		printf("ERROR\n");
 		//	exit(1);
 		return NULL;
 	}
-
 }
 
 int archive(char **paths, size_t paths_len, header_t *headers[])
@@ -54,7 +55,6 @@ int archive(char **paths, size_t paths_len, header_t *headers[])
 	if (dest == NULL)
 	{
 		printf("Error creating archive file\n");
-		//	exit(1);
 		return -1;
 	}
 

@@ -86,9 +86,9 @@ typedef struct posix_header
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;              /* 256 */
+  char typeflag;              /* 156 */
+  char linkname[LINKNAMELEN]; /* 157 */
   char magic[TMAGLEN];        /* 257 */
-  char linkname[LINKNAMELEN]; /* 156 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
   char gname[GNAMELEN];       /* 297 */
@@ -97,7 +97,6 @@ typedef struct posix_header
   char prefix[PREFIXLEN];     /* 345 */
                               /* 500 */
 } header_t;
-
 
 typedef enum
 {
