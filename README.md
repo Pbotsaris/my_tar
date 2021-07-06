@@ -22,12 +22,12 @@ example output:
       (...)
 
 where
-- `field` is the name of the field 
-- `|   |` represents a memory block of 1 byte
+- `|   |` represents a memory block of 1 byte. And empty block is an <space> char. 
 - `| _ |` is an empty block
+- `---` is a divider between fields.
+- `field` is the name of the field 
 - `length` is the length of a field
 - `offset` is the memory offset of a field in within the header 512 bytes block and
-- `---` is a divider between fields.
 
 ## Testing
 
