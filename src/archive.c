@@ -38,8 +38,7 @@ header_t *tar(char *path, FILE *dest)
 		return header;
 
 	}	else {
-		printf("ERROR\n");
-		//	exit(1);
+		printf("Error while writting to archive\n");
 		return NULL;
 	}
 }
@@ -49,6 +48,18 @@ header_t *tar(char *path, FILE *dest)
 		struct stat stats;
 	    stat(path, &stats);
  		   return S_ISREG(stats.st_mode);
+}
+
+
+int count_dir(char **paths, size_t paths_len)
+{
+	int count;
+	for (size_t i = 0; i < paths_len; ++i) {
+		if(is_dir(paths[i]))
+			count++;
+	}	
+
+	return count;	
 
 }
 
@@ -70,9 +81,9 @@ int archive_file(char **paths, size_t paths_len, header_t *headers[])
 			{
 				fd = open(paths[index], O_APPEND);
 				lseek(fd, 0, SEEK_SET);
-				// speak dir
+				// skip dir
 				if(!is_dir(paths[index]))
-				// header per file
+					// header per file
 					headers[index - 1] = tar(paths[index], dest);
 				index++;
 				close(fd);
@@ -81,7 +92,7 @@ int archive_file(char **paths, size_t paths_len, header_t *headers[])
 			fclose(dest);
 		}
 		else {
-			printf("file not found. exiting...\n");
+			printf("File not found.\n");
 			return -1;
 		}
 	}
