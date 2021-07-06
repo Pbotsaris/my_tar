@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     }else if(paths_len >= 2 && options == c){
     // archive returns the number of headers it create
 <<<<<<< HEAD
+<<<<<<< HEAD
     header_t *file_headers[paths_len - 1];
     int num_headers = archive_file(paths, paths_len, file_headers);
 
@@ -72,8 +73,10 @@ int main(int argc, char *argv[])
     for(int i = 0; i < num_headers; i++) 
         free(file_headers[i]);
 =======
+=======
+>>>>>>> 9a66417fa5a59ec156dada4c2c52e6fa32fce87a
     header_t *headers[paths_len - 1];
-    int num_headers = archive(paths, paths_len, headers);
+    int num_headers = archive_file(paths, paths_len, headers);
     // search fo 'd' for debug mode
     bool_t is_debug = search_flag(argv, 'd');
     if(is_debug == TRUE)
@@ -86,9 +89,12 @@ int main(int argc, char *argv[])
     if(options == t){
         my_ls_tar(paths[0]);
     }
+<<<<<<< HEAD
 
    
 >>>>>>> 9c69f62e56e6ccffd16c4effe5533e806b1ed1fb
 
+=======
+>>>>>>> 9a66417fa5a59ec156dada4c2c52e6fa32fce87a
     return 0;
 }

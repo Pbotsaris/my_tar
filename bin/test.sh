@@ -1,5 +1,6 @@
 #!/bin/bash
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 rm *.tar
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -14,11 +15,13 @@ echo "fake"
 cat fake.tar
 >>>>>>> 9c69f62e56e6ccffd16c4effe5533e806b1ed1fb
 
+=======
+>>>>>>> 9a66417fa5a59ec156dada4c2c52e6fa32fce87a
 run_tar(){
   if [[ "$OSTYPE" == "darwin"* ]]; then
     gtar -cf real.tar $1
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    gtar -cf real.tar $1 
+    tar -cf real.tar $1 
   fi
 }
 
@@ -28,10 +31,10 @@ else
   rm *.tar
 
   if [[ $1 == "-d" ]]; then
-    ./bin/my_tar -s $1 fake.tar $2 
+    ./bin/my_tar -cf $1 fake.tar $2 
     run_tar $2
   else
-    ./bin/my_tar -s fake.tar $1 
+    ./bin/my_tar -cf fake.tar $1 
     run_tar $1
   fi
 
