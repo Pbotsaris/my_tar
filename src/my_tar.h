@@ -72,9 +72,7 @@
 #define DECIMAL 10
 #define BLOCKSIZE 512
 #define BYTOFFLEN 17
-#define JMPSIZE 24
-#define JMPFLAG 32
-#define ENDBLK 344
+#define ENDBLK 183
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
@@ -87,7 +85,7 @@ typedef struct posix_header
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;              /* 156 */
+  char typeflag;  /* 156 */
   char linkname[LINKNAMELEN]; /* 157 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
