@@ -22,7 +22,9 @@
 int main(int argc, char *argv[])
 {
 
-    // search for -s  for skipping options
+    /*
+      Handling options
+                                                            */
     char **paths;
     option_t options;
     bool_t is_skip_options = search_flag(argv, 's');
@@ -35,33 +37,52 @@ int main(int argc, char *argv[])
     else
         printf("skipping options for debug.\n");
 
-    // prepare paths for ingest
+    /*
+      prepare paths for ingest
+                                                            */
     int path_start_index = find_paths_start_index(argv);
-    // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
-    // get the actual length of the paths array.
     size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
 
-    // return error with wrong extention
+    /* wrong extention */
     if(is_tar_valid == FALSE){
         printf("Archives must have a .tar extention.\n");
         return 0;
     }
 
-    // didn't provide a path to archive
+    /* no path to archive */
     if(paths_len == 1){
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
     }
-    // archive returns the number of headers it create
-    header_t *file_headers[paths_len - 1];
-    int num_headers = archive_file(paths, paths_len, file_headers);
 
-    // search fo 'd' for debug mode
+    /*
+       Handle files and dirs
+                                                            */
+    size_t num_dirs = count_dirs(paths, paths_len);
+
+    size_t dir_indexes[num_dirs > 0 ? num_dirs : 1];
+    int num_dir_files = 0;
+
+    if(num_dirs > 0) {
+    get_dir_indexes(paths, dir_indexes, paths_len);
+    num_dir_files = count_dir_files(paths, dir_indexes, num_dirs);
+    }
+    else
+        dir_indexes[0] = -1;
+
+
+    header_t *headers[paths_len + num_dir_files];
+    int num_headers = archive(paths, paths_len, dir_indexes, headers);
+
+
+    /* 
+       -  Debug mode
+                                                            */
     bool_t is_debug = search_flag(argv, 'd');
     if(is_debug == TRUE)
-        debug_header(file_headers[0]);
+        debug_header(headers[0]);
 
     // search for 'l' for listing TODO: WE DONT NEED THIS FOR L. THIS IS BEING HANDLED IN SELECT OPTION
     bool_t is_ls = search_flag(argv, 'l');
@@ -70,7 +91,7 @@ int main(int argc, char *argv[])
     }
 
     for(int i = 0; i < num_headers; i++) 
-        free(file_headers[i]);
+        free(headers[i]);
 
     return 0;
 }
