@@ -61,7 +61,6 @@ int main(int argc, char *argv[])
        Handle files and dirs
                                                             */
     size_t num_dirs = count_dirs(paths, paths_len);
-
     size_t dir_indexes[num_dirs > 0 ? num_dirs : 1];
     int num_dir_files = 0;
 
