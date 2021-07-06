@@ -7,7 +7,7 @@ Under construction...
 Option `-d <filename>` for debug. While on debug mode, the program will skip all archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
 
 
-    ./bin/my_tar -d 
+    ./bin/my_tar -d <filename>
 
 example output:
 
