@@ -22,6 +22,10 @@
 int main(int argc, char *argv[])
 {
 
+    // search fo 'd' for debug mode
+    bool_t is_debug = search_flag(argv, 'd');
+  //  if(is_debug == TRUE)
+
     // search for -s  for skipping options
     char **paths;
     option_t options;
@@ -54,17 +58,10 @@ int main(int argc, char *argv[])
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
     }else if(paths_len >= 2 && options == c){
-    // archive returns the number of headers it create
-    header_t *file_headers[paths_len - 1];
-    int num_headers = archive_file(paths, paths_len, file_headers);
-
-    // search fo 'd' for debug mode
-    bool_t is_debug = search_flag(argv, 'd');
-    if(is_debug == TRUE)
-        debug_header(file_headers[0]);
-        for(int i = 0; i < num_headers; i++) 
-            free(file_headers[i]);
+    archive(paths, paths_len);
     }
+
+    
     // search for 'l' for listing
     if(options == t){
         my_ls_tar(paths[0]);

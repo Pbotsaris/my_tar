@@ -1,6 +1,6 @@
 #include "my_tar.h"
 
-header_t *tar(char *path, FILE *dest)
+void tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
 			remain_fill_block;
@@ -12,7 +12,6 @@ header_t *tar(char *path, FILE *dest)
 	{
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
-
 
 		long long buff_size = stats.st_size;
 		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
@@ -33,12 +32,11 @@ header_t *tar(char *path, FILE *dest)
 			free(fill_block);
 		}
 		free(buffer);
+		free(header);
 		close(fd);
-		return header;
 
 	}	else {
 		printf("Error while writting to archive\n");
-		return NULL;
 	}
 }
 
@@ -62,19 +60,19 @@ int count_dir(char **paths, size_t paths_len)
 
 }
 
-int archive_file(char **paths, size_t paths_len, header_t *headers[])
+void archive(char **paths, size_t paths_len)
 {
 
 	struct stat stats;
 	FILE *dest = fopen(paths[0], "wb");
 	int fd; 
 	size_t index = 1;
-	if (dest == NULL)
-	{
-		return -1;
+	if (dest == NULL){
+		printf("Failed to open archive file\n");
+			return;
 	}
 
-			printf("Achiving in %s\n", paths[0]);
+			printf("Files being archived to %s\n", paths[0]);
 
 	while (index < paths_len)
 	{
@@ -84,8 +82,7 @@ int archive_file(char **paths, size_t paths_len, header_t *headers[])
 				lseek(fd, 0, SEEK_SET);
 				// skip dir
 				if(!is_dir(paths[index]))
-					// header per file
-					headers[index - 1] = tar(paths[index], dest);
+					tar(paths[index], dest);
 				index++;
 				close(fd);
 			}
@@ -94,8 +91,8 @@ int archive_file(char **paths, size_t paths_len, header_t *headers[])
 		}
 		else {
 			printf("File not found.\n");
-			return -1;
+			return;
 		}
 	}
-	return index - 1;
+	return;
 }
