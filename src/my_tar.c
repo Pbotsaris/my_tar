@@ -42,7 +42,6 @@ int main(int argc, char *argv[])
     // get the actual length of the paths array.
     size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
-
     // return error with wrong extention
     if(is_tar_valid == FALSE){
         printf("Archives must have a .tar extention.\n");
@@ -50,11 +49,12 @@ int main(int argc, char *argv[])
     }
 
     // didn't provide a path to archive
-    if(paths_len == 1){
+    if(paths_len == 1 && options == c ){
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
-    }
+    }else if(paths_len >= 2 && options == c){
     // archive returns the number of headers it create
+<<<<<<< HEAD
     header_t *file_headers[paths_len - 1];
     int num_headers = archive_file(paths, paths_len, file_headers);
 
@@ -71,6 +71,24 @@ int main(int argc, char *argv[])
 
     for(int i = 0; i < num_headers; i++) 
         free(file_headers[i]);
+=======
+    header_t *headers[paths_len - 1];
+    int num_headers = archive(paths, paths_len, headers);
+    // search fo 'd' for debug mode
+    bool_t is_debug = search_flag(argv, 'd');
+    if(is_debug == TRUE)
+        debug_header(headers[0]);
+     for(int i = 0; i < num_headers; i++) 
+        free(headers[i]);
+    }
+    
+    // search for 'l' for listing
+    if(options == t){
+        my_ls_tar(paths[0]);
+    }
+
+   
+>>>>>>> 9c69f62e56e6ccffd16c4effe5533e806b1ed1fb
 
     return 0;
 }

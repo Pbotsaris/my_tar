@@ -236,11 +236,10 @@ bool_t validate_tar_extention(char *path)
 	int ext_index = 3;
 	char ext[5] = ".tar";
 
-	for(int path_index = len - 1; path_index >= (int)len - ext_index; path_index--)
+	for(int path_index = len - 1; ext_index >= 0; path_index--)
 	{
 		if(path[path_index] != ext[ext_index])
 			is_valid = FALSE;
-
 		ext_index--;	
 	}
 	return is_valid;
