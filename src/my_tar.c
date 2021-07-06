@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
         printf("skipping options for debug.\n");
 
     // prepare paths for ingest
+    //
     int path_start_index = find_paths_start_index(argv);
     // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
@@ -54,8 +55,6 @@ int main(int argc, char *argv[])
         return 0;
     }else if(paths_len >= 2 && options == c){
     // archive returns the number of headers it create
-<<<<<<< HEAD
-<<<<<<< HEAD
     header_t *file_headers[paths_len - 1];
     int num_headers = archive_file(paths, paths_len, file_headers);
 
@@ -63,38 +62,12 @@ int main(int argc, char *argv[])
     bool_t is_debug = search_flag(argv, 'd');
     if(is_debug == TRUE)
         debug_header(file_headers[0]);
-
-    // search for 'l' for listing TODO: WE DONT NEED THIS FOR L. THIS IS BEING HANDLED IN SELECT OPTION
-    bool_t is_ls = search_flag(argv, 'l');
-    if(is_ls == TRUE){
-        my_ls_tar(argv[3]);
+        for(int i = 0; i < num_headers; i++) 
+            free(file_headers[i]);
     }
-
-    for(int i = 0; i < num_headers; i++) 
-        free(file_headers[i]);
-=======
-=======
->>>>>>> 9a66417fa5a59ec156dada4c2c52e6fa32fce87a
-    header_t *headers[paths_len - 1];
-    int num_headers = archive_file(paths, paths_len, headers);
-    // search fo 'd' for debug mode
-    bool_t is_debug = search_flag(argv, 'd');
-    if(is_debug == TRUE)
-        debug_header(headers[0]);
-     for(int i = 0; i < num_headers; i++) 
-        free(headers[i]);
-    }
-    
     // search for 'l' for listing
     if(options == t){
         my_ls_tar(paths[0]);
     }
-<<<<<<< HEAD
-
-   
->>>>>>> 9c69f62e56e6ccffd16c4effe5533e806b1ed1fb
-
-=======
->>>>>>> 9a66417fa5a59ec156dada4c2c52e6fa32fce87a
     return 0;
 }
