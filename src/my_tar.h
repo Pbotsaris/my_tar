@@ -73,7 +73,8 @@
 #define BLOCKSIZE 512
 #define BYTOFFLEN 17
 #define JMPSIZE 24
-#define ENDBLK 376
+#define JMPFLAG 32
+#define ENDBLK 344
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
