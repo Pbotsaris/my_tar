@@ -22,7 +22,7 @@ example output:
       (...)
 
 where
-- `|   |` represents a memory block of 1 byte. And empty block is an <space> char. 
+- `|   |` represents a memory block of 1 byte. And empty block is an `<space>` char. 
 - `| _ |` is an empty block
 - `---` is a divider between fields.
 - `field` is the name of the field 
