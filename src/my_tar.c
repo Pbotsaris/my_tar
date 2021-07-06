@@ -52,11 +52,10 @@ int main(int argc, char *argv[])
     if(paths_len == 1 && options == c ){
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
-<<<<<<< HEAD
     }else if(paths_len >= 2 && options == c){
     // archive returns the number of headers it create
     header_t *headers[paths_len - 1];
-    int num_headers = archive(paths, paths_len, headers);
+    int num_headers = archive_file(paths, paths_len, headers);
     // search fo 'd' for debug mode
     bool_t is_debug = search_flag(argv, 'd');
     if(is_debug == TRUE)
@@ -69,30 +68,5 @@ int main(int argc, char *argv[])
     if(options == t){
         my_ls_tar(paths[0]);
     }
-
-   
-=======
-    }
-
-
-    // archive returns the number of headers it create
-    header_t *file_headers[paths_len - 1];
-    int num_headers = archive_file(paths, paths_len, file_headers);
-
-    // search fo 'd' for debug mode
-    bool_t is_debug = search_flag(argv, 'd');
-    if(is_debug == TRUE)
-        debug_header(file_headers[0]);
-
-    // search for 'l' for listing TODO: WE DONT NEED THIS FOR L. THIS IS BEING HANDLED IN SELECT OPTION
-    bool_t is_ls = search_flag(argv, 'l');
-    if(is_ls == TRUE){
-        my_ls_tar(argv[3]);
-    }
-
-    for(int i = 0; i < num_headers; i++) 
-        free(file_headers[i]);
->>>>>>> 337e3ad526e4bdf2beee881902eccde85483abda
-
     return 0;
 }
