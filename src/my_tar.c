@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 
     if((index = search_flag(argv, 'd')) > 0){
          debug_header(argv[index + 1]);
+         printf("%s\n", argv[index]);
          return 0;
        }
 

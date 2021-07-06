@@ -177,8 +177,10 @@ int search_flag(char **argv, char flag)
 
 	while(argv[index]){
 		int pos =	search_dash(argv[index]);
-		if(pos >= 0 && argv[index][pos + 1] == flag)
+		if(pos >= 0 && argv[index][pos + 1] == flag){
 			found_flag = TRUE;
+			break;
+		}
 
 		index++;
 	}
