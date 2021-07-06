@@ -96,8 +96,6 @@ option_t search_flag_f(option_t flag_opt, char *str)
 
 																																	*/
 
-
-
 void print_error(option_t flag_opt)
 {
 	if(flag_opt == MISSING_F)
@@ -213,6 +211,7 @@ int find_paths_start_index(char **argv)
 
 		index++;
 	}
+	// skip  file.tar
 	return index;
 }
 

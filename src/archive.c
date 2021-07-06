@@ -13,6 +13,7 @@ header_t *tar(char *path, FILE *dest)
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
 
+
 		long long buff_size = stats.st_size;
 		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
 		read(fd, buffer, buff_size);
@@ -31,10 +32,8 @@ header_t *tar(char *path, FILE *dest)
 			fwrite(fill_block, remain_fill_block, 1, dest);
 			free(fill_block);
 		}
-
 		free(buffer);
 		close(fd);
-		printf("File name in archive: %s\n", header->name);
 		return header;
 
 	}	else {
@@ -48,21 +47,23 @@ header_t *tar(char *path, FILE *dest)
 {
 		struct stat stats;
 	    stat(path, &stats);
- 		   return S_ISREG(stats.st_mode);
+ 		   return S_ISDIR(stats.st_mode);
 
 }
 
 int archive_file(char **paths, size_t paths_len, header_t *headers[])
 {
+
 	struct stat stats;
 	FILE *dest = fopen(paths[0], "wb");
 	int fd; 
 	size_t index = 1;
 	if (dest == NULL)
 	{
-		printf("Error creating archive file\n");
 		return -1;
 	}
+
+			printf("Achiving in %s\n", paths[0]);
 
 	while (index < paths_len)
 	{
