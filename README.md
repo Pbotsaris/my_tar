@@ -26,8 +26,8 @@ The testing script will run `my_tar` in skip mode and the real `tar` then cat th
 
 Run the script:
 
-    $ ./bin/test.sh
+    $ ./bin/test.sh <filename>
 
 For debug mode pass the `-d` option 
 
-    $ ./bin/test.sh -d
+    $ ./bin/test.sh -d <filename>
