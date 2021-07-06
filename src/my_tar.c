@@ -55,22 +55,22 @@ int main(int argc, char *argv[])
         return 0;
     }
     // archive returns the number of headers it create
-    header_t *headers[paths_len - 1];
-    int num_headers = archive(paths, paths_len, headers);
+    header_t *file_headers[paths_len - 1];
+    int num_headers = archive_file(paths, paths_len, file_headers);
 
     // search fo 'd' for debug mode
     bool_t is_debug = search_flag(argv, 'd');
     if(is_debug == TRUE)
-        debug_header(headers[0]);
+        debug_header(file_headers[0]);
 
-    // search for 'l' for listing
+    // search for 'l' for listing TODO: WE DONT NEED THIS FOR L. THIS IS BEING HANDLED IN SELECT OPTION
     bool_t is_ls = search_flag(argv, 'l');
     if(is_ls == TRUE){
         my_ls_tar(argv[3]);
     }
 
     for(int i = 0; i < num_headers; i++) 
-        free(headers[i]);
+        free(file_headers[i]);
 
     return 0;
 }

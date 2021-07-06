@@ -86,9 +86,9 @@ typedef struct posix_header
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;              /* 256 */
+  char typeflag;              /* 156 */
+  char linkname[LINKNAMELEN]; /* 157 */
   char magic[TMAGLEN];        /* 257 */
-  char linkname[LINKNAMELEN]; /* 156 */
   char version[TVERSLEN];     /* 263 */
   char uname[UNAMELEN];       /* 265 */
   char gname[GNAMELEN];       /* 297 */
@@ -97,7 +97,6 @@ typedef struct posix_header
   char prefix[PREFIXLEN];     /* 345 */
                               /* 500 */
 } header_t;
-
 
 typedef enum
 {
@@ -145,7 +144,7 @@ void *my_memset(void* str, int c, int len);
 
 // main calbacks
 header_t *create_header(char *path, struct stat stats);
-int archive(char **paths, size_t paths_len, header_t *headers[]);
+int archive_file(char **paths, size_t paths_len, header_t *headers[]);
 option_t check_option(char **format);
 
 bool_t search_flag(char **argv, char flag);
