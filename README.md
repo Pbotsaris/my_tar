@@ -21,7 +21,13 @@ example output:
         
       (...)
 
-where `field` is the name of the field,  `|   |` represents a memory block of 1 byte, `| _ |` is an empty block, `length` is the length of a field, `offset` is the memory offset of a field in within the header 512 bytes block and `---` is a divider between fields.
+where
+- `field` is the name of the field 
+- `|   |` represents a memory block of 1 byte
+- `| _ |` is an empty block
+- `length` is the length of a field
+- `offset` is the memory offset of a field in within the header 512 bytes block and
+- `---` is a divider between fields.
 
 ## Testing
 
