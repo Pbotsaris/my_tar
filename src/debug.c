@@ -20,8 +20,18 @@ void print_values(char *field, size_t len, int field_pos, int offset)
 }
 
 
-void debug_header(header_t *header)
+void debug_header(char *path)
 {
+
+	header_t *header; 
+	struct stat stats;
+
+	if ( stat(path, &stats) == 0)
+			header = create_header(path, stats);
+	else
+		return;
+
+
 
 	int *bytes_offset = create_bytes_offset();
 
@@ -36,6 +46,7 @@ void debug_header(header_t *header)
 	}
 
 	free(bytes_offset);
+	free(header);
 
 }
 

@@ -22,49 +22,58 @@
 int main(int argc, char *argv[])
 {
 
-    // search fo 'd' for debug mode
-    bool_t is_debug = search_flag(argv, 'd');
-  //  if(is_debug == TRUE)
-
-    // search for -s  for skipping options
     char **paths;
+    int index = -1;
     option_t options;
-    bool_t is_skip_options = search_flag(argv, 's');
-    if(is_skip_options == FALSE){
-        // check for options
+
+    /*
+        DEBUG  
+                                                            */
+
+    if((index = search_flag(argv, 'd')) > 0){
+         debug_header(argv[index + 1]);
+         return 0;
+       }
+
+    /*
+         OPTIONS  
+                                                            */
         options = check_option(argv);
         if(options == ERROROPT || options == MISSING_F || options == NONE)
             return 0;
-    }
-    else
-        printf("skipping options for debug.\n");
 
-    // prepare paths for ingest
-    //
+    /*
+        SPLIT ARGV 
+
+                                                            */
     int path_start_index = find_paths_start_index(argv);
-    // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
-    // get the actual length of the paths array.
     size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
-    // return error with wrong extention
     if(is_tar_valid == FALSE){
         printf("Archives must have a .tar extention.\n");
         return 0;
     }
 
-    // didn't provide a path to archive
+    /*
+         ARCHIVE
+                                                            */
+
     if(paths_len == 1 && options == c ){
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
-    }else if(paths_len >= 2 && options == c){
-    archive(paths, paths_len);
     }
+    if(paths_len >= 2 && options == c)
+           archive(paths, paths_len);
 
-    
-    // search for 'l' for listing
+      /*
+           LIST TAR 
+                                                            */
+
     if(options == t){
         my_ls_tar(paths[0]);
     }
+
+
     return 0;
 }
