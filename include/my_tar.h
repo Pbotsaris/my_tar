@@ -121,15 +121,6 @@ typedef enum
 
 typedef enum {tar_mode, stat_mode}modes_t;
 
-// ERRS
-#define MISSING_F_ERR "my_tar: Refusing to read archive contents from terminal (missing -f option?)\n"
-#define MISSING_OPT_ERR "You must specify one of the the following options -c -r -t -u -x\n"
-#define NULL_OPT "my_tar: Error is not recoverable: exiting now\n"
-#define EXC_NAME_SIZE "my_tar: Filename exceeds maximum length of 200\n"
-#define STAT_ERR "Unable to read"
-#define FLAGTYPE_ERR "File type not recognized. Setting as regular file."
-
-
 #define MODES_ARR_LEN 9
 
 

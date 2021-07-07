@@ -1,4 +1,5 @@
 #include "../include/my_tar.h"
+#include "../include/messages.h"
 
 /*
  *
@@ -161,7 +162,7 @@ void archive(char **paths, size_t paths_len)
 
 		}
 		else {
-			printf("File not found.\n");
+			printf("%s\n", FILE_NOT_FOUND_ERR);
 			return;
 		}
 	}
