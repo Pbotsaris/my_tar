@@ -9,7 +9,7 @@ OBJ=obj/my_tar.o    	   	\
 CFLAGS=-W -g 
 CC=gcc 
 BIN=bin/my_tar
-RM=rm -r
+RM=rm -rf
 
 all: $(BIN)
 
@@ -20,5 +20,5 @@ obj/%.o: src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
-	$(RM) /bin/my_tar obj/*
+	$(RM) bin/my_tar bin/*.dSYM obj/*
 
