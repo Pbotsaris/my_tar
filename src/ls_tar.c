@@ -1,4 +1,7 @@
 #include "../include/my_tar.h"
+#include "../include/messages.h"
+#include "../include/header.h"
+
 
 header_t *get_header(int tar){
    // int tar = open(path, O_RDWR);
