@@ -1,9 +1,9 @@
 #!/bin/bash
 run_tar(){
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    gtar -cf real.tar $1
+    gtar -cf real.tar $1 $2
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    tar -cf real.tar $1 
+    tar -cf real.tar $1 $2
   fi
 }
 
@@ -13,11 +13,11 @@ else
   rm *.tar
 
   if [[ $1 == "-d" ]]; then
-    ./bin/my_tar -cf $1 fake.tar $2 
-    run_tar $2
+    ./bin/my_tar -cf $1 fake.tar $2 $3 
+    run_tar $2 $3
   else
-    ./bin/my_tar -cf fake.tar $1 
-    run_tar $1
+    ./bin/my_tar -cf fake.tar $1 $2
+    run_tar $1 $2
   fi
 
   echo "real"
