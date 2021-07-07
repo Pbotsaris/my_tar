@@ -65,16 +65,17 @@ int main(int argc, char *argv[])
     }
 
     /*
-       ARCHIVE
+       ARCHIVE 
                                                  */
-
-    if(paths_len == 1 && options == c ){
-        printf("You must provide a .tar file and a path to file to archive.\n");
-        return 0;
+    if(options == u || options == c){
+        if(paths_len > 1){
+             archive(paths, paths_len, options);
+        }else{
+            printf("You must provide a .tar file and a path to file to archive.\n");
+            return 1;
+        }
     }
-    if(paths_len >= 2 && options == c)
-        archive(paths, paths_len);
-
+    
     /*
      *
        LIST TAR 
