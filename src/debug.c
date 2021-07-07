@@ -1,5 +1,6 @@
 #include "../include/my_tar.h"
-
+#include "../include/messages.h"
+#include "../include/header.h"
 
 void print_values(char *field, size_t len, int field_pos, int offset)
 {
@@ -20,7 +21,7 @@ void print_values(char *field, size_t len, int field_pos, int offset)
 }
 
 
-void debug_header(char *path)
+int debug_header(char *path)
 {
 
 	header_t *header; 
@@ -29,8 +30,7 @@ void debug_header(char *path)
 	if ( stat(path, &stats) == 0)
 			header = create_header(path, stats);
 	else
-		return;
-
+		return -1;
 
 
 	int *bytes_offset = create_bytes_offset();
@@ -47,6 +47,8 @@ void debug_header(char *path)
 
 	free(bytes_offset);
 	free(header);
+
+	return 0;
 
 }
 

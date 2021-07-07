@@ -1,4 +1,7 @@
 #include "../include/my_tar.h"
+#include "../include/messages.h"
+#include "../include/header.h"
+#include "../include/header.h"
 
 /*
  *
@@ -107,11 +110,15 @@ int *create_modes(modes_t type)
  *
  
 	-  Fills a buffer with 0 for unused indexes
+	-  returns -1 on error
 
 */
 
-void fill_zeros(char *field, int len, int total_len)
+int fill_zeros(char *field, int len, int total_len)
 {
+	if(total_len > (int)strlen(field))
+			return -1;
+
 	int j = len;
 	char buff[total_len];
 	memset(buff, '0', total_len - 1);
@@ -123,6 +130,8 @@ void fill_zeros(char *field, int len, int total_len)
 	}
 	buff[total_len - 1] = '\0';
 	strcpy(field, buff);
+
+	return 0;
 }
 
 /*
