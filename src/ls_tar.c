@@ -1,13 +1,13 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
+#include <stdio.h>
 
 
 header_t *get_header(int tar){
    // int tar = open(path, O_RDWR);
     header_t *header = malloc(sizeof(header_t));
     char temp;
-    
     read(tar,header->name, NAMELEN);
     read(tar, header->mode, MODELEN);
     read(tar, header->uid, UIDLEN);
@@ -22,7 +22,7 @@ header_t *get_header(int tar){
     read(tar, header->version, TVERSLEN);
     read(tar, header->uname, UNAMELEN);
     read(tar, header->gname, GNAMELEN);
-    lseek(tar, ENDBLK + BLOCKSIZE, SEEK_CUR);
+    lseek(tar, ENDBLK , SEEK_CUR);
 
     return header;
 }
@@ -39,7 +39,6 @@ int skip_content(header_t *header){
        for(int i = 0; (size - i) >= 1;i++)
             counter++;
    }
-    printf("Im skipping %d\n", counter);
     return BLOCKSIZE * counter; 
 }
 
@@ -61,7 +60,6 @@ int my_ls_tar(char *path){
             current_file_position = lseek(tar, skip_content(header), SEEK_CUR);        
         else
             current_file_position += BLOCKSIZE;
-        printf("POS %d\n", current_file_position);
         free(header);
     }
     close(tar);
