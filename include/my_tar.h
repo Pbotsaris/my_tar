@@ -44,7 +44,7 @@ int debug_header(char *path);
 void *my_memset(void* str, int c, int len);
 
 /*       archive       */
-int archive(char **paths, size_t paths_len);
+int archive(char **paths, size_t paths_len, option_t option);
 
 /*      options       */
 option_t check_option(char **format);

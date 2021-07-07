@@ -55,6 +55,7 @@
 #define BLOCKSIZE 512
 #define BYTOFFLEN 17
 #define ENDBLK 183
+#define HEADERBYTE 12
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
