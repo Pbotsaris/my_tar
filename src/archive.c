@@ -20,16 +20,15 @@ void tar(char *path, FILE *dest)
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
 
-
+    	fwrite(header, BLOCKSIZE, 1, dest);
 		/*  SKIP SYMLINK  */ 
-		if(header->typeflag != SYMTYPE){
+		if(header->typeflag != SYMTYPE || header->typeflag != DIRTYPE){
     		long long buff_size = stats.st_size;
-    		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
+    		char *buffer = (char*)malloc(sizeof(char) * (buff_size + 1));
     		read(fd, buffer, buff_size);
-    		buffer[buff_size-1] = '\0';
+    		buffer[buff_size-1] = '\n';
         	fwrite(buffer, buff_size, 1, dest);
 
-    		fwrite(header, BLOCKSIZE, 1, dest);
 		    remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
 
 		    if(remain_fill_block != 0){
