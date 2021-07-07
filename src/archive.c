@@ -1,6 +1,11 @@
 #include "my_tar.h"
 
-header_t *tar(char *path, FILE *dest)
+/*
+ *
+ - PRIVATE: append a data in a given path to .tar file
+
+*/
+void tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
 			remain_fill_block;
@@ -13,14 +18,13 @@ header_t *tar(char *path, FILE *dest)
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
 
-
 		long long buff_size = stats.st_size;
 		char *buffer = (char*)malloc(sizeof(char) * buff_size + 1);
 		read(fd, buffer, buff_size);
 		buffer[buff_size-1] = '\0';
 
 		fwrite(header, BLOCKSIZE, 1, dest);
-		// don't writeif symlink
+		/*  SKIP SYMLINK  */ 
 		if(header->typeflag != SYMTYPE)
 			fwrite(buffer, buff_size, 1, dest);
 
@@ -33,58 +37,135 @@ header_t *tar(char *path, FILE *dest)
 			free(fill_block);
 		}
 		free(buffer);
+		free(header);
 		close(fd);
-		return header;
 
 	}	else {
-		printf("ERROR\n");
-		//	exit(1);
-		return NULL;
+		printf("Error while writting to archive\n");
 	}
 }
 
- bool_t is_dir(char *path)
+/*
+ *
+ - PRIVATE: Validates if either a path is a directory
+
+*/
+
+bool_t is_dir(char *path)
 {
-		struct stat stats;
-	    stat(path, &stats);
- 		   return S_ISDIR(stats.st_mode);
+	struct stat stats;
+	stat(path, &stats);
+	return S_ISDIR(stats.st_mode);
+}
+
+/*
+ *
+ - PRIVATE: Concats path as follows -  dir ++ / ++ file
+
+*/
+
+char *join_path(char *dir, char *file)
+{
+	size_t len = strlen(dir)  + strlen(file);;
+
+	char *buffer = NULL;
+	buffer = (char*)malloc( (len + 2) * sizeof(char));
+	memset(buffer, '\0', len + 2);
+	strcat(buffer, dir);
+	strcat(buffer, "/");
+	strcat(buffer, file);
+
+	return buffer;		 
 
 }
 
-int archive_file(char **paths, size_t paths_len, header_t *headers[])
+/*
+ *
+ - PRIVATE: call tar to all files in a directory but other directories
+
+*/
+
+void handle_dir(char *path, FILE *dest)
+{
+	DIR * dirp;
+	struct dirent * entry;
+	char *temp[200];
+
+	dirp = opendir(path); 
+	if(dirp){
+		while ((entry = readdir(dirp)) != NULL) {
+			if (entry->d_type != DT_DIR) { 
+				char *full_path =join_path(path, entry->d_name);
+				tar(full_path, dest);
+				free(full_path);
+			}
+		}
+		closedir(dirp);
+	}
+	else {
+		printf("Failed openning the directory %s\n", path);
+
+	}
+}
+
+/*
+ * =====================================================================================
+ *
+ *  ARCHIVE																																										     
+ *   																									                     													 
+ *    -  Takes an array of **paths and archieves to a tar file
+ *    -  path[0] is the path to the tar file. 
+ *    - Subsequent items are paths to files to be archived
+ *    - paths can be both files of directories
+ *
+ *    
+ * =====================================================================================
+ */
+
+
+void archive(char **paths, size_t paths_len)
 {
 
 	struct stat stats;
 	FILE *dest = fopen(paths[0], "wb");
 	int fd; 
+	int dir_counter = 0;
+	int header_index = 0;
 	size_t index = 1;
+
+
 	if (dest == NULL)
 	{
-		return -1;
+		printf("Error creating archive file\n");
+		return ;
 	}
 
-			printf("Achiving in %s\n", paths[0]);
+	printf("Files being archived to %s\n", paths[0]);
+
+	//		fd = open(paths[index], O_APPEND);
+	//					lseek(fd, 0, SEEK_SET);
 
 	while (index < paths_len)
 	{
-		if ( stat(paths[index], &stats)  == 0){
+		if ( stat(paths[index], &stats) == 0){
 			{
-				fd = open(paths[index], O_APPEND);
-				lseek(fd, 0, SEEK_SET);
-				// speak dir
-				if(!is_dir(paths[index]))
-				// header per file
-					headers[index - 1] = tar(paths[index], dest);
+				/* DIR */ 
+				if(is_dir(paths[index]))
+					handle_dir(paths[index], dest);
+				/* FILE */ 
+				else
+					tar(paths[index], dest);
+
 				index++;
-				close(fd);
 			}
 
-			fclose(dest);
 		}
 		else {
-			printf("file not found. exiting...\n");
-			return -1;
+			printf("File not found.\n");
+			return;
 		}
 	}
-	return index - 1;
+
+	//		close(fd);
+	fclose(dest);
 }

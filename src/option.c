@@ -3,7 +3,7 @@
 /*
  *
  *
- 		- HELPER: Looks for the dash char(-) in a string.
+ 		- PRIVATE: Looks for the dash char(-) in a string.
 																																			*/
 
 int search_dash(char *str)
@@ -29,7 +29,7 @@ int search_dash(char *str)
 /*
  *
  *
- 		- HELPER: select option. Returns ERROROPT if option is not found.
+ 		- PRIVATE: select option. Returns ERROROPT if option is not found.
 
 																																		*/
 
@@ -61,7 +61,7 @@ option_t select_option(char flag, option_t flag_opt)
 /*
  *
  *
- 		- HELPER: searches for a -f flag. flag_opt to missing_f in case of failure
+ 		- PRIVATE: searches for a -f flag. flag_opt to missing_f in case of failure
 
 																																	*/
 
@@ -92,7 +92,7 @@ option_t search_flag_f(option_t flag_opt, char *str)
 /*
  *
  *
- 		- HELPER: Prints error depending on error type in flag_opt
+ 		- PRIVATE: Prints error depending on error type in flag_opt
 
 																																	*/
 
@@ -170,19 +170,21 @@ option_t check_option(char **argv)
  */
 
 
-bool_t search_flag(char **argv, char flag)
+int search_flag(char **argv, char flag)
 {
 	int index = 1;
 	bool_t found_flag = FALSE;
 
 	while(argv[index]){
 		int pos =	search_dash(argv[index]);
-		if(pos >= 0 && argv[index][pos + 1] == flag)
+		if(pos >= 0 && argv[index][pos + 1] == flag){
 			found_flag = TRUE;
+			break;
+		}
 
 		index++;
 	}
-	return found_flag;
+	return found_flag ? index : -1;
 }
 
 /*

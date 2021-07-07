@@ -8,6 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <dirent.h>
 #if __linux__
 #include <sys/sysmacros.h>
 #endif
@@ -136,18 +137,23 @@ int *create_modes(modes_t type);
 void fill_zeros(char *field, int len, int total_len) ;
 int my_itoa(char *str, int num, int base);
 int decimal_to_octal(int decimal);
-int my_ls_tar(char *path);
 int check_byte(int block);
-void debug_header(header_t *header);
+void debug_header(char *path);
 void *my_memset(void* str, int c, int len);
 
-// main calbacks
+// create_header
 header_t *create_header(char *path, struct stat stats);
-int archive_file(char **paths, size_t paths_len, header_t *headers[]);
-option_t check_option(char **format);
 
-bool_t search_flag(char **argv, char flag);
+// archive
+void archive(char **paths, size_t paths_len);
+
+// options
+option_t check_option(char **format);
+int search_flag(char **argv, char flag);
 int find_paths_start_index(char **argv);
 bool_t validate_tar_extention(char *path);
+
+// ls
+int my_ls_tar(char *path);
 
 #endif

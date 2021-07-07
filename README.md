@@ -4,19 +4,30 @@ Under construction...
 
 
 ## Dev options 
-Use `-d` for debug mode and `-s` to skip parsing options to avoid errors.
+Option `-d <filename>` for debug. While on debug mode, the program will skip all archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
 
-Debug:
 
-    ./bin/my_tar -d 
+    ./bin/my_tar -d <filename>
 
-Skip:
+example output:
 
-    ./bin/my_tar -s 
+     Field: chksum -- length: 8  -- offset: 148
+     |  0  |  1  |  3  |  2  |  0  |  0  |     |  _  |
+        
+     --
+        
+     Field: magic -- length: 6  -- offset: 257
+     |  u  |  s  |  t  |  a  |  r  |  _  |
+        
+      (...)
 
-Both:
-
-    ./bin/my_tar -d -s
+where
+- `|   |` represents a memory block of 1 byte. And empty block is an `<space>` char. 
+- `| _ |` is an empty block
+- `---` is a divider between fields.
+- `field` is the name of the field 
+- `length` is the length of a field
+- `offset` is the memory offset of a field in within the header 512 bytes block and
 
 ## Testing
 

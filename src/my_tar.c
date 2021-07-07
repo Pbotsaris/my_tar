@@ -22,52 +22,66 @@
 int main(int argc, char *argv[])
 {
 
-    // search for -s  for skipping options
     char **paths;
+    int index = -1;
     option_t options;
-    bool_t is_skip_options = search_flag(argv, 's');
-    if(is_skip_options == FALSE){
-        // check for options
-        options = check_option(argv);
-        if(options == ERROROPT || options == MISSING_F || options == NONE)
-            return 0;
-    }
-    else
-        printf("skipping options for debug.\n");
 
-    // prepare paths for ingest
-    //
+    /*
+     *
+       DEBUG  
+                                               */
+
+    if((index = search_flag(argv, 'd')) > 0){
+        debug_header(argv[index + 1]);
+        printf("%s\n", argv[index]);
+        return 0;
+    }
+
+    /*
+     *
+       OPTIONS  
+                                              */
+
+    options = check_option(argv);
+    if(options == ERROROPT || options == MISSING_F || options == NONE)
+        return 0;
+
+    /*
+     *
+       SPLIT ARGV 
+
+                                               */
+
     int path_start_index = find_paths_start_index(argv);
-    // offset argv to path_start_index. Store in paths pointer.
     paths = argv + path_start_index;
-    // get the actual length of the paths array.
     size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
-    // return error with wrong extention
+    /* wrong extention */
     if(is_tar_valid == FALSE){
         printf("Archives must have a .tar extention.\n");
         return 0;
     }
 
-    // didn't provide a path to archive
+    /*
+       ARCHIVE
+                                                 */
+
     if(paths_len == 1 && options == c ){
         printf("You must provide a .tar file and a path to file to archive.\n");
         return 0;
-    }else if(paths_len >= 2 && options == c){
-    // archive returns the number of headers it create
-    header_t *file_headers[paths_len - 1];
-    int num_headers = archive_file(paths, paths_len, file_headers);
+    }
+    if(paths_len >= 2 && options == c)
+        archive(paths, paths_len);
 
-    // search fo 'd' for debug mode
-    bool_t is_debug = search_flag(argv, 'd');
-    if(is_debug == TRUE)
-        debug_header(file_headers[0]);
-        for(int i = 0; i < num_headers; i++) 
-            free(file_headers[i]);
+    /*
+     *
+       LIST TAR 
+                                                 */
+
+    if(paths_len == 1){
+        printf("You must provide a .tar file and a path to file to archive.\n");
+        return 0;
     }
-    // search for 'l' for listing
-    if(options == t){
-        my_ls_tar(paths[0]);
-    }
+
     return 0;
 }
