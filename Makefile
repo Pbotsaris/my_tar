@@ -6,7 +6,8 @@ OBJ=obj/my_tar.o    	   	\
 		obj/option.o	    		\
 		obj/ls_tar.o
 
-CFLAGS=-W -g 
+CFLAGS=-W -g -Iinclude
+HEADER=include/my_tar.h
 CC=gcc 
 BIN=bin/my_tar
 RM=rm -rf
@@ -14,9 +15,9 @@ RM=rm -rf
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) -o $(BIN) $(OBJ) $(CFLAGS)
+	$(CC) -o $(BIN) $(OBJ) $(CFLAGS) 
 
-obj/%.o: src/%.c
+obj/%.o: src/%.c 
 	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
