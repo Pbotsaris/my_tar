@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
     if(paths_len == 1 && options == t){
        my_ls_tar(paths[0]); 
-    }else
+    }else if (options == t)
         printf("You must provide a .tar file and a path to file to archive.\n");
     
     return 0;
