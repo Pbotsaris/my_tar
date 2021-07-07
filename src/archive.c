@@ -1,28 +1,33 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
+#include <stdio.h>
 
 /*
  *
  - PRIVATE: append a data in a given path to .tar file
 
 */
-void tar(char *path, FILE *dest)
+int tar(char *path, FILE *dest)
 {
 	int fd = open(path, O_APPEND),
 			remain_fill_block;
 
-	header_t *header;
-	struct stat stats;
-
-	if (fd)
+    char fill_header[HEADERBYTE]; // HEADERBYTE = 12
+    my_memset(fill_header , '\0', HEADERBYTE);
+	
+    header_t *header;
+    struct stat stats;
+    if (fd)
 	{
 		if ( stat(path, &stats)  == 0)
 			header = create_header(path, stats);
+    	
+        fwrite(header, sizeof(header_t), 1, dest);
+        fwrite(fill_header, HEADERBYTE, 1, dest);
 
-    	fwrite(header, BLOCKSIZE, 1, dest);
 		/*  SKIP SYMLINK  */ 
-		if(header->typeflag != SYMTYPE || header->typeflag != DIRTYPE){
+		if( header->typeflag != DIRTYPE && header->typeflag != SYMTYPE){
     		long long buff_size = stats.st_size;
     		char *buffer = (char*)malloc(sizeof(char) * (buff_size + 1));
     		read(fd, buffer, buff_size);
@@ -37,14 +42,17 @@ void tar(char *path, FILE *dest)
 		    	fwrite(fill_block, remain_fill_block, 1, dest);
 		    	free(fill_block);
 		    }
+
 		    free(buffer);
         }
-
-		free(header);
+        free(header);
 		close(fd);
+
+        return 0;
 
 	}	else {
 		printf("Error while writting to archive\n");
+        return 1;
 	}
 }
 
@@ -92,8 +100,8 @@ void handle_dir(char *path, FILE *dest)
 {
 	DIR * dirp;
 	struct dirent * entry;
-
 	dirp = opendir(path); 
+    
     tar(path, dest);
 	if(dirp){
 		while ((entry = readdir(dirp)) != NULL) {
@@ -124,25 +132,32 @@ void handle_dir(char *path, FILE *dest)
  *    
  * =====================================================================================
  */
+FILE *check_file(FILE *dest, option_t option){
+
+    if(option == c)
+        return dest;
+
+    if(option == t){
+       dest = fopen(file, "wb");
+
+       if(dest == NULL)
+           return NULL;
+   }
+}   
 
 
-int archive(char **paths, size_t paths_len)
+int archive(char **paths, size_t paths_len, option_t option)
 {
 
 	struct stat stats;
-	FILE *dest = fopen(paths[0], "wb");
-	int fd; 
-	int dir_counter = 0;
-	int header_index = 0;
+    FILE *dest = fopen(paths[0], "wb"); 
+    dest = check_file(dest, option);
+    if(dest == NULL){
+        printf("Couldn't open your tar\n");
+        return 1;
+    }
 	size_t index = 1;
-
-
-	if (dest == NULL)
-	{
-		printf("Error creating archive file\n");
-		return -1;
-	}
-
+    
 	printf("Files being archived to %s\n", paths[0]);
 
 	//		fd = open(paths[index], O_APPEND);
