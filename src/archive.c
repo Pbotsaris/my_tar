@@ -89,9 +89,9 @@ void handle_dir(char *path, FILE *dest)
 {
 	DIR * dirp;
 	struct dirent * entry;
-	char *temp[200];
 
 	dirp = opendir(path); 
+    tar(path, dest);
 	if(dirp){
 		while ((entry = readdir(dirp)) != NULL) {
 			if (entry->d_type != DT_DIR) { 
