@@ -1,7 +1,6 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
-#include <stdio.h>
 
 /*
  *
@@ -18,6 +17,7 @@ int tar(char *path, FILE *dest)
 	
     header_t *header;
     struct stat stats;
+    
     if (fd)
 	{
 		if ( stat(path, &stats)  == 0)
@@ -132,26 +132,21 @@ void handle_dir(char *path, FILE *dest)
  *    
  * =====================================================================================
  */
-FILE *check_file(FILE *dest, option_t option){
-
-    if(option == c)
-        return dest;
-
-    if(option == t){
-       dest = fopen(file, "wb");
-
-       if(dest == NULL)
-           return NULL;
-   }
-}   
-
 
 int archive(char **paths, size_t paths_len, option_t option)
 {
 
 	struct stat stats;
-    FILE *dest = fopen(paths[0], "wb"); 
-    dest = check_file(dest, option);
+    FILE *dest;
+
+    if(option == c)
+        dest = fopen(paths[0], "wb");
+
+    if(option == u && (dest = fopen(paths[0], "r+")) != NULL)
+        fseek(dest, 0, SEEK_END);
+    else
+        dest = fopen(paths[0], "wb");
+
     if(dest == NULL){
         printf("Couldn't open your tar\n");
         return 1;
