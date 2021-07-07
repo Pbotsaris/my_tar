@@ -1,6 +1,7 @@
-#include "my_tar.h"
-#include <fcntl.h>
-#include <stdio.h>
+#include "../include/my_tar.h"
+#include "../include/messages.h"
+#include "../include/header.h"
+
 
 header_t *get_header(int tar){
    // int tar = open(path, O_RDWR);
@@ -64,5 +65,7 @@ int my_ls_tar(char *path){
         free(header);
     }
     close(tar);
+
+    return 0;
 }
 

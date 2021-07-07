@@ -1,4 +1,6 @@
-#include "my_tar.h"
+#include "../include/my_tar.h"
+#include "../include/messages.h"
+#include "../include/header.h"
 
 /*
  *
@@ -125,7 +127,7 @@ void handle_dir(char *path, FILE *dest)
  */
 
 
-void archive(char **paths, size_t paths_len)
+int archive(char **paths, size_t paths_len)
 {
 
 	struct stat stats;
@@ -139,7 +141,7 @@ void archive(char **paths, size_t paths_len)
 	if (dest == NULL)
 	{
 		printf("Error creating archive file\n");
-		return ;
+		return -1;
 	}
 
 	printf("Files being archived to %s\n", paths[0]);
@@ -163,11 +165,12 @@ void archive(char **paths, size_t paths_len)
 
 		}
 		else {
-			printf("File not found.\n");
-			return;
+			printf("%s\n", FILE_NOT_FOUND_ERR);
+			return -1;
 		}
 	}
 
 	//		close(fd);
 	fclose(dest);
+	return 0;
 }
