@@ -52,7 +52,6 @@ int my_itoa(char *str, int num, int base)
 
     reverse(str, idx);
     //    str[idx] = '\0';
-
     return idx;
 }
 
@@ -116,8 +115,8 @@ int *create_modes(modes_t type)
 
 int fill_zeros(char *field, int len, int total_len)
 {
-	if(total_len > (int)strlen(field))
-			return -1;
+    if(total_len < (int)strlen(field))
+        return 1;
 
 	int j = len;
 	char buff[total_len];
@@ -129,9 +128,10 @@ int fill_zeros(char *field, int len, int total_len)
 		j--;
 	}
 	buff[total_len - 1] = '\0';
-	strcpy(field, buff);
 
-	return 0;
+	strcpy(field, buff);
+    
+    return 0;
 }
 
 /*
