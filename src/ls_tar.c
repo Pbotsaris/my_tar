@@ -37,9 +37,8 @@ int skip_content(header_t *header){
       
        for(int i = 0; (size - i) >= 1;i++)
             counter++;
-    
    }
-
+    printf("Im skipping %d\n", counter);
     return BLOCKSIZE * counter; 
 }
 
@@ -57,56 +56,13 @@ int my_ls_tar(char *path){
         header = get_header(tar);
         if(header->name[0] != '\0')
             printf("%s\n", header->name);
-        current_file_position = lseek(tar, skip_content(header), SEEK_CUR);        
+        if(header->typeflag != DIRTYPE)
+            current_file_position = lseek(tar, skip_content(header), SEEK_CUR);        
+        else
+            current_file_position += BLOCKSIZE;
+        printf("POS %d\n", current_file_position);
         free(header);
     }
     close(tar);
 }
-//Needs to add directory
-//int my_ls_tar(char *path)
-//{
-//    int tar = open(path, O_RDWR),
-//        counter = 1,
-//        current_file_position = 0,
-//        end_file;
-//
-//    char buffer[BLOCKSIZE],
-//        type[TYPFLAGLEN];
-//
-//    float size;
-//
-//    if (tar < 0)
-//        return 1;
-//
-//    end_file = (lseek(tar, 0, SEEK_END) - BLOCKSIZE);
-//    lseek(tar, 0, SEEK_SET);
-//
-//    while (current_file_position <= end_file)
-//    {
-//        read(tar, buffer, NAMELEN); // READ THE NAME
-//
-//        if (buffer[0] != '\0') // CHECKS IF BUFFER ISN'T EMPTY TO PRINT HEADER NAME
-//            printf("%s\n", buffer);
-//
-//        lseek(tar, JMPSIZE, SEEK_CUR); // LOOKS FOR THE SIZE OF THE FILE
-//
-//        read(tar, buffer, SIZELEN);    // READS THE SIZE OF THE FILE
-//        size = atoi(buffer);          // SIZE TO INT
-//        lseek(tar, JMPFLAG, SEEK_CUR);
-//        read(tar, type, 1);
-//        printf("%s\n", type);
-//        if(type[0] == REGTYPE || type[0] == AREGTYPE)
-//            printf("Im here\n");
-//        break;
-//        if (size > block_size_octal)
-//        {
-//            size /= block_size_octal; // COUNTING HOW MANY BLOCKS ARE SAVED FOR CONTENT
-//            for (int i = 0; (size - i) >= 1; i++)
-//                counter++;
-//        }
-//        current_file_position = lseek(tar, sizeof(buffer) * (counter), SEEK_CUR); // SEEKS THE NEXT HEADER AND SAVES THAT TO SEE IF WE ARRIVED TO THE END OF THE FILE
-//        counter = 1;
-//    }
-//
-//    close(tar);
-//}
+

@@ -78,10 +78,10 @@ int main(int argc, char *argv[])
        LIST TAR 
                                                  */
 
-    if(paths_len == 1){
+    if(paths_len == 1 && options == t){
+       my_ls_tar(paths[0]); 
+    }else
         printf("You must provide a .tar file and a path to file to archive.\n");
-        return 0;
-    }
-
+    
     return 0;
 }
