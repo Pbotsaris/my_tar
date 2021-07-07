@@ -1,5 +1,4 @@
-#include "my_tar.h"
-
+#include "../include/my_tar.h"
 /*!
 	
 	 HELPER TO: add_typeflag(header_t *header, struct stat stats);
