@@ -6,7 +6,7 @@ OBJ=obj/my_tar.o    	   	\
 		obj/option.o	    		\
 		obj/ls_tar.o
 
-CFLAGS=-W -g -Iinclude
+CFLAGS=-W -g3 -Iinclude
 HEADER=include/my_tar.h
 CC=gcc 
 BIN=bin/my_tar
@@ -22,4 +22,3 @@ obj/%.o: src/%.c
 
 clean:
 	$(RM) bin/my_tar bin/*.dSYM obj/*
-
