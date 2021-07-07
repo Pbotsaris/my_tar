@@ -1,3 +1,0 @@
-this file name is ridiculously long to test if prefix is working.
-
-names with more than 100 chars will use the prefix field to to store the extra chars
