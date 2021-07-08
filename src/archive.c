@@ -1,59 +1,102 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
+#include <fcntl.h>
 
+int search_match(header_t *path_header, int tar)
+{
+    header_t *tar_header;
+    if (!(tar_header = malloc(sizeof(header_t))))
+        return 3;
+    char buffer[512];
+
+    int size = lseek(tar, 0, SEEK_END) - BLOCKSIZE,
+        current_file_location = 0;
+
+    printf("%ld\n" ,lseek(tar, 0, SEEK_SET));
+    read(tar,buffer, 100 );
+    printf("Name %s\n", buffer);
+    while (current_file_location <= size)
+    {
+        tar_header = get_header(tar);
+        if (tar_header->name == path_header->name &&
+            tar_header->mtime == path_header->mtime)
+        {
+            printf("I found one\n");
+            return 1;
+        }
+
+        if (tar_header->typeflag != DIRTYPE)
+            current_file_location = lseek(tar, skip_content(tar_header), SEEK_CUR);
+        else
+            current_file_location = +BLOCKSIZE;
+        free(tar_header);
+    }
+    return 0;
+}
 /*
  *
  - PRIVATE: append a data in a given path to .tar file
 
 */
-int tar(char *path, FILE *dest)
+int tar(char *path, int dest, option_t option)
 {
-	int fd = open(path, O_APPEND),
-			remain_fill_block;
+    printf("File: %s\n", path);
+    int fd = open(path, O_APPEND),
+        remain_fill_block;
 
     char fill_header[HEADERBYTE]; // HEADERBYTE = 12
-    my_memset(fill_header , '\0', HEADERBYTE);
-	
+    my_memset(fill_header, '\0', HEADERBYTE);
+
     header_t *header;
     struct stat stats;
-    
+
     if (fd)
-	{
-		if ( stat(path, &stats)  == 0)
-			header = create_header(path, stats);
-    	
-        fwrite(header, sizeof(header_t), 1, dest);
-        fwrite(fill_header, HEADERBYTE, 1, dest);
+    {
+        if (stat(path, &stats) == 0)
+            header = create_header(path, stats);
 
-		/*  SKIP SYMLINK  */ 
-		if( header->typeflag != DIRTYPE && header->typeflag != SYMTYPE){
-    		long long buff_size = stats.st_size;
-    		char *buffer = (char*)malloc(sizeof(char) * (buff_size + 1));
-    		read(fd, buffer, buff_size);
-    		buffer[buff_size-1] = '\n';
-        	fwrite(buffer, buff_size, 1, dest);
+        if (option == u && search_match(header, dest) != 0)
+        {
+            free(header);
+            close(fd);
+            return 1;
+        }
 
-		    remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
+        write(dest, header, sizeof(header_t));
+        write(dest, fill_header, HEADERBYTE);
 
-		    if(remain_fill_block != 0){
-		    	char* fill_block = malloc(sizeof(char)*remain_fill_block);
-		    	my_memset(fill_block, '\0', remain_fill_block);
-		    	fwrite(fill_block, remain_fill_block, 1, dest);
-		    	free(fill_block);
-		    }
+        /*  SKIP SYMLINK  */
+        if (header->typeflag != DIRTYPE && header->typeflag != SYMTYPE)
+        {
+            long long buff_size = stats.st_size;
+            char *buffer = (char *)malloc(sizeof(char) * (buff_size + 1));
+            read(fd, buffer, buff_size);
+            buffer[buff_size - 1] = '\n';
+            write(dest, buffer, buff_size);
 
-		    free(buffer);
+            remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
+
+            if (remain_fill_block != 0)
+            {
+                char *fill_block = malloc(sizeof(char) * remain_fill_block);
+                my_memset(fill_block, '\0', remain_fill_block);
+                write(dest, fill_block, remain_fill_block);
+                free(fill_block);
+            }
+
+            free(buffer);
         }
         free(header);
-		close(fd);
+        close(fd);
 
         return 0;
-
-	}	else {
-		printf("Error while writting to archive\n");
+    }
+    else
+    {
+        printf("Error while writting to archive\n");
         return 1;
-	}
+    }
 }
 
 /*
@@ -64,9 +107,9 @@ int tar(char *path, FILE *dest)
 
 bool_t is_dir(char *path)
 {
-	struct stat stats;
-	stat(path, &stats);
-	return S_ISDIR(stats.st_mode);
+    struct stat stats;
+    stat(path, &stats);
+    return S_ISDIR(stats.st_mode);
 }
 
 /*
@@ -77,17 +120,17 @@ bool_t is_dir(char *path)
 
 char *join_path(char *dir, char *file)
 {
-	size_t len = strlen(dir)  + strlen(file);;
+    size_t len = strlen(dir) + strlen(file);
+    ;
 
-	char *buffer = NULL;
-	buffer = (char*)malloc( (len + 2) * sizeof(char));
-	memset(buffer, '\0', len + 2);
-	strcat(buffer, dir);
-	strcat(buffer, "/");
-	strcat(buffer, file);
+    char *buffer = NULL;
+    buffer = (char *)malloc((len + 2) * sizeof(char));
+    memset(buffer, '\0', len + 2);
+    strcat(buffer, dir);
+    strcat(buffer, "/");
+    strcat(buffer, file);
 
-	return buffer;		 
-
+    return buffer;
 }
 
 /*
@@ -96,27 +139,30 @@ char *join_path(char *dir, char *file)
 
 */
 
-void handle_dir(char *path, FILE *dest)
+void handle_dir(char *path, int dest, option_t option)
 {
-	DIR * dirp;
-	struct dirent * entry;
-	dirp = opendir(path); 
-    
-    tar(path, dest);
-	if(dirp){
-		while ((entry = readdir(dirp)) != NULL) {
-			if (entry->d_type != DT_DIR) { 
-				char *full_path =join_path(path, entry->d_name);
-				tar(full_path, dest);
-				free(full_path);
-			}
-		}
-		closedir(dirp);
-	}
-	else {
-		printf("Failed openning the directory %s\n", path);
+    DIR *dirp;
+    struct dirent *entry;
+    dirp = opendir(path);
 
-	}
+    tar(path, dest, option);
+    if (dirp)
+    {
+        while ((entry = readdir(dirp)) != NULL)
+        {
+            if (entry->d_type != DT_DIR)
+            {
+                char *full_path = join_path(path, entry->d_name);
+                tar(full_path, dest, option);
+                free(full_path);
+            }
+        }
+        closedir(dirp);
+    }
+    else
+    {
+        printf("Failed openning the directory %s\n", path);
+    }
 }
 
 /*
@@ -132,54 +178,39 @@ void handle_dir(char *path, FILE *dest)
  *    
  * =====================================================================================
  */
-
-int archive(char **paths, size_t paths_len, option_t option)
+int archive(char **path, size_t paths_len, option_t option)
 {
+    struct stat stats;
 
-	struct stat stats;
-    FILE *dest;
+    int dest = open(path[0], O_CREAT | O_WRONLY);
 
-    if(option == c)
-        dest = fopen(paths[0], "wb");
-
-    if(option == u && (dest = fopen(paths[0], "r+")) != NULL)
-        fseek(dest, 0, SEEK_END);
-    else
-        dest = fopen(paths[0], "wb");
-
-    if(dest == NULL){
-        printf("Couldn't open your tar\n");
+    if (dest < 0)
+    {
+        printf("Could't open tar\n");
         return 1;
     }
-	size_t index = 1;
-    
-	printf("Files being archived to %s\n", paths[0]);
 
-	//		fd = open(paths[index], O_APPEND);
-	//					lseek(fd, 0, SEEK_SET);
+    size_t index = 1;
 
-	while (index < paths_len)
-	{
-		if ( stat(paths[index], &stats) == 0){
-			{
-				/* DIR */ 
-				if(is_dir(paths[index]))
-					handle_dir(paths[index], dest);
-				/* FILE */ 
-				else
-					tar(paths[index], dest);
+    printf("Files being archived %s\n", path[0]);
 
-				index++;
-			}
+    while (index < paths_len)
+    {
+        if (stat(path[index], &stats) == 0)
+        {
+            if (is_dir(path[index]))
+                handle_dir(path[index], dest, option);
+            else
+                tar(path[index], dest, option);
 
-		}
-		else {
-			printf("%s\n", FILE_NOT_FOUND_ERR);
-			return -1;
-		}
-	}
-
-	//		close(fd);
-	fclose(dest);
-	return 0;
+            index++;
+        }
+        else
+        {
+            printf("ERROR\n");
+            return 1;
+        }
+    }
+    close(dest);
+    return 0;
 }
