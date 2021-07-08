@@ -87,35 +87,33 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 
 																												*/
 
-
 unsigned int checksum(char *field, size_t len)
 {
 	char *temp = field;
 	unsigned int sum = 0;
-	for (int i = len - 1; i >= 0; i--){
+	for (int i = len - 1; i >= 0; i--)
+	{
 		sum += (unsigned char)*temp;
 		temp++;
 	}
 	return sum;
 }
 
-
 void add_space_checksum(header_t *header)
 {
 
-/*
+	/*
  *
  
 	-  Add an empty space in the end of checksum field then null terminate it
 
 																											*/
 
-
-for(int i = 0; i < - CHKSUMLEN; i++)
+	for (int i = 0; i < -CHKSUMLEN; i++)
 	{
-		if(i == 0)
+		if (i == 0)
 			continue;
-		header->chksum[i] = header->chksum[i + 1] ;
+		header->chksum[i] = header->chksum[i + 1];
 	}
 	header->chksum[CHKSUMLEN - 2] = ' ';
 	header->chksum[CHKSUMLEN - 1] = '\0';
@@ -137,24 +135,23 @@ void add_checksum(header_t *header)
 	char *temp = header->name;
 	int i;
 
-	for (i = 0; i < BYTOFFLEN - 1; ++i) {
+	for (i = 0; i < BYTOFFLEN - 1; ++i)
+	{
 		temp += bytes_offset[i];
 		chksum += checksum(temp, bytes_offset[i + 1]);
 	}
 
 	/*	 remove chksum field from calculation   */
 	for (i = sizeof(header->chksum); i-- != 0;)
-		chksum -= (unsigned char) header->chksum[i];
+		chksum -= (unsigned char)header->chksum[i];
 	chksum += ' ' * sizeof header->chksum;
 
-	int len =	my_itoa(header->chksum, chksum * 8, OCTAL);
+	int len = my_itoa(header->chksum, chksum * 8, OCTAL);
 	fill_zeros(header->chksum, len, CHKSUMLEN);
 	// add extra space end of chksum
-  add_space_checksum(header);
+	add_space_checksum(header);
 
 	free(bytes_offset);
-
-
 }
 
 void add_uid_gid(header_t *header, struct stat stats)
@@ -211,16 +208,14 @@ void add_size(header_t *header, struct stat stats)
 
 */
 
-
 void copy_name(char *field, char *name, size_t len)
 {
 	size_t i;
-   field[0] = ' ';
-	for (i = 0; i < len; ++i) 
-			field[i + 1] = name[i];
+	field[0] = ' ';
+	for (i = 0; i < len; ++i)
+		field[i + 1] = name[i];
 
-    field[len + 1] = '\0';
-
+	field[len + 1] = '\0';
 }
 
 /*
@@ -268,7 +263,6 @@ void add_mode(header_t *header, struct stat stats)
 	free(stat_modes);
 }
 
-
 /*
  *
 
@@ -276,14 +270,15 @@ void add_mode(header_t *header, struct stat stats)
 
 */
 
-
 void remove_slash(char *field, size_t len)
 {
-  printf("my_tar: Removing leading `/' from member names\n");
+	printf("my_tar: Removing leading `/' from member names\n");
 
 	size_t i;
-	for (i = 0; i < len - 1; ++i){
-		field[i] = field[i +1];}
+	for (i = 0; i < len - 1; ++i)
+	{
+		field[i] = field[i + 1];
+	}
 
 	field[len - 2] = '\0';
 }
@@ -304,9 +299,8 @@ void add_name(header_t *header, char *path)
 		strcpy(header->name, path);
 		header->prefix[0] = '\0';
 
-		if(header->name[0]== '/')
+		if (header->name[0] == '/')
 			remove_slash(header->name, strlen(header->name));
-		
 	}
 
 	else if (path_len < NAMELEN * 2)
@@ -317,7 +311,7 @@ void add_name(header_t *header, char *path)
 		strncpy(header->name, &path[split_pos], NAMELEN);
 		header->name[NAMELEN - 1] = '\0';
 
-		if(header->name[0]== '/')
+		if (header->name[0] == '/')
 			remove_slash(header->name, strlen(header->name));
 	}
 	else
@@ -359,7 +353,7 @@ void init_optional_fields(header_t *header)
 header_t *create_header(char *path, struct stat stats)
 {
 	header_t *header;
-	header = (header_t *)calloc(1, sizeof(header_t)+1);
+	header = (header_t *)calloc(1, sizeof(header_t) + 1);
 	init_optional_fields(header);
 	add_name(header, path);
 	add_mtime(header, stats);

@@ -32,7 +32,6 @@ void reverse(char str[], int length)
 
 */
 
-
 int my_itoa(char *str, int num, int base)
 {
     int idx = 0;
@@ -55,7 +54,6 @@ int my_itoa(char *str, int num, int base)
     return idx;
 }
 
-
 /*
  *
  
@@ -63,22 +61,20 @@ int my_itoa(char *str, int num, int base)
 
 */
 
-
 int *create_bytes_offset(void)
 {
-int b[BYTOFFLEN] = {
-		0, NAMELEN, MODELEN, UIDLEN, GIDLEN,
-		SIZELEN, MTIMELEN, CHKSUMLEN, LINKNAMELEN,
-		TYPFLAGLEN, TMAGLEN, TVERSLEN, UNAMELEN,
-		GNAMELEN, DEVMAJORLEN, DEVMINORLEN,
-		PREFIXLEN
-	};
-   int *bytes_offset = (int*)malloc(BYTOFFLEN * sizeof(int));
+    int b[BYTOFFLEN] = {
+        0, NAMELEN, MODELEN, UIDLEN, GIDLEN,
+        SIZELEN, MTIMELEN, CHKSUMLEN, LINKNAMELEN,
+        TYPFLAGLEN, TMAGLEN, TVERSLEN, UNAMELEN,
+        GNAMELEN, DEVMAJORLEN, DEVMINORLEN,
+        PREFIXLEN};
+    int *bytes_offset = (int *)malloc(BYTOFFLEN * sizeof(int));
 
-	 for (int i = 0; i < BYTOFFLEN; ++i) 
-		 bytes_offset[i] = b[i];
+    for (int i = 0; i < BYTOFFLEN; ++i)
+        bytes_offset[i] = b[i];
 
-	 return bytes_offset;
+    return bytes_offset;
 }
 
 /*
@@ -88,21 +84,20 @@ int b[BYTOFFLEN] = {
 
 */
 
-
 int *create_modes(modes_t type)
 {
-	int *modes = (int*)malloc(MODES_ARR_LEN * sizeof(int));
+    int *modes = (int *)malloc(MODES_ARR_LEN * sizeof(int));
 
-	int tar_modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC,
-		TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
+    int tar_modes[MODES_ARR_LEN] = {TUREAD, TUWRITE, TUEXEC,
+                                    TGREAD, TGWRITE, TGEXEC, TOREAD, TOWRITE, TOEXEC};
 
-	int stat_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR,
-		S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+    int stat_modes[MODES_ARR_LEN] = {S_IREAD, S_IWUSR, S_IXUSR,
+                                     S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 
-	for (int i = 0; i < MODES_ARR_LEN ; ++i) 
-		modes[i] =  type == tar_mode ? tar_modes[i] : stat_modes[i];
+    for (int i = 0; i < MODES_ARR_LEN; ++i)
+        modes[i] = type == tar_mode ? tar_modes[i] : stat_modes[i];
 
-	return modes;
+    return modes;
 }
 
 /*
@@ -115,22 +110,22 @@ int *create_modes(modes_t type)
 
 int fill_zeros(char *field, int len, int total_len)
 {
-    if(total_len < (int)strlen(field))
+    if (total_len < (int)strlen(field))
         return 1;
 
-	int j = len;
-	char buff[total_len];
-	memset(buff, '0', total_len - 1);
+    int j = len;
+    char buff[total_len];
+    memset(buff, '0', total_len - 1);
 
-	for (int i = 0; i < len; i++)
-	{
-		buff[(total_len - 1) - j] = field[i];
-		j--;
-	}
-	buff[total_len - 1] = '\0';
+    for (int i = 0; i < len; i++)
+    {
+        buff[(total_len - 1) - j] = field[i];
+        j--;
+    }
+    buff[total_len - 1] = '\0';
 
-	strcpy(field, buff);
-    
+    strcpy(field, buff);
+
     return 0;
 }
 
@@ -146,7 +141,7 @@ int decimal_to_octal(int decimal)
     int octal = 0;
     int num_digits = 1;
     int temp = 0;
-	  temp	= decimal;
+    temp = decimal;
     while (temp != 0)
     {
 
@@ -162,9 +157,11 @@ int decimal_to_octal(int decimal)
     -memsets
  */
 
-void *my_memset(void *str, int c, int len){
-    unsigned char* p = str;
-    while(len--){
+void *my_memset(void *str, int c, int len)
+{
+    unsigned char *p = str;
+    while (len--)
+    {
         *p++ = (unsigned char)c;
     }
     return str;
