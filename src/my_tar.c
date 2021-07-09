@@ -33,7 +33,8 @@ int main(int argc, char *argv[])
        DEBUG  
                                                */
 
-    if((index = search_flag(argv, 'd')) > 0){
+    if ((index = search_flag(argv, 'd')) > 0)
+    {
         debug_header(argv[index + 1]);
         printf("%s\n", argv[index]);
         return 0;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
                                               */
 
     options = check_option(argv);
-    if(options == ERROROPT || options == MISSING_F || options == NONE)
+    if (options == ERROROPT || options == MISSING_F || options == NONE)
         return 0;
 
     /*
@@ -59,7 +60,8 @@ int main(int argc, char *argv[])
     size_t paths_len = argc - path_start_index;
     bool_t is_tar_valid = validate_tar_extention(paths[0]);
     /* wrong extention */
-    if(is_tar_valid == FALSE){
+    if (is_tar_valid == FALSE)
+    {
         printf("Archives must have a .tar extention.\n");
         return 0;
     }
@@ -67,24 +69,30 @@ int main(int argc, char *argv[])
     /*
        ARCHIVE 
                                                  */
-    if(options == u || options == c){
-        if(paths_len > 1){
-             archive(paths, paths_len, options);
-        }else{
+    if (options == u || options == c)
+    {
+        if (paths_len > 1)
+        {
+            archive(paths, paths_len, options);
+        }
+        else
+        {
             printf("You must provide a .tar file and a path to file to archive.\n");
             return 1;
         }
     }
-    
+
     /*
      *
        LIST TAR 
                                                  */
 
-    if(paths_len == 1 && options == t){
-       my_ls_tar(paths[0]); 
-    }else if (options == t)
+    if (paths_len == 1 && options == t)
+    {
+        my_ls_tar(paths[0]);
+    }
+    else if (options == t)
         printf("You must provide a .tar file and a path to file to archive.\n");
-    
+
     return 0;
 }

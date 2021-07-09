@@ -22,7 +22,15 @@
 
 typedef enum
 {
-  c, r, t, u, x, d, NONE, MISSING_F, ERROROPT
+  c,
+  r,
+  t,
+  u,
+  x,
+  d,
+  NONE,
+  MISSING_F,
+  ERROROPT
 } option_t;
 
 typedef enum
@@ -31,17 +39,21 @@ typedef enum
   TRUE,
 } bool_t;
 
-typedef enum {tar_mode, stat_mode}modes_t;
+typedef enum
+{
+  tar_mode,
+  stat_mode
+} modes_t;
 
 /*       helpers       */
 int *create_bytes_offset(void);
 int *create_modes(modes_t type);
-int fill_zeros(char *field, int len, int total_len) ;
+int fill_zeros(char *field, int len, int total_len);
 int my_itoa(char *str, int num, int base);
 int decimal_to_octal(int decimal);
 int check_byte(int block);
 int debug_header(char *path);
-void *my_memset(void* str, int c, int len);
+void *my_memset(void *str, int c, int len);
 
 /*       archive       */
 int archive(char **paths, size_t paths_len, option_t option);
@@ -53,6 +65,7 @@ int find_paths_start_index(char **argv);
 bool_t validate_tar_extention(char *path);
 
 /*      list       */
+
 int my_ls_tar(char *path);
 
 #endif

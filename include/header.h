@@ -56,6 +56,8 @@
 #define BYTOFFLEN 17
 #define ENDBLK 183
 #define HEADERBYTE 12
+#define JMPTIME 36
+#define ENDHEADER 376
 
 // The name, linkname, magic, uname, and gname are null-terminated
 // All other fields are zero-filled octal numbers in ASCII
@@ -68,7 +70,7 @@ typedef struct posix_header
   char size[SIZELEN];         /* 124 */
   char mtime[MTIMELEN];       /* 136 */
   char chksum[CHKSUMLEN];     /* 148 */
-  char typeflag;  /* 156 */
+  char typeflag;              /* 156 */
   char linkname[LINKNAMELEN]; /* 157 */
   char magic[TMAGLEN];        /* 257 */
   char version[TVERSLEN];     /* 263 */
@@ -80,6 +82,8 @@ typedef struct posix_header
                               /* 500 */
 } header_t;
 
+int skip_content(header_t *header);
+header_t *get_header(int tar);
 header_t *create_header(char *path, struct stat stats);
 
 #endif
