@@ -26,7 +26,7 @@ int search_match(header_t *path_header, int tar)
         }
 
         if (tar_header->typeflag != DIRTYPE)
-            current_file_location = lseek(tar, skip_content(tar_header), SEEK_CUR);
+            current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
         else
             current_file_location = +BLOCKSIZE;
         free(tar_header);
