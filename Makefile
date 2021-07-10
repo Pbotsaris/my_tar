@@ -2,7 +2,6 @@ OBJ=obj/my_tar.o    	   	\
 		obj/create_header.o	 	\
 		obj/utils.o           \
 		obj/debug.o           \
-		obj/extract.o         \
 		obj/archive.o		    	\
 		obj/option.o	    		\
 		obj/ls_tar.o
