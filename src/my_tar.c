@@ -86,26 +86,14 @@ int main(int argc, char *argv[])
 
     /*
      *
-       EXTRACT 
+       LIST OR EXTRACT
                                                  */
 
-    if (options == x )
+    if (paths_len == 1 && (options == t || options == x))
     {
-        extract(paths[0]);
-
+        list_or_extract(paths[0], options);
     }
-
-
-    /*
-     *
-       LIST TAR 
-                                                 */
-
-    if (paths_len == 1 && options == t)
-    {
-        my_ls_tar(paths[0]);
-    }
-    else if (options == t)
+    else if (options == t || options == x)
         printf("You must provide a .tar file and a path to file to archive.\n");
 
     return 0;

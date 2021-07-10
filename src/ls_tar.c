@@ -42,7 +42,7 @@ int skip_content(header_t *header)
     return BLOCKSIZE * counter;
 }
 
-int my_ls_tar(char *path)
+int list_or_extract(char *path, option_t options)
 {
 
     int tar = open(path, O_RDWR),
@@ -51,10 +51,10 @@ int my_ls_tar(char *path)
 
     lseek(tar, 0, SEEK_SET);
 
-    header_t *header = malloc(sizeof(header_t));
-
     while (current_file_position <= end_file)
     {
+      header_t *header = malloc(sizeof(header_t));
+
         header = get_header(tar);
         if (header->name[0] != '\0')
             printf("%s\n", header->name);
@@ -62,8 +62,10 @@ int my_ls_tar(char *path)
             current_file_position = lseek(tar, skip_content(header), SEEK_CUR);
         else
             current_file_position += BLOCKSIZE;
+
         free(header);
     }
+
     close(tar);
 
     return 0;

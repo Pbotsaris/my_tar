@@ -70,7 +70,6 @@ int extract(char *path);
 
 
 /*      list       */
-
-int my_ls_tar(char *path);
+int list_or_extract(char *path, option_t options);
 
 #endif
