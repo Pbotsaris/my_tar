@@ -42,16 +42,43 @@ int skip_content(header_t *header)
     return BLOCKSIZE * counter;
 }
 
-int list_or_extract(char *path, option_t options)
+
+void make_directory(char *path)
+{
+    struct stat stats;   
+  if (stat (path, &stats) == 0)
+     printf("The directory %s already exists. Unable to extract." , path);
+  else
+   mkdir(path, S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); 
+}
+
+void extract(int tar, int file_position, int end_file)
+{
+    while (file_position <= end_file)
+    {
+      header_t *header = malloc(sizeof(header_t));
+
+        header = get_header(tar);
+
+        if (header->name[0] != '\0')
+            printf("%s\n", header->name);
+        if (header->typeflag != DIRTYPE)
+            file_position = lseek(tar, skip_content(header), SEEK_CUR);
+        else
+        {
+            make_directory(header->name);
+            file_position += BLOCKSIZE;
+        }
+
+        free(header);
+    }
+
+}
+
+void list(int tar, int file_position, int end_file)
 {
 
-    int tar = open(path, O_RDWR),
-        current_file_position = 0,
-        end_file = (lseek(tar, 0, SEEK_END) - BLOCKSIZE);
-
-    lseek(tar, 0, SEEK_SET);
-
-    while (current_file_position <= end_file)
+while (file_position <= end_file)
     {
       header_t *header = malloc(sizeof(header_t));
 
@@ -59,13 +86,29 @@ int list_or_extract(char *path, option_t options)
         if (header->name[0] != '\0')
             printf("%s\n", header->name);
         if (header->typeflag != DIRTYPE)
-            current_file_position = lseek(tar, skip_content(header), SEEK_CUR);
+            file_position = lseek(tar, skip_content(header), SEEK_CUR);
         else
-            current_file_position += BLOCKSIZE;
+            file_position += BLOCKSIZE;
 
         free(header);
     }
+}
 
+int list_or_extract(char *path, option_t options)
+{
+
+    int tar = open(path, O_RDWR),
+        file_position = 0,
+        end_file = (lseek(tar, 0, SEEK_END) - BLOCKSIZE);
+
+    lseek(tar, 0, SEEK_SET);
+
+    if(options == t)
+      list(tar, file_position, end_file);
+
+    if(options == x)
+      extract(tar, file_position, end_file);
+    
     close(tar);
 
     return 0;

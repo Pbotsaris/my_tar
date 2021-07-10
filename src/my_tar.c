@@ -83,14 +83,15 @@ int main(int argc, char *argv[])
         }
     }
 
-
     /*
      *
        LIST OR EXTRACT
                                                  */
 
+
     if (paths_len == 1 && (options == t || options == x))
     {
+
         list_or_extract(paths[0], options);
     }
     else if (options == t || options == x)
