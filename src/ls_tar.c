@@ -29,14 +29,14 @@ int skip_content(header_t *header)
 {
 
     int block_size_octal = decimal_to_octal(BLOCKSIZE),
-        size = atoi(header->size),
+        content_size = atoi(header->size),
         counter = 1;
 
-    if (size > block_size_octal)
+    if (content_size > block_size_octal)
     {
-        size /= block_size_octal;
+        content_size /= block_size_octal;
 
-        for (int i = 0; (size - i) >= 1; i++)
+        for (int i = 0; (content_size - i) >= 1; i++)
             counter++;
     }
     return BLOCKSIZE * counter;
