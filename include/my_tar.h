@@ -64,6 +64,11 @@ int search_flag(char **argv, char flag);
 int find_paths_start_index(char **argv);
 bool_t validate_tar_extention(char *path);
 
+
+/*      options       */
+int extract(char *path);
+
+
 /*      list       */
 
 int my_ls_tar(char *path);

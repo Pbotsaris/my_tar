@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
     /*
      *
        SPLIT ARGV 
-
                                                */
 
     int path_start_index = find_paths_start_index(argv);
@@ -67,8 +66,10 @@ int main(int argc, char *argv[])
     }
 
     /*
+     *
        ARCHIVE 
                                                  */
+
     if (options == u || options == c)
     {
         if (paths_len > 1)
@@ -81,6 +82,19 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
+
+
+    /*
+     *
+       EXTRACT 
+                                                 */
+
+    if (options == x )
+    {
+        extract(paths[0]);
+
+    }
+
 
     /*
      *
