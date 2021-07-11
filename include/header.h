@@ -82,8 +82,8 @@ typedef struct posix_header
                               /* 500 */
 } header_t;
 
-int skip_content(header_t *header);
 header_t *get_header(int tar);
 header_t *create_header(char *path, struct stat stats);
+int next_header_position(header_t *header);
 
 #endif
