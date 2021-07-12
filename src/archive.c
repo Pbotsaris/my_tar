@@ -15,11 +15,12 @@ int search_match(header_t *path_header, int tar)
             return -1;
 
         tar_header = get_header(tar);
-        
-
+       
         if (strcmp(tar_header->name, path_header->name) == 0 && 
-                strcmp(tar_header->mtime, path_header->mtime) == 0)
+                strcmp(tar_header->mtime, path_header->mtime) == 0){
+            free(tar_header);
             return 1;
+        }
 
         if (tar_header->typeflag != DIRTYPE)
             current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
@@ -62,7 +63,6 @@ int tar(char *path, int dest, option_t option)
             return 1;
         }
         
-
         write(dest, header, sizeof(header_t));
         write(dest, fill_header, HEADERBYTE);
 
@@ -72,7 +72,7 @@ int tar(char *path, int dest, option_t option)
             long long buff_size = stats.st_size;
             char *buffer = (char *)malloc(sizeof(char) * (buff_size + 1));
             read(fd, buffer, buff_size);
-            buffer[buff_size - 1] = '\n';
+            buffer[buff_size] = '\n';
             write(dest, buffer, buff_size);
 
             remain_fill_block = (BLOCKSIZE - (buff_size % BLOCKSIZE));
