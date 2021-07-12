@@ -2,8 +2,6 @@
 #include "../include/messages.h"
 #include "../include/header.h"
 
-
-
 void write_file(int dest, int tar)
 {
     char *buffer[BLOCKSIZE];
@@ -52,6 +50,7 @@ void extract(int tar, int file_position, int end_file)
         if (header->typeflag != DIRTYPE){
             touch(tar, header);
             file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
+            printf(" file pos %i\n", file_position);
         }
         else
         {
