@@ -1,7 +1,6 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
-#include <fcntl.h>
 
 int search_match(header_t *path_header, int tar)
 {
