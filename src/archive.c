@@ -1,7 +1,6 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
-#include <fcntl.h>
 
 int search_match(header_t *path_header, int tar)
 {
@@ -15,6 +14,8 @@ int search_match(header_t *path_header, int tar)
 
     printf("%ld\n", lseek(tar, 0, SEEK_SET));
     read(tar, buffer, 100);
+    printf("%ld\n" ,lseek(tar, 0, SEEK_SET));
+    read(tar,buffer, 100 );
     printf("Name %s\n", buffer);
     while (current_file_location <= size)
     {
@@ -27,7 +28,7 @@ int search_match(header_t *path_header, int tar)
         }
 
         if (tar_header->typeflag != DIRTYPE)
-            current_file_location = lseek(tar, skip_content(tar_header), SEEK_CUR);
+            current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
         else
             current_file_location = +BLOCKSIZE;
         free(tar_header);
@@ -53,6 +54,8 @@ int tar(char *path, int dest, option_t option)
 
     if (fd)
     {
+
+
         if (stat(path, &stats) == 0)
             header = create_header(path, stats);
 
@@ -183,6 +186,7 @@ int archive(char **path, size_t paths_len, option_t option)
     struct stat stats;
 
     int dest = open(path[0], O_CREAT | O_WRONLY);
+    chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
     if (dest < 0)
     {
@@ -192,7 +196,7 @@ int archive(char **path, size_t paths_len, option_t option)
 
     size_t index = 1;
 
-    printf("Files being archived %s\n", path[0]);
+    printf("Files being archived to %s\n", path[0]);
 
     while (index < paths_len)
     {
@@ -207,7 +211,7 @@ int archive(char **path, size_t paths_len, option_t option)
         }
         else
         {
-            printf("ERROR\n");
+            printf("The path provided is incorrect\n");
             return 1;
         }
     }

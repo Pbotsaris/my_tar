@@ -366,3 +366,71 @@ header_t *create_header(char *path, struct stat stats)
 	add_checksum(header);
 	return header;
 }
+
+
+/*
+ * =====================================================================================
+ *
+ *   GET HEADER
+ *   																									                     													 
+ *    -  Read from a tar file and reconstrcut a header 
+ *    -> Returns header
+ *    
+ * =====================================================================================
+ */
+
+
+header_t *get_header(int tar)
+{
+    header_t *header = malloc(sizeof(header_t));
+    char temp;
+    read(tar, header->name, NAMELEN);
+    read(tar, header->mode, MODELEN);
+    read(tar, header->uid, UIDLEN);
+    read(tar, header->gid, GIDLEN);
+    read(tar, header->size, SIZELEN);
+    read(tar, header->mtime, MTIMELEN);
+    read(tar, header->chksum, CHKSUMLEN);
+    read(tar, &temp, TYPFLAGLEN);
+    header->typeflag = temp;
+    read(tar, header->linkname, LINKNAMELEN);
+    read(tar, header->magic, TMAGLEN);
+    read(tar, header->version, TVERSLEN);
+    read(tar, header->uname, UNAMELEN);
+    read(tar, header->gname, GNAMELEN);
+    return header;
+}
+
+
+/*
+ * =====================================================================================
+ *
+ *   NEXT HEADER POSITION
+ *    -  When a tar has many files, this function assists to move the lseek cursor
+ *    to the next header position
+ *    -> Returns the position of next header in a tar file
+ *    
+ * =====================================================================================
+ */
+
+
+
+int next_header_position(header_t *header)
+{
+    int block_size_octal = decimal_to_octal(BLOCKSIZE),
+        content_size = atoi(header->size),
+        counter = 1;
+
+    if (content_size > block_size_octal)
+    {
+     int num_of_blocks = content_size /= block_size_octal;
+
+        for (int i = 0; (num_of_blocks - i) >= 1; i++)
+            counter++;
+    }
+    return BLOCKSIZE * counter;
+}
+
+
+
+

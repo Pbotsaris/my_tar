@@ -1,10 +1,10 @@
 OBJ=obj/my_tar.o    	   	\
-		obj/create_header.o	 	\
+		obj/header.o	       	\
 		obj/utils.o           \
 		obj/debug.o           \
 		obj/archive.o		    	\
 		obj/option.o	    		\
-		obj/ls_tar.o
+		obj/list_and_extract.o
 
 CFLAGS=-W -g3 -Iinclude
 HEADER=include/my_tar.h
