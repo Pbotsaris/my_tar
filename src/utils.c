@@ -129,6 +129,7 @@ int fill_zeros(char *field, int len, int total_len)
     return 0;
 }
 
+   // TODO: CONSOLIDATE FUNCTIONS
 /*
  *
 	   - converts a decimal number to octal base
@@ -138,9 +139,7 @@ int fill_zeros(char *field, int len, int total_len)
 
 int decimal_to_octal(int decimal)
 {
-    int octal = 0;
-    int num_digits = 1;
-    int temp = 0;
+    int octal = 0, num_digits = 1, temp = 0;
     temp = decimal;
     while (temp != 0)
     {
@@ -150,6 +149,26 @@ int decimal_to_octal(int decimal)
         num_digits *= 10;
     }
     return octal;
+}
+
+/*
+ *
+	   - converts a decimal number to octal base
+     -> returns octal number
+
+*/
+
+int octal_to_decimal(int octal)
+{
+    int decimal = 0, num_digits = 1, temp = 0;
+    temp = octal;
+    while (temp != 0)
+    {
+        decimal += (temp % 10) * num_digits;
+        temp /= 10;
+        num_digits *= 8;
+    }
+    return decimal;
 }
 
 /*  

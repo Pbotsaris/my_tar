@@ -37,8 +37,9 @@ int touch(int tar, header_t *header)
             return -1;
         }
         write_file(dest, tar);
-        chmod(header->name, atoi(header->mode));
+        chmod(header->name, octal_to_decimal(atoi(header->mode)));
     }
+
 
     printf("The file %s was succesfully extracted. \n", header->name);
     return 0;
@@ -54,15 +55,15 @@ int extract(int tar, int file_position, int end_file)
         lseek(tar, ENDBLK, SEEK_CUR);
 
         if (header->typeflag != DIRTYPE){
-           if(touch(tar, header) == 0)
-              file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
-           else
-               return -1;
+            if(touch(tar, header) == 0)
+                file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
+            else
+                return -1;
         }
         else
         {
             if(make_directory(header->name) == 0)
-                  file_position += BLOCKSIZE;
+                file_position += BLOCKSIZE;
             else
                 return -1;
         }
