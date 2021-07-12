@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <dirent.h>
+#include <errno.h>
 #include <fcntl.h>
 #if __linux__
 #include <sys/sysmacros.h>
