@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
        ARCHIVE 
                                                  */
 
-    if (options == u || options == c)
+    if (options == u || options == c || options == r)
     {
         if (paths_len > 1)
         {

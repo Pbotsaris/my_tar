@@ -1,29 +1,26 @@
 #include "../include/my_tar.h"
 #include "../include/messages.h"
 #include "../include/header.h"
+#include <fcntl.h>
 
 int search_match(header_t *path_header, int tar)
 {
-    header_t *tar_header;
-    if (!(tar_header = malloc(sizeof(header_t))))
-        return 3;
-    char buffer[512];
-
     int size = lseek(tar, 0, SEEK_END) - BLOCKSIZE,
         current_file_location = 0;
 
-    printf("%ld\n" ,lseek(tar, 0, SEEK_SET));
-    read(tar,buffer, 100 );
-    printf("Name %s\n", buffer);
+    lseek(tar, 0, SEEK_SET);
     while (current_file_location <= size)
     {
+        header_t *tar_header;
+        if (!(tar_header = malloc(sizeof(header_t))))
+            return -1;
+
         tar_header = get_header(tar);
-        if (tar_header->name == path_header->name &&
-            tar_header->mtime == path_header->mtime)
-        {
-            printf("I found one\n");
+        
+
+        if (strcmp(tar_header->name, path_header->name) == 0 && 
+                strcmp(tar_header->mtime, path_header->mtime) == 0)
             return 1;
-        }
 
         if (tar_header->typeflag != DIRTYPE)
             current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
@@ -40,7 +37,6 @@ int search_match(header_t *path_header, int tar)
 */
 int tar(char *path, int dest, option_t option)
 {
-    printf("File: %s\n", path);
     int fd = open(path, O_APPEND),
         remain_fill_block;
 
@@ -49,6 +45,9 @@ int tar(char *path, int dest, option_t option)
 
     header_t *header;
     struct stat stats;
+    
+    if(option == r)
+        lseek(dest, 0, SEEK_END);
 
     if (fd)
     {
@@ -57,12 +56,13 @@ int tar(char *path, int dest, option_t option)
         if (stat(path, &stats) == 0)
             header = create_header(path, stats);
 
-        if (option == u && search_match(header, dest) != 0)
+        if (option == u && (search_match(header, dest) != 0))
         {
             free(header);
             close(fd);
             return 1;
         }
+        
 
         write(dest, header, sizeof(header_t));
         write(dest, fill_header, HEADERBYTE);
@@ -140,7 +140,7 @@ char *join_path(char *dir, char *file)
 
 */
 
-void handle_dir(char *path, int dest, option_t option)
+int handle_dir(char *path, int dest, option_t option)
 {
     DIR *dirp;
     struct dirent *entry;
@@ -159,10 +159,12 @@ void handle_dir(char *path, int dest, option_t option)
             }
         }
         closedir(dirp);
+        return 0;
     }
     else
     {
         printf("Failed openning the directory %s\n", path);
+        return 1;
     }
 }
 
@@ -183,7 +185,7 @@ int archive(char **path, size_t paths_len, option_t option)
 {
     struct stat stats;
 
-    int dest = open(path[0], O_CREAT | O_WRONLY);
+    int dest = open(path[0], O_CREAT | O_RDWR);
     chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
     if (dest < 0)
@@ -194,7 +196,6 @@ int archive(char **path, size_t paths_len, option_t option)
 
     size_t index = 1;
 
-    printf("Files being archived to %s\n", path[0]);
 
     while (index < paths_len)
     {
@@ -213,6 +214,7 @@ int archive(char **path, size_t paths_len, option_t option)
             return 1;
         }
     }
+    printf("Archiving was successful!\n");
     close(dest);
     return 0;
 }
