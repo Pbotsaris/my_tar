@@ -12,8 +12,6 @@ int search_match(header_t *path_header, int tar)
     int size = lseek(tar, 0, SEEK_END) - BLOCKSIZE,
         current_file_location = 0;
 
-    printf("%ld\n", lseek(tar, 0, SEEK_SET));
-    read(tar, buffer, 100);
     printf("%ld\n" ,lseek(tar, 0, SEEK_SET));
     read(tar,buffer, 100 );
     printf("Name %s\n", buffer);
