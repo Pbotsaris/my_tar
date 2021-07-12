@@ -11,13 +11,19 @@ void write_file(int dest, int tar)
 }
 
 
-void make_directory(char *path)
+int make_directory(char *path)
 {
     struct stat stats;   
     if (stat (path, &stats) == 0)
+    {
         printf("The directory %s already exists. Unable to extract. \n" , path);
+        return -1;
+    }
     else
+    {
         mkdir(path, S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); 
+        return 0;
+    }
 }
 
 
@@ -27,7 +33,7 @@ int touch(int tar, header_t *header)
     {
         int dest = open(header->name, O_CREAT | O_WRONLY);
         if (dest < 0){
-            printf("Could not create file %s for extraction.\n", header->name);
+            printf("failed to extract. File %s could not be created.", header->name);
             return -1;
         }
         write_file(dest, tar);
@@ -39,7 +45,7 @@ int touch(int tar, header_t *header)
 }
 
 
-void extract(int tar, int file_position, int end_file)
+int extract(int tar, int file_position, int end_file)
 {
     while (file_position <= end_file)
     {
@@ -48,16 +54,22 @@ void extract(int tar, int file_position, int end_file)
         lseek(tar, ENDBLK, SEEK_CUR);
 
         if (header->typeflag != DIRTYPE){
-            touch(tar, header);
-            file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
+           if(touch(tar, header) == 0)
+              file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
+           else
+               return -1;
         }
         else
         {
-            make_directory(header->name);
-            file_position += BLOCKSIZE;
+            if(make_directory(header->name) == 0)
+                  file_position += BLOCKSIZE;
+            else
+                return -1;
         }
         free(header);
     }
+
+    return 0;
 
 }
 
@@ -95,7 +107,8 @@ int list_or_extract(char *path, option_t options)
         list(tar, file_position, end_file);
 
     if(options == x)
-        extract(tar, file_position, end_file);
+        if(extract(tar, file_position, end_file) < 0)
+            return -1;
 
     close(tar);
 
