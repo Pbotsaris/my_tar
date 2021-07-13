@@ -51,6 +51,7 @@ int *create_modes(modes_t type);
 int fill_zeros(char *field, int len, int total_len);
 int my_itoa(char *str, int num, int base);
 int decimal_to_octal(int decimal);
+int octal_to_decimal(int octal);
 int check_byte(int block);
 int debug_header(char *path);
 void *my_memset(void *str, int c, int len);
@@ -66,5 +67,6 @@ bool_t validate_tar_extention(char *path);
 
 /*      list       */
 int list_or_extract(char *path, option_t options);
+void list(int tar, int file_position, int end_file);
 
 #endif
