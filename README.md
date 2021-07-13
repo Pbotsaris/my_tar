@@ -1,6 +1,5 @@
 # My tar
-A Naive implementation of the legendary Tape Archive. This program supports the follow options:
-- `-cf <file.tar> <file-to-archive>` – 
+A Naive implementation of the legendary Tape Archiver. 
 
 ## Build
 While in the project root directory, run `make` to build the binary:
