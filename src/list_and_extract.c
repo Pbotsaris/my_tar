@@ -59,7 +59,9 @@ int touch(int tar, header_t *header)
         chmod(header->name, octal_to_decimal(atoi(header->mode)));
     }
 
-    printf("The file %s was succesfully extracted. \n", header->name);
+    if(header->name[0] != '\0')
+        printf("The file %s was succesfully extracted. \n", header->name);
+
     return 0;
 }
 

@@ -68,5 +68,6 @@ bool_t validate_tar_extention(char *path);
 
 /*      list       */
 int list_or_extract(char *path, option_t options);
+void list(int tar, int file_position, int end_file);
 
 #endif
