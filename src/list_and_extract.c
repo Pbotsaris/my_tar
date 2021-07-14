@@ -52,11 +52,9 @@ int make_symlink(header_t *header)
           printf("Failed to removed existing file. Failed to extract %s\n", header->name);
           return -1;
       }
-  }
-    else {
-          printf("Failed to extract symlink %s\n", header->name);
-          return -1;
     }
+
+  printf("The symlink %s was extracted succesfully\n", header->name);
   chmod(header->name, octal_to_decimal(atoi(header->mode)));
 
   return 0;
@@ -75,9 +73,7 @@ int make_fifo(header_t *header)
             return -1;
         }
     }
-    else {
-          printf("Failed to extract fifo file %s\n", header->name);
-    }
+    printf("The fifo %s was extracted succesfully\n", header->name);
     return 0;
 }
 
@@ -98,10 +94,8 @@ int make_special(header_t *header)
           return -1;
       }
     }
-    else {
-          printf("Failed to extract the special file %s\n", header->name);
-          return -1;
-    }
+
+    printf("The special file type %s was extracted succesfully\n", header->name);
     return 0;
 
 }

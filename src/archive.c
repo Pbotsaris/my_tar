@@ -51,7 +51,6 @@ int tar(char *path, int dest, option_t option)
     if (fd)
     {
 
-
         if (stat(path, &stats) == 0)
             header = create_header(path, stats);
 
