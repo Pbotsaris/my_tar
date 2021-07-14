@@ -4,28 +4,29 @@
 
 int search_match(header_t *path_header, int tar)
 {
-    int size = lseek(tar, 0, SEEK_END) - BLOCKSIZE,
-        current_file_location = 0;
+    int size = lseek(tar, 0, SEEK_END),
+        current_file_location = lseek(tar, 0, SEEK_SET);
 
-    lseek(tar, 0, SEEK_SET);
     while (current_file_location <= size)
     {
         header_t *tar_header;
-        if (!(tar_header = malloc(sizeof(header_t))))
-            return -1;
+        if (!(tar_header = malloc(sizeof(BLOCKSIZE))))
+            return 1;
 
         tar_header = get_header(tar);
-       
-        if (strcmp(tar_header->name, path_header->name) == 0 && 
+        lseek(tar, ENDBLK, SEEK_CUR);
+
+        if (strcmp(tar_header->name, path_header->name) == 0 &&
                 strcmp(tar_header->mtime, path_header->mtime) == 0){
             free(tar_header);
             return 1;
         }
-
+        
         if (tar_header->typeflag != DIRTYPE)
             current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
         else
-            current_file_location = +BLOCKSIZE;
+            current_file_location += BLOCKSIZE;
+        
         free(tar_header);
     }
     return 0;
@@ -46,8 +47,6 @@ int tar(char *path, int dest, option_t option)
     header_t *header;
     struct stat stats;
     
-    if(option == r)
-        lseek(dest, 0, SEEK_END);
 
     if (fd)
     {
@@ -56,7 +55,9 @@ int tar(char *path, int dest, option_t option)
         if (stat(path, &stats) == 0)
             header = create_header(path, stats);
 
-        if (option == u && (search_match(header, dest) != 0))
+        if(option == r)
+              lseek(dest, 0, SEEK_END);
+        else if (option == u && (search_match(header, dest) != 0))
         {
             free(header);
             close(fd);
