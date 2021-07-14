@@ -198,6 +198,7 @@ int archive(char **path, size_t paths_len, option_t option)
 
     while (index < paths_len)
     {
+
         if (stat(path[index], &stats) == 0)
         {
             if (is_dir(path[index]))
@@ -209,7 +210,7 @@ int archive(char **path, size_t paths_len, option_t option)
         }
         else
         {
-            printf("The path provided is incorrect\n");
+            printf("The path %s was incorrect\n", path[index]);
             return 1;
         }
     }
