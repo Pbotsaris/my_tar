@@ -2,6 +2,12 @@
 #include "../include/messages.h"
 #include "../include/header.h"
 
+/*
+ *
+ - PRIVATE: Searches for maching files in archive for when appending (-uf)
+
+*/
+
 int search_match(header_t *path_header, int tar)
 {
     int size = lseek(tar, 0, SEEK_END),
@@ -12,7 +18,6 @@ int search_match(header_t *path_header, int tar)
         header_t *tar_header;
         if (!(tar_header = malloc(sizeof(BLOCKSIZE))))
             return 1;
-
 
         tar_header = get_header(tar);
         lseek(tar, ENDBLK, SEEK_CUR);
@@ -32,6 +37,7 @@ int search_match(header_t *path_header, int tar)
     }
     return 0;
 }
+
 /*
  *
  - PRIVATE: append a data in a given path to .tar file
@@ -44,11 +50,11 @@ int tar(char *path, int dest, option_t option)
     header_t *header;
     struct stat stats;
 
-    /* stat check done in parent func */
+    /* stat check done in parent */
     stat(path, &stats);
     header = create_header(path, stats);
 
-    char fill_header[HEADERBYTE]; // HEADERBYTE = 12
+    char fill_header[HEADERBYTE]; /* HEADERBYTE = 12 */
     my_memset(fill_header, '\0', HEADERBYTE);
 
     if(option == r)
@@ -119,8 +125,6 @@ bool_t is_dir(char *path)
 */
 
 
-
-
 char *join_path(char *dir, char *file)
 {
     size_t len = strlen(dir) + strlen(file);
@@ -170,7 +174,6 @@ int handle_dir(char *path, int dest, option_t option)
     }
 }
 
-
 /*
  * =====================================================================================
  *
@@ -184,6 +187,7 @@ int handle_dir(char *path, int dest, option_t option)
  *    
  * =====================================================================================
  */
+
 int archive(char **path, size_t paths_len, option_t option)
 {
     struct stat stats;
