@@ -16,8 +16,6 @@ void write_file(int dest, int tar)
     close(dest);
 }
 
-
-
 /*
  *
  - PRIVATE: Creates a directory
@@ -40,6 +38,14 @@ int make_directory(char *path)
     }
 }
 
+/*
+ *
+ - PRIVATE: Creates a symlink
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
+
+
 int make_symlink(header_t *header)
 {
   if (symlink(header->linkname, header->name) == EEXIST)
@@ -60,6 +66,12 @@ int make_symlink(header_t *header)
   return 0;
 }
 
+/*
+ *
+ - PRIVATE: Creates a FIFO file
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
 
 int make_fifo(header_t *header)
 {
@@ -77,6 +89,12 @@ int make_fifo(header_t *header)
     return 0;
 }
 
+/*
+ *
+ - PRIVATE: Creates a CHAR or BLOCK Files
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
 
 int make_special(header_t *header)
 {
