@@ -6,5 +6,3 @@ source.c
 source.h
 source.cc
 *.tar
-*.text
-*.txt
