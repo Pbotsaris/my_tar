@@ -1,29 +1,91 @@
 #!/bin/bash
-run_tar(){
+echo " "
+
+run_real_tar(){
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    gtar -cf real.tar $1 $2
+    gtar -cf real.tar $@
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    tar -cf real.tar $1 $2
+    tar -cf real.tar $@
   fi
 }
 
-if [ -z $1 ]; then
-  echo "please enter a filename"
+# run make first
+echo "** Running Make to compile.."
+make
+echo "--"
+echo " "
+
+ITER=1 
+
+if [[ -z $1 ]]; then
+  for file in test_files/*; do
+
+    echo "** Testing " "$file"
+    echo "--"
+    echo " "
+    echo "Archiving:"
+   ./bin/my_tar -cf t.tar "$file"
+    echo "-"
+
+    echo "Appending same file:"
+   ./bin/my_tar -uf t.tar "$file"
+    echo "-"
+
+    echo "Appending another file:"
+    echo "another file to append" > test_files/append.txt
+   ./bin/my_tar -uf t.tar test_files/append.txt
+    rm test_files/append.txt
+    echo "-"
+  
+    echo "List files:"
+   ./bin/my_tar -tf t.tar 
+    echo "-"
+
+    echo "Creating output folder for extraction:"
+    mkdir output
+    mv t.tar output/t.tar
+
+    echo "Extracting files:"
+   ./bin/my_tar -xf output/t.tar
+    echo "-"
+
+
+    echo "Listing output folder:"
+    ls -la output
+    echo "-"
+
+    echo "Removed output folder"
+    rm -rf output
+
+  done
+
 else
-  rm *.tar
 
-  if [[ $1 == "-d" ]]; then
-    ./bin/my_tar -cf $1 fake.tar $2 $3 
-    run_tar $2 $3
-  else
-    ./bin/my_tar -cf fake.tar $1 $2
-    run_tar $1 $2
+for arg in "$@"; do
+
+  ITER=$(expr $ITER + 1)
+  if [[ $arg == "-d" ]]; then
+
+    ./bin/my_tar "$arg" "${@:$ITER}"
+
+  elif [[ $arg == "--cat" ]]; then
+
+    echo "** Running in cat mode for" "${@:$ITER}"
+
+    ./bin/my_tar -cf fake.tar "${@:$ITER}"
+    run_real_tar "${@:$ITER}" 
+
+    echo "--"
+    echo " "
+
+    echo "** Comparing my_tar vs tar contents:"
+    echo "real tar:"
+    cat real.tar
+    echo " "
+    echo "my tar:"
+    cat fake.tar
   fi
-
-  echo "real"
-  cat real.tar
-  echo " "
-  echo "fake"
-  cat fake.tar
-
+done
+rm *tar
 fi
+
