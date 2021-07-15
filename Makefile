@@ -1,9 +1,9 @@
-OBJ=obj/my_tar.o    	   	\
-		obj/header.o	       	\
-		obj/utils.o           \
-		obj/debug.o           \
-		obj/archive.o		    	\
-		obj/option.o	    		\
+OBJ=obj/my_tar.o    	   				\
+		obj/header.o	      			 	\
+		obj/utils.o         			  \
+		obj/debug.o          			  \
+		obj/archive_and_append.o		\
+		obj/option.o	    					\
 		obj/list_and_extract.o
 
 CFLAGS=-W -g3 -Iinclude

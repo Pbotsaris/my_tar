@@ -72,6 +72,8 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
+	else if(S_ISFIFO(stats.st_mode))
+		header->typeflag = FIFOTYPE;
 	// if not none above
 	else
 	{
@@ -420,9 +422,11 @@ int next_header_position(header_t *header)
     int block_size_octal = decimal_to_octal(BLOCKSIZE),
         content_size = atoi(header->size),
         counter = 1;
+
     if (content_size > block_size_octal)
     {
      int num_of_blocks = content_size /= block_size_octal;
+
         for (int i = 0; (num_of_blocks - i) >= 1; i++)
             counter++;
     }
