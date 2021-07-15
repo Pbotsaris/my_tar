@@ -2,72 +2,79 @@
 #include "../include/messages.h"
 #include "../include/header.h"
 
+/*
+ *
+ - PRIVATE: Searches for maching files in archive for when appending (-uf)
+
+*/
+
 int search_match(header_t *path_header, int tar)
 {
-    int size = lseek(tar, 0, SEEK_END) - BLOCKSIZE,
-        current_file_location = 0;
+    int size = lseek(tar, 0, SEEK_END),
+        current_file_location = lseek(tar, 0, SEEK_SET);
 
-    lseek(tar, 0, SEEK_SET);
     while (current_file_location <= size)
     {
         header_t *tar_header;
-        if (!(tar_header = malloc(sizeof(header_t))))
-            return -1;
+        if (!(tar_header = malloc(sizeof(BLOCKSIZE))))
+            return 1;
 
         tar_header = get_header(tar);
-       
-        if (strcmp(tar_header->name, path_header->name) == 0 && 
+        lseek(tar, ENDBLK, SEEK_CUR);
+
+        if (strcmp(tar_header->name, path_header->name) == 0 &&
                 strcmp(tar_header->mtime, path_header->mtime) == 0){
             free(tar_header);
             return 1;
         }
-
+        
         if (tar_header->typeflag != DIRTYPE)
             current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
         else
-            current_file_location = +BLOCKSIZE;
+            current_file_location += BLOCKSIZE;
+        
         free(tar_header);
     }
     return 0;
 }
+
 /*
  *
  - PRIVATE: append a data in a given path to .tar file
 
 */
+
 int tar(char *path, int dest, option_t option)
 {
-    int fd = open(path, O_APPEND),
-        remain_fill_block;
-
-    char fill_header[HEADERBYTE]; // HEADERBYTE = 12
-    my_memset(fill_header, '\0', HEADERBYTE);
 
     header_t *header;
     struct stat stats;
-    
+
+    /* stat check done in parent */
+    stat(path, &stats);
+    header = create_header(path, stats);
+
+    char fill_header[HEADERBYTE]; /* HEADERBYTE = 12 */
+    my_memset(fill_header, '\0', HEADERBYTE);
+
     if(option == r)
         lseek(dest, 0, SEEK_END);
-
-    if (fd)
+    else if (option == u && (search_match(header, dest) != 0))
     {
+        free(header);
+        return -1;
+    }
 
+    write(dest, header, sizeof(header_t));
+    write(dest, fill_header, HEADERBYTE);
 
-        if (stat(path, &stats) == 0)
-            header = create_header(path, stats);
+    /*  WRITE CONTENT ONLY ON REG AND HARD LINK  */
+    if (header->typeflag == LNKTYPE && header->typeflag == REGTYPE)
+    {
+        int fd = open(path, O_APPEND),
+            remain_fill_block;
 
-        if (option == u && (search_match(header, dest) != 0))
-        {
-            free(header);
-            close(fd);
-            return 1;
-        }
-        
-        write(dest, header, sizeof(header_t));
-        write(dest, fill_header, HEADERBYTE);
-
-        /*  SKIP SYMLINK  */
-        if (header->typeflag != DIRTYPE && header->typeflag != SYMTYPE)
+        if (fd)
         {
             long long buff_size = stats.st_size;
             char *buffer = (char *)malloc(sizeof(char) * (buff_size + 1));
@@ -84,19 +91,18 @@ int tar(char *path, int dest, option_t option)
                 write(dest, fill_block, remain_fill_block);
                 free(fill_block);
             }
-
-            free(buffer);
+            close(fd);
         }
-        free(header);
-        close(fd);
+        else
+        {
+            printf("Error while writting to archive\n");
+            free(header);
+            return -1;
+        }
+    }
 
-        return 0;
-    }
-    else
-    {
-        printf("Error while writting to archive\n");
-        return 1;
-    }
+    free(header);
+    return 0;
 }
 
 /*
@@ -114,9 +120,10 @@ bool_t is_dir(char *path)
 
 /*
  *
- - PRIVATE: Concats path as follows -  dir ++ / ++ file
+ - PRIVATE: Validates if either a path is first in first out 
 
 */
+
 
 char *join_path(char *dir, char *file)
 {
@@ -180,6 +187,7 @@ int handle_dir(char *path, int dest, option_t option)
  *    
  * =====================================================================================
  */
+
 int archive(char **path, size_t paths_len, option_t option)
 {
     struct stat stats;
@@ -188,14 +196,9 @@ int archive(char **path, size_t paths_len, option_t option)
     chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
     if (dest < 0)
-    {
-        printf("Could't open tar\n");
         return 1;
-    }
 
     size_t index = 1;
-
-
     while (index < paths_len)
     {
         if (stat(path[index], &stats) == 0)
@@ -204,12 +207,11 @@ int archive(char **path, size_t paths_len, option_t option)
                 handle_dir(path[index], dest, option);
             else
                 tar(path[index], dest, option);
-
             index++;
         }
         else
         {
-            printf("The path provided is incorrect\n");
+            printf("The path %s was incorrect\n", path[index]);
             return 1;
         }
     }

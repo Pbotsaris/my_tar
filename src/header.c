@@ -72,6 +72,8 @@ void add_typeflag(header_t *header, struct stat stats, char *path)
 		header->typeflag = BLKTYPE;
 		add_dev_major_minor(header, stats);
 	}
+	else if(S_ISFIFO(stats.st_mode))
+		header->typeflag = FIFOTYPE;
 	// if not none above
 	else
 	{
