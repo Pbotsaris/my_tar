@@ -20,15 +20,18 @@ ITER=1
 if [[ -z $1 ]]; then
   for file in test_files/*; do
 
+    echo " "
     echo "** Testing " "$file"
     echo "--"
     echo " "
     echo "Archiving:"
    ./bin/my_tar -cf t.tar "$file"
+   ./bin/my_tar -tf t.tar 
     echo "-"
 
     echo "Appending same file:"
    ./bin/my_tar -uf t.tar "$file"
+   ./bin/my_tar -tf t.tar 
     echo "-"
 
     echo "Appending another file:"
@@ -37,24 +40,25 @@ if [[ -z $1 ]]; then
     rm test_files/append.txt
     echo "-"
   
-    echo "List files:"
+    echo "List all files files:"
    ./bin/my_tar -tf t.tar 
     echo "-"
 
     echo "Creating output folder for extraction:"
     mkdir output
     mv t.tar output/t.tar
+    ls -la output
+    echo "-"
 
     echo "Extracting files:"
    ./bin/my_tar -xf output/t.tar
     echo "-"
 
-
     echo "Listing output folder:"
     ls -la output
     echo "-"
 
-    echo "Removed output folder"
+    echo "Removing output folder"
     rm -rf output
 
   done

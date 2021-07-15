@@ -239,22 +239,26 @@ char *extract_dirname_from_path(char *path, int pos)
 }
 
 
-void create_path_directories(header_t *header, int *pos)
+int create_path_directories(header_t *header, int *pos)
 {
-
+    int pos_len = count_dirs_in_path(header->name, strlen(header->name));
+    for(int i = 0;  i < pos_len; i++)
     {
-        int pos_len = count_dirs_in_path(header->name, strlen(header->name));
-        for(int i = 0;  i < pos_len; i++)
-        {
-            char *dirname =  extract_dirname_from_path(header->name, pos[i]);
-            /* Creates the  directory if it doesn't exists */
-            if (dir_exists(dirname) < 1)
-                make_directory(dirname);
+        char *dirname =  extract_dirname_from_path(header->name, pos[i]);
+        /* Creates the  directory if it doesn't exists */
+        if (dir_exists(dirname) < 1){
+            make_directory(dirname);
             free(dirname);
         }
 
+        else
+        {
+            return -1;
+            free(dirname);
+        }
     }
 
+    return 0;
 }
 
 /*
@@ -277,12 +281,13 @@ int extract(int tar, int file_position, int end_file)
     {
         header_t *header = malloc(sizeof(header_t));
         header = get_header(tar);
+        bool_t dir_exists = FALSE;
         lseek(tar, ENDBLK, SEEK_CUR);
 
         /* check for path has directory and return position of dirname in path string */
         int *pos = has_path_dir(header);
         if (pos[0] >= 0) 
-            create_path_directories(header,pos);
+            create_path_directories(header,pos); 
 
         if (header->typeflag == REGTYPE || header->typeflag == LNKTYPE)
         {
@@ -292,7 +297,8 @@ int extract(int tar, int file_position, int end_file)
         else if(header->typeflag == DIRTYPE)
         {
             make_directory(header->name);
-            file_position += BLOCKSIZE;
+            file_position += BLOCKSIZE + 1;
+            
         }
         else if(header->typeflag == SYMTYPE)
         { 
@@ -310,9 +316,9 @@ int extract(int tar, int file_position, int end_file)
             file_position += BLOCKSIZE;
         }
         /* ELSE DO SKIP */
-
         free(pos);
         free(header);
+
     }
     return 0;
 }
@@ -343,7 +349,7 @@ void list(int tar, int file_position, int end_file)
 
         if (header->name[0] != '\0')
             printf("%s\n", header->name);
-        if (header->typeflag != DIRTYPE)
+        if (header->typeflag == REGTYPE || header->typeflag == LNKTYPE)
             file_position = lseek(tar, next_header_position(header), SEEK_CUR);
         else
             file_position += BLOCKSIZE;

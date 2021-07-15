@@ -69,7 +69,7 @@ int tar(char *path, int dest, option_t option)
     write(dest, fill_header, HEADERBYTE);
 
     /*  WRITE CONTENT ONLY ON REG AND HARD LINK  */
-    if (header->typeflag == LNKTYPE && header->typeflag == REGTYPE)
+    if (header->typeflag == LNKTYPE || header->typeflag == REGTYPE)
     {
         int fd = open(path, O_APPEND),
             remain_fill_block;
