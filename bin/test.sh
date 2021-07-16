@@ -21,48 +21,51 @@ if [[ -z $1 ]]; then
   for file in test_files/*; do
 
     echo " "
+    echo "----------------------------------"
+    echo "----------------------------------"
     echo "** Testing " "$file"
-    echo "--"
+    echo "----------------------------------"
+    echo "----------------------------------"
     echo " "
     echo "Archiving:"
    ./bin/my_tar -cf t.tar "$file"
    ./bin/my_tar -tf t.tar 
     echo "-"
 
-    echo "Appending same file:"
+    echo "Appending same file with -uf not modified returns an error:"
    ./bin/my_tar -uf t.tar "$file"
    ./bin/my_tar -tf t.tar 
     echo "-"
 
-    echo "Appending another file:"
+    echo "Appending another file with -rf:"
     echo "another file to append" > test_files/append.txt
-   ./bin/my_tar -uf t.tar test_files/append.txt
+   ./bin/my_tar -rf t.tar test_files/append.txt
     rm test_files/append.txt
     echo "-"
-  
-    echo "List all files files:"
+
+    echo "List all files in archive:"
    ./bin/my_tar -tf t.tar 
     echo "-"
 
     echo "Creating output folder for extraction:"
     mkdir output
     mv t.tar output/t.tar
-    ls -la output
+    echo " "
+
+    echo "CDing to output and xxtracting files:"
+    cd output
+    ../bin/my_tar -xf t.tar
+    echo " "
+
+    echo "CDing t parrent and listing output folder:"
+    cd ..
+    ls -la output/test_files
     echo "-"
 
-    echo "Extracting files:"
-   ./bin/my_tar -xf output/t.tar
-    echo "-"
-
-    echo "Listing output folder:"
-    ls -la output
-    echo "-"
-
-    echo "Removing output folder"
-    rm -rf output
-
+    echo "Removing output folder."
+    rm -rf output/test_files
   done
-
+  echo "SUCCESS!"
 else
 
 for arg in "$@"; do
@@ -71,6 +74,20 @@ for arg in "$@"; do
   if [[ $arg == "-d" ]]; then
 
     ./bin/my_tar "$arg" "${@:$ITER}"
+
+  elif [[ $arg == "--append" ]]; then
+
+    echo "Test appending with -uf. Create tar with" "$2"
+   ./bin/my_tar -cf t.tar "$2"
+    cat t.tar
+    echo "Modify" "$2"
+    echo "--> this file has been modified" > "$2"
+    echo "Appending..."
+   ./bin/my_tar -uf t.tar "$2"
+   echo "After:"
+    cat t.tar
+
+   ./bin/my_tar -tf t.tar "$2"
 
   elif [[ $arg == "--cat" ]]; then
 

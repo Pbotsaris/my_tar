@@ -50,13 +50,30 @@ where
 
 ## Testing
 
-The testing script will run `my_tar` in skip mode and the real `tar` then cat the outputs for comparison. First, update permissions:
+There is a very basic script to help test some of this programs functionalities. First, make sure you set the permissions accordingly: 
 
     $ chmod u+x bin/test.sh
 
-Run the script:
+Run test:
 
-    $ ./bin/test.sh <filename>
+    $ ./bin/test.sh 
+
+This will run the program in all its available options but `-u` which is tested using the `--append` option. The script will test the My Tar against all 
+file types in the `test_files`. The script will also clean up after itself removing all temp files.
+
+Other available options:
+
+    $ ./bin/test.sh --cat filename ...
+
+`--cat` will archive a file in both `my_tar` and the original `tar` and `cat` their contents for comparisson. OSX users must install `gtar` to run the script.
+Darwin uses bdstar as its default`tar`and `gtar` ensures we get a consitent tar format.
+
+
+    $ ./bin/test.sh -d <filename>
+
+Runs the program in debug mode. While in debug mode no files will be archived but the program will output the contents of the header this passed in file generates. Only 1 file can be debug at the time. 
+
+    $ ./bin/test.sh --append <filename>
 
 For debug mode pass the `-d` option 
 
