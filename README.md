@@ -61,7 +61,7 @@ Run test:
 This command will run the program in all its available options consecutively. Appending with `-u` is not tested in this mode but using the `--append` option. The script will test **My Tar** against all 
 file types in the `test_files`. This repo includes fifo, symlink, hardlink, regular and directory file types in `test_files`. 
 
-The script will clean up after itself removing all temp files.
+The script will clean up after itself removing all artifacts files.
 
 the script will compile with make before attempting to run the program.
 
