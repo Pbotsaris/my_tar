@@ -6,7 +6,7 @@ While in the project root directory, run `make` to build the binary:
 
     $ make
 
-You can also run `clean` to removed '/bin/my_tar' and `.o` artifacts.
+Run `clean` to remove `/bin/my_tar` and `.o` artifacts.
 
     $ make clean
 
@@ -15,15 +15,15 @@ You can also run `clean` to removed '/bin/my_tar' and `.o` artifacts.
     $ .bin/my_tar [-cutx] [-f file.tar] file_to_archive ...
 
 ## Options
-- `-cf file.tar file_to_archive ...` : Archive a file(s) or directories.  Multiple files is possible.
-- `-uf file.tar file_to_archive ...` : Updates archive with new files.
+- `-cf file.tar file_to_archive ...` : Archive a file(s) or directory. Multiple files is also possible.
+- `-uf file.tar file_to_archive ...` : Updates archive with new file(s).
 - `-tf file.tar` :  Lists files in the tape archive.
-- `-xf file.tar` :  Extracts all files in a archive. Existing files in the disk will be overwritten
+- `-xf file.tar` :  Extracts all files in a archive. Existing files in the disk will be overwritten.
 
 When `-cf` directories, My tar will archive all files within the directory. Sub directories will be tar'ed as directories but their contents will not be included.
 
 ## Dev options 
-Option `-d <filename>` for debug. While on debug mode, the program will skip all archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
+Option `-d <filename>` for debug. While in debug mode, the program will skip archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
 
 
     ./bin/my_tar -d <filename>
@@ -59,11 +59,11 @@ Run test:
     $ ./bin/test.sh 
 
 This command will run the program in all its available options consecutively. Appending with `-u` is not tested in this mode but using the `--append` option. The script will test **My Tar** against all 
-file types in the `test_files`. This repo includes fifo, symlink, hardlink, regular and directory file types in `test_files`. 
+file types in the `test_files` folder. This repo includes fifo, symlink, hardlink, regular and directory file types in `test_files`. 
 
-The script will clean up after itself removing all artifacts files.
+The script will clean up after itself removing all  files.
 
-the script will compile with make before attempting to run the program.
+The script will compile with `make` and `make clean` before/after attempting to run the program.
 
 Other available options:
 
@@ -75,7 +75,8 @@ Darwin uses bdstar as its default`tar`and `gtar` ensures we get a consitent tar 
 
     $ ./bin/test.sh -d file_to_header
 
-Runs the program in debug mode. While in debug mode no files will be archived but the program will output the contents of the header this passed in file generates. Only 1 file can be debug at the time. 
+Runs in debug mode as described above.
+
 
     $ ./bin/test.sh --append tar_file_to_apend.tar file_to_append
 
