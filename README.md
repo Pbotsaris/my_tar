@@ -58,23 +58,32 @@ Run test:
 
     $ ./bin/test.sh 
 
-This will run the program in all its available options but `-u` which is tested using the `--append` option. The script will test the My Tar against all 
-file types in the `test_files`. The script will also clean up after itself removing all temp files.
+This command will run the program in all its available options consecutively. Appending with `-u` is not tested in this mode but using the `--append` option. The script will test **My Tar** against all 
+file types in the `test_files`. This repo includes fifo, symlink, hardlink, regular and directory file types in `test_files`. 
+
+The script will clean up after itself removing all temp files.
+
+the script will compile with make before attempting to run the program.
 
 Other available options:
 
-    $ ./bin/test.sh --cat filename ...
+    $ ./bin/test.sh --cat file_to_archive ...
 
 `--cat` will archive a file in both `my_tar` and the original `tar` and `cat` their contents for comparisson. OSX users must install `gtar` to run the script.
 Darwin uses bdstar as its default`tar`and `gtar` ensures we get a consitent tar format.
 
 
-    $ ./bin/test.sh -d <filename>
+    $ ./bin/test.sh -d file_to_header
 
 Runs the program in debug mode. While in debug mode no files will be archived but the program will output the contents of the header this passed in file generates. Only 1 file can be debug at the time. 
 
-    $ ./bin/test.sh --append <filename>
+    $ ./bin/test.sh --append tar_file_to_apend.tar file_to_append
 
-For debug mode pass the `-d` option 
+Use `--append` for testing th `=uf` option. Remember that you must pass in an existing file in the archive in other to append using `-u`.
 
-    $ ./bin/test.sh -d <filename>
+
+If you have valgrind and want memory check: 
+
+    $ ./bin/test.sh --append tar_file_to_apend.tar file_to_append
+
+

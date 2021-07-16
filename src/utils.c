@@ -141,22 +141,6 @@ int decimal_to_octal(int decimal) {
 }
 
 /*
-=======
-int decimal_to_octal(int decimal)
-{
-    int octal = 0, num_digits = 1, temp = 0;
-    temp = decimal;
-    while (temp != 0)
-    {
-
-        octal += (temp % 8) * num_digits;
-        temp /= 8;
-        num_digits *= 10;
-    }
-    return octal;
-}
-
-/*
  *
 	   - converts a decimal number to octal base
      -> returns octal number

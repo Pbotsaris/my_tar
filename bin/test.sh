@@ -75,11 +75,15 @@ for arg in "$@"; do
 
     ./bin/my_tar "$arg" "${@:$ITER}"
 
+  elif [[ $arg == "-m" ]]; then
+
+    valgrind ./bin/my_tar
+
   elif [[ $arg == "--append" ]]; then
 
     echo "Test appending with -uf. Create tar with" "$2"
    ./bin/my_tar -cf t.tar "$2"
-    cat t.tar
+  #  cat t.tar
     echo "Modify" "$2"
     echo "--> this file has been modified" > "$2"
     echo "Appending..."
@@ -108,5 +112,6 @@ for arg in "$@"; do
   fi
 done
 rm *tar
+make clean
 fi
 
