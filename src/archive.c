@@ -2,6 +2,38 @@
 #include "../include/messages.h"
 #include "../include/header.h"
 
+char *get_path_dir(char* path){
+
+    size_t size = strlen(path) + 1,
+        index = size;
+
+    char *str = malloc(sizeof(char*)*strlen(path));
+
+    while(path[index] != '/')
+        index--;
+  
+    return strncpy(str, path, (size - index));
+}
+
+char *get_file_name(char *path){
+    size_t size = strlen(path) + 1,
+           index = size - 1,
+           current = 0;
+
+    char *str = malloc(sizeof(char*)*size);
+
+    while(path[index] != '/')
+        index--;
+    index++;
+    while(index < size){
+        str[current] = path[index];
+        index++;
+        current++;
+    }
+    printf("%s\n", str);
+    return str;
+}
+
 int search_match(header_t *path_header, int tar)
 {
     int size = lseek(tar, 0, SEEK_END),
@@ -47,13 +79,13 @@ int tar(char *path, int dest, option_t option)
     header_t *header;
     struct stat stats;
     
-
     if (fd)
     {
-
-
-        if (stat(path, &stats) == 0)
-            header = create_header(path, stats);
+        if(lstat(path, &stats) == 0){
+        }
+            stat(path, &stats);
+    
+        header = create_header(path, stats);
 
         if(option == r)
               lseek(dest, 0, SEEK_END);
@@ -100,6 +132,7 @@ int tar(char *path, int dest, option_t option)
     }
 }
 
+
 /*
  *
  - PRIVATE: Validates if either a path is a directory
@@ -122,7 +155,6 @@ bool_t is_dir(char *path)
 char *join_path(char *dir, char *file)
 {
     size_t len = strlen(dir) + strlen(file);
-    ;
 
     char *buffer = NULL;
     buffer = (char *)malloc((len + 2) * sizeof(char));
@@ -181,9 +213,28 @@ int handle_dir(char *path, int dest, option_t option)
  *    
  * =====================================================================================
  */
+int check_file_type(char *path, int dest, option_t option){
+
+    struct stat stats;
+    /* path = "test_files/linkfile.txt"; */
+    if (stat(path, &stats) == 0)
+    {
+        if (is_dir(path))
+            handle_dir(path, dest, option);
+        else
+            tar(path, dest, option);
+    }
+    else
+    {
+        printf("The path provided is incorrect\n");
+        return 1;
+    }
+    return 0;
+}
+
+
 int archive(char **path, size_t paths_len, option_t option)
 {
-    struct stat stats;
 
     int dest = open(path[0], O_CREAT | O_RDWR);
     chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
@@ -195,25 +246,14 @@ int archive(char **path, size_t paths_len, option_t option)
     }
 
     size_t index = 1;
-
-
+    struct stat stats;
     while (index < paths_len)
     {
-        if (stat(path[index], &stats) == 0)
-        {
-            if (is_dir(path[index]))
-                handle_dir(path[index], dest, option);
-            else
-                tar(path[index], dest, option);
-
+        if((check_file_type(path[index], dest, option) == 0))
             index++;
-        }
-        else
-        {
-            printf("The path provided is incorrect\n");
-            return 1;
-        }
+        else return 1;
     }
+
     printf("Archiving was successful!\n");
     close(dest);
     return 0;

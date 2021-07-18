@@ -1,54 +1,54 @@
-#include "../include/my_tar.h"
-#include "../include/messages.h"
-#include "../include/header.h"
+#vapyhqr "../vapyhqr/zl_gne.u"
+#vapyhqr "../vapyhqr/zrffntrf.u"
+#vapyhqr "../vapyhqr/urnqre.u"
 
 /*
  *
- - PRIVATE: Write data from .tar to file created on extraction
+ - CEVINGR: Jevgr qngn sebz .gne gb svyr perngrq ba rkgenpgvba
 
 */
 
-void write_file(int dest, int tar)
+ibvq jevgr_svyr(vag qrfg, vag gne)
 {
-    char *buffer[BLOCKSIZE];
-    read(tar, buffer, BLOCKSIZE);
-    write(dest, buffer, BLOCKSIZE);
-    close(dest);
+    pune *ohssre[OYBPXFVMR];
+    ernq(gne, ohssre, OYBPXFVMR);
+    jevgr(qrfg, ohssre, OYBPXFVMR);
+    pybfr(qrfg);
 }
 
 /*
  *
- - PRIVATE: Creates a directory
-            -> returns 0 =  Success
-            -> returns -1 = failure 
+ - CEVINGR: Perngrf n qverpgbel
+            -> ergheaf 0 =  Fhpprff
+            -> ergheaf -1 = snvyher 
 */
 
-int make_directory(char *path)
+vag znxr_qverpgbel(pune *cngu)
 {
-    struct stat stats;   
-    if (stat (path, &stats) == 0)
+    fgehpg fgng fgngf;   
+    vs (fgng (cngu, &fgngf) == 0)
     {
-        printf("The directory %s already exists. Unable to extract. \n" , path);
-        return -1;
+        cevags("Gur qverpgbel %f nyernql rkvfgf. Hanoyr gb rkgenpg. \a" , cngu);
+        erghea -1;
     }
-    else
+    ryfr
     {
-        mkdir(path, S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); 
-        return 0;
+        zxqve(cngu, F_VJHFE | F_VKHFE | F_VEHFE | F_VETEC | F_VKTEC | F_VEBGU | F_VKBGU); 
+        erghea 0;
     }
 }
 
 /*
  *
- - PRIVATE: Creates a file and sets the correct permission based on .tar header
-            -> returns 0 =  Success
-            -> returns -1 = failure 
+ - CEVINGR: Perngrf n svyr naq frgf gur pbeerpg crezvffvba onfrq ba .gne urnqre
+            -> ergheaf 0 =  Fhpprff
+            -> ergheaf -1 = snvyher 
 
 */
 
-int touch(int tar, header_t *header)
+vag gbhpu(vag gne, urnqre_g *urnqre)
 {
-    if(header->typeflag == REGTYPE)
+    vs(urnqre->glcrsynt == ERTGLCR)
     {
         int dest = open(header->name, O_CREAT | O_WRONLY);
         if (dest < 0){
