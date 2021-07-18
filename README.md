@@ -6,7 +6,7 @@ While in the project root directory, run `make` to build the binary:
 
     $ make
 
-You can also run `clean` to removed '/bin/my_tar' and `.o` artifacts.
+Run `clean` to remove `/bin/my_tar` and `.o` artifacts.
 
     $ make clean
 
@@ -15,15 +15,15 @@ You can also run `clean` to removed '/bin/my_tar' and `.o` artifacts.
     $ .bin/my_tar [-cutx] [-f file.tar] file_to_archive ...
 
 ## Options
-- `-cf file.tar file_to_archive ...` : Archive a file(s) or directories.  Multiple files is possible.
-- `-uf file.tar file_to_archive ...` : Updates archive with new files.
+- `-cf file.tar file_to_archive ...` : Archive a file(s) or directory. Multiple files is also possible.
+- `-uf file.tar file_to_archive ...` : Updates archive with new file(s).
 - `-tf file.tar` :  Lists files in the tape archive.
-- `-xf file.tar` :  Extracts all files in a archive. Existing files in the disk will be overwritten
+- `-xf file.tar` :  Extracts all files in a archive. Existing files in the disk will be overwritten.
 
 When `-cf` directories, My tar will archive all files within the directory. Sub directories will be tar'ed as directories but their contents will not be included.
 
 ## Dev options 
-Option `-d <filename>` for debug. While on debug mode, the program will skip all archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
+Option `-d <filename>` for debug. While in debug mode, the program will skip archiving and print out a ASCII representation of the header produced from `<filename>`. Example: 
 
 
     ./bin/my_tar -d <filename>
@@ -50,14 +50,41 @@ where
 
 ## Testing
 
-The testing script will run `my_tar` in skip mode and the real `tar` then cat the outputs for comparison. First, update permissions:
+There is a very basic script to help test some of this programs functionalities. First, make sure you set the permissions accordingly: 
 
     $ chmod u+x bin/test.sh
 
-Run the script:
+Run test:
 
-    $ ./bin/test.sh <filename>
+    $ ./bin/test.sh 
 
-For debug mode pass the `-d` option 
+This command will run the program in all its available options consecutively. Appending with `-u` is not tested in this mode but using the `--append` option. The script will test **My Tar** against all 
+file types in the `test_files` folder. This repo includes fifo, symlink, hardlink, regular and directory file types in `test_files`. 
 
-    $ ./bin/test.sh -d <filename>
+The script will clean up after itself removing all  files.
+
+The script will compile with `make` and `make clean` before/after attempting to run the program.
+
+Other available options:
+
+    $ ./bin/test.sh --cat file_to_archive ...
+
+`--cat` will archive a file in both `my_tar` and the original `tar` and `cat` their contents for comparisson. OSX users must install `gtar` to run the script.
+Darwin uses bdstar as its default`tar`and `gtar` ensures we get a consitent tar format.
+
+
+    $ ./bin/test.sh -d file_to_header
+
+Runs in debug mode as described above.
+
+
+    $ ./bin/test.sh --append tar_file_to_apend.tar file_to_append
+
+Use `--append` for testing th `=uf` option. Remember that you must pass in an existing file in the archive in other to append using `-u`.
+
+
+If you have valgrind and want memory check: 
+
+    $ ./bin/test.sh --append tar_file_to_apend.tar file_to_append
+
+

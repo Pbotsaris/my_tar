@@ -2,6 +2,7 @@
 #include "../include/messages.h"
 #include "../include/header.h"
 
+<<<<<<< HEAD:src/archive.c
 char *get_path_dir(char* path){
 
     size_t size = strlen(path) + 1,
@@ -35,49 +36,75 @@ char *get_file_name(char *path){
 }
 
 int search_match(header_t *path_header, int tar)
+=======
+
+void move_file_position(header_t *tar_header, int dest, int *current_file_location)
+
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0:src/archive_and_append.c
 {
-    int size = lseek(tar, 0, SEEK_END),
-        current_file_location = lseek(tar, 0, SEEK_SET);
+ if (tar_header->typeflag == REGTYPE || tar_header->typeflag == LNKTYPE)
+            *current_file_location = lseek(dest, next_header_position(tar_header), SEEK_CUR);
+        else
+            *current_file_location += BLOCKSIZE;
+}
+
+/*
+ *
+ - PRIVATE: Searches for maching files in archive for when appending (-uf)
+
+*/
+
+int search_match(header_t *path_header, int dest)
+{
+    int size = lseek(dest, 0, SEEK_END),
+        current_file_location = lseek(dest, 0, SEEK_SET);
 
     while (current_file_location <= size)
     {
         header_t *tar_header;
         if (!(tar_header = malloc(sizeof(BLOCKSIZE))))
-            return 1;
+            return -1;
 
-        tar_header = get_header(tar);
-        lseek(tar, ENDBLK, SEEK_CUR);
+        tar_header = get_header(dest);
+        lseek(dest, ENDBLK, SEEK_CUR);
 
-        if (strcmp(tar_header->name, path_header->name) == 0 &&
-                strcmp(tar_header->mtime, path_header->mtime) == 0){
-            free(tar_header);
-            return 1;
+        if (strcmp(tar_header->name, path_header->name) == 0){
+
+            if (strcmp(tar_header->mtime, path_header->mtime) != 0){
+                /* found match */
+                free(tar_header);
+                return 0;
+            }
+            else {
+                printf("Cannot append. This version of %s is older than in the archive.\n", tar_header->name);
+                free(tar_header);
+                return -1;
+            }
         }
-        
-        if (tar_header->typeflag != DIRTYPE)
-            current_file_location = lseek(tar, next_header_position(tar_header), SEEK_CUR);
-        else
-            current_file_location += BLOCKSIZE;
-        
-        free(tar_header);
+        else {
+            move_file_position(tar_header, dest, &current_file_location);
+            free(tar_header);
+        }
     }
-    return 0;
+
+    /* not found */
+     printf("%s: Could not find a matching file in the archive\n", path_header->name);
+    return -1;
+
 }
+
 /*
  *
  - PRIVATE: append a data in a given path to .tar file
 
 */
+
 int tar(char *path, int dest, option_t option)
 {
-    int fd = open(path, O_APPEND),
-        remain_fill_block;
-
-    char fill_header[HEADERBYTE]; // HEADERBYTE = 12
-    my_memset(fill_header, '\0', HEADERBYTE);
 
     header_t *header;
     struct stat stats;
+<<<<<<< HEAD:src/archive.c
     
     if (fd)
     {
@@ -86,21 +113,34 @@ int tar(char *path, int dest, option_t option)
             stat(path, &stats);
     
         header = create_header(path, stats);
+=======
 
-        if(option == r)
-              lseek(dest, 0, SEEK_END);
-        else if (option == u && (search_match(header, dest) != 0))
-        {
-            free(header);
-            close(fd);
-            return 1;
-        }
-        
-        write(dest, header, sizeof(header_t));
-        write(dest, fill_header, HEADERBYTE);
+    /* stat check done in parent */
+    stat(path, &stats);
+    header = create_header(path, stats);
 
-        /*  SKIP SYMLINK  */
-        if (header->typeflag != DIRTYPE && header->typeflag != SYMTYPE)
+    char fill_header[HEADERBYTE]; /* HEADERBYTE = 12 */
+    my_memset(fill_header, '\0', HEADERBYTE);
+
+    if(option == r)
+        lseek(dest, 0, SEEK_END);
+    else if (option == u && (search_match(header, dest) != 0))
+    {
+        free(header);
+        return -1;
+    }
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0:src/archive_and_append.c
+
+    write(dest, header, sizeof(header_t));
+    write(dest, fill_header, HEADERBYTE);
+
+    /*  WRITE CONTENT ONLY ON REG AND HARD LINK  */
+    if (header->typeflag == LNKTYPE || header->typeflag == REGTYPE)
+    {
+        int fd = open(path, O_APPEND),
+            remain_fill_block;
+
+        if (fd)
         {
             long long buff_size = stats.st_size;
             char *buffer = (char *)malloc(sizeof(char) * (buff_size + 1));
@@ -117,19 +157,18 @@ int tar(char *path, int dest, option_t option)
                 write(dest, fill_block, remain_fill_block);
                 free(fill_block);
             }
-
-            free(buffer);
+            close(fd);
         }
-        free(header);
-        close(fd);
+        else
+        {
+            printf("Error while writting to archive\n");
+            free(header);
+            return -1;
+        }
+    }
 
-        return 0;
-    }
-    else
-    {
-        printf("Error while writting to archive\n");
-        return 1;
-    }
+    free(header);
+    return 0;
 }
 
 
@@ -148,9 +187,10 @@ bool_t is_dir(char *path)
 
 /*
  *
- - PRIVATE: Concats path as follows -  dir ++ / ++ file
+ - PRIVATE: Validates if either a path is first in first out 
 
 */
+
 
 char *join_path(char *dir, char *file)
 {
@@ -196,7 +236,7 @@ int handle_dir(char *path, int dest, option_t option)
     else
     {
         printf("Failed openning the directory %s\n", path);
-        return 1;
+        return -1;
     }
 }
 
@@ -213,6 +253,7 @@ int handle_dir(char *path, int dest, option_t option)
  *    
  * =====================================================================================
  */
+<<<<<<< HEAD:src/archive.c
 int check_file_type(char *path, int dest, option_t option){
 
     struct stat stats;
@@ -235,17 +276,22 @@ int check_file_type(char *path, int dest, option_t option){
 
 int archive(char **path, size_t paths_len, option_t option)
 {
+=======
+
+int archive(char **path, size_t paths_len, option_t option)
+{
+    struct stat stats;
+    int tar_result = 0;
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0:src/archive_and_append.c
 
     int dest = open(path[0], O_CREAT | O_RDWR);
     chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
     if (dest < 0)
-    {
-        printf("Could't open tar\n");
         return 1;
-    }
 
     size_t index = 1;
+<<<<<<< HEAD:src/archive.c
     struct stat stats;
     while (index < paths_len)
     {
@@ -255,6 +301,28 @@ int archive(char **path, size_t paths_len, option_t option)
     }
 
     printf("Archiving was successful!\n");
+=======
+    while (index < paths_len)
+    {
+        if (stat(path[index], &stats) == 0)
+        {
+            if (is_dir(path[index]))
+                tar_result = handle_dir(path[index], dest, option);
+            else
+                tar_result = tar(path[index], dest, option);
+            index++;
+        }
+        else
+        {
+            printf("The path %s was incorrect\n", path[index]);
+            return -1;
+        }
+    }
+
+    if(tar_result > 0)
+        printf("Archiving was successful!\n");
+
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0:src/archive_and_append.c
     close(dest);
     return 0;
 }

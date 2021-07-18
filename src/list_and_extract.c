@@ -40,19 +40,109 @@ vag znxr_qverpgbel(pune *cngu)
 
 /*
  *
+<<<<<<< HEAD
  - CEVINGR: Perngrf n svyr naq frgf gur pbeerpg crezvffvba onfrq ba .gne urnqre
             -> ergheaf 0 =  Fhpprff
             -> ergheaf -1 = snvyher 
+=======
+ - PRIVATE: Creates a symlink
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
+
+
+int make_symlink(header_t *header)
+{
+  if (symlink(header->linkname, header->name) == EEXIST)
+  {
+      printf("The file %s already exists. Replacing...", header->name);
+      if(remove(header->name))
+          symlink(header->linkname, header->name);
+      else
+      {
+          printf("Failed to removed existing file. Failed to extract %s\n", header->name);
+          return -1;
+      }
+    }
+
+  printf("The symlink %s was extracted succesfully\n", header->name);
+  chmod(header->name, octal_to_decimal(atoi(header->mode)));
+
+  return 0;
+}
+
+/*
+ *
+ - PRIVATE: Creates a FIFO file
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
+
+int make_fifo(header_t *header)
+{
+    if(mkfifo(header->name, octal_to_decimal(atoi(header->mode))) == EEXIST)
+    {
+        if(remove(header->name))
+            mkfifo(header->name, octal_to_decimal(atoi(header->mode)));
+        else
+        {
+            printf("Failed to removed existing file. Failed to extract %s \n", header->name);
+            return -1;
+        }
+    }
+    printf("The fifo %s was extracted succesfully\n", header->name);
+    return 0;
+}
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0
+
+/*
+ *
+ - PRIVATE: Creates a CHAR or BLOCK Files
+            -> returns 0 =  Success
+            -> returns -1 = failure 
+*/
+
+<<<<<<< HEAD
+vag gbhpu(vag gne, urnqre_g *urnqre)
+=======
+int make_special(header_t *header)
+{
+    unsigned int maj = major(octal_to_decimal(atoi(header->devmajor)));
+    unsigned int min = major(octal_to_decimal(atoi(header->devminor)));
+    dev_t dev = makedev(maj, min);
+
+    if(mknod(header->name, octal_to_decimal(atoi(header->mode)), dev) == EEXIST)
+    {
+     if(remove(header->name))
+        mknod(header->name, octal_to_decimal(atoi(header->mode)), dev);
+      else
+      {
+          printf("Failed to removed existing file. Failed to extract %s\n", header->name);
+          return -1;
+      }
+    }
+
+    printf("The special file type %s was extracted succesfully\n", header->name);
+    return 0;
+
+}
+
+/*
+ *
+ - PRIVATE: Creates a file and sets the correct permission based on .tar header
+ -> returns 0 =  Success
+ -> returns -1 = failure 
 
 */
 
-vag gbhpu(vag gne, urnqre_g *urnqre)
+int touch(header_t *header, int tar)
+>>>>>>> 264613e56a0d1ed1bc9d1b6ba03d4d9e547228e0
 {
     vs(urnqre->glcrsynt == ERTGLCR)
     {
         int dest = open(header->name, O_CREAT | O_WRONLY);
         if (dest < 0){
-            printf("failed to extract. File %s could not be created.", header->name);
+            printf("failed to extract. File %s could not be created\n.", header->name);
             return -1;
         }
         write_file(dest, tar);
@@ -69,8 +159,8 @@ vag gbhpu(vag gne, urnqre_g *urnqre)
 /*
  *
  - PRIVATE: Check weather a directory exists in a given path
-            -> returns 1 = directory found
-            -> returns 0 || 1 = directory not found
+ -> returns 1 = directory found
+ -> returns 0 || 1 = directory not found
 
 */
 
@@ -91,8 +181,8 @@ int dir_exists(char *path)
 /*
  *
  - PRIVATE: Counts the number of directories and sub directories in a path
-            e.g. dir/sub-dir/sub-dir/file  =  3
-            -> returns the count
+ e.g. dir/sub-dir/sub-dir/file  =  3
+ -> returns the count
 
 */
 
@@ -109,24 +199,24 @@ int count_dirs_in_path(char *path, int len)
 /*
  *
  - PRIVATE: Checks wheater a path contains directory or just a file
-                e.g. file.txt = true,  dir/file.txt = false 
-            -> returns the leftmost position of the directory name in relation to the path string.
-                e.g. dir/sub-dir/file = [3, 11]
-            -> returns an array [-1 ] if path does not contain directories 
+ e.g. file.txt = true,  dir/file.txt = false 
+ -> returns the leftmost position of the directory name in relation to the path string.
+ e.g. dir/sub-dir/file = [3, 11]
+ -> returns an array [-1 ] if path does not contain directories 
 
 */
 
-int *has_path_dir(char *path)
+int *has_path_dir(header_t *header)
 {
-    size_t len = strlen(path);
-    int num_dirs = count_dirs_in_path(path, len);
+    size_t len = strlen(header->name);
+    int num_dirs = count_dirs_in_path(header->name, len);
     int pos_index = 0;
 
     int *positions;
     positions = (int*)malloc(num_dirs * sizeof(int));
 
     for (size_t i = 0; i < len; ++i) 
-        if(path[i] == '/') 
+        if(header->name[i] == '/') 
         {
             positions[pos_index] = i;
             pos_index++;
@@ -140,10 +230,10 @@ int *has_path_dir(char *path)
 /*
  *
  - PRIVATE: Extract a single directory path based base on its leftmost position in the path string
-                e.g. path = dir/sub-dir/file.txt
-                        pos = 3 then returns dir
-                        pos = 11 then returns dir/sub-dir
-*/
+ e.g. path = dir/sub-dir/file.txt
+ pos = 3 then returns dir
+ pos = 11 then returns dir/sub-dir
+ */
 
 char *extract_dirname_from_path(char *path, int pos)
 {
@@ -156,6 +246,29 @@ char *extract_dirname_from_path(char *path, int pos)
     }
     dirname[pos] = '\0';
     return dirname;
+}
+
+
+int create_path_directories(header_t *header, int *pos)
+{
+    int pos_len = count_dirs_in_path(header->name, strlen(header->name));
+    for(int i = 0;  i < pos_len; i++)
+    {
+        char *dirname =  extract_dirname_from_path(header->name, pos[i]);
+        /* Creates the  directory if it doesn't exists */
+        if (dir_exists(dirname) < 1){
+            make_directory(dirname);
+            free(dirname);
+        }
+
+        else
+        {
+            return -1;
+            free(dirname);
+        }
+    }
+
+    return 0;
 }
 
 /*
@@ -178,42 +291,46 @@ int extract(int tar, int file_position, int end_file)
     {
         header_t *header = malloc(sizeof(header_t));
         header = get_header(tar);
+        bool_t dir_exists = FALSE;
         lseek(tar, ENDBLK, SEEK_CUR);
 
-        if (header->typeflag != DIRTYPE){
-            /* check for path has directory and return position of dirname in path string */
-            int *pos = has_path_dir(header->name);
-            if (pos[0] >= 0) 
-            {
-             int pos_len = count_dirs_in_path(header->name, strlen(header->name));
-             for(int i = 0;  i < pos_len; i++)
-             {
-                char *dirname =  extract_dirname_from_path(header->name, pos[i]);
-            /* Creates the  directory if it doesn't exists */
-                if (dir_exists(dirname) < 1)
-                     make_directory(dirname);
-                free(dirname);
-             }
-             free(pos);
-            }
+        /* check for path has directory and return position of dirname in path string */
+        int *pos = has_path_dir(header);
+        if (pos[0] >= 0) 
+            create_path_directories(header,pos); 
 
-            if (touch(tar, header) == 0)
-                file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
-            else
-                return -1;
-        }
-        else
+        if (header->typeflag == REGTYPE || header->typeflag == LNKTYPE)
         {
-            if (make_directory(header->name) == 0)
-                file_position += BLOCKSIZE;
-            else
-                return -1;
+            touch(header, tar);
+            file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
         }
+        else if(header->typeflag == DIRTYPE)
+        {
+            make_directory(header->name);
+            file_position += BLOCKSIZE + 1;
+            
+        }
+        else if(header->typeflag == SYMTYPE)
+        { 
+            make_symlink(header);
+            file_position += BLOCKSIZE;
+        }
+        else if(header->typeflag == FIFOTYPE)
+        {
+            make_fifo(header);
+            file_position += BLOCKSIZE;
+        }
+        else if(header->typeflag == CHRTYPE || header->typeflag == BLKTYPE || header->typeflag == CONTTYPE) 
+        {
+            make_special(header);
+            file_position += BLOCKSIZE;
+        }
+        /* ELSE DO SKIP */
+        free(pos);
         free(header);
+
     }
-
     return 0;
-
 }
 
 /*
@@ -242,7 +359,7 @@ void list(int tar, int file_position, int end_file)
 
         if (header->name[0] != '\0')
             printf("%s\n", header->name);
-        if (header->typeflag != DIRTYPE)
+        if (header->typeflag == REGTYPE || header->typeflag == LNKTYPE)
             file_position = lseek(tar, next_header_position(header), SEEK_CUR);
         else
             file_position += BLOCKSIZE;
