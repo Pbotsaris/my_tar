@@ -78,10 +78,13 @@ int tar(char *path, int dest, option_t option)
 
     if(option == r)
         lseek(dest, 0, SEEK_END);
-    else if (option == u && (search_match(header, dest) != 0))
+    
+    if (option == u && (search_match(header, dest) != 0))
     {
         free(header);
         return -1;
+    }else{
+        lseek(dest, 0, SEEK_END);
     }
 
     write(dest, header, sizeof(header_t));
@@ -211,9 +214,13 @@ int archive(char **path, size_t paths_len, option_t option)
 {
     struct stat stats;
     int tar_result = 0;
+    
+    if(option == c)
+        remove(path[0]);
 
     int dest = open(path[0], O_CREAT | O_RDWR);
     chmod(path[0], S_IWUSR | S_IXUSR | S_IRUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+
 
     if (dest < 0)
         return 1;
