@@ -8,14 +8,16 @@
 
 */
 
+
 void write_file(int dest, int tar)
 {
-    char *buffer[BLOCKSIZE];
+    
+    char buffer[BLOCKSIZE+1];
     read(tar, buffer, BLOCKSIZE);
+    buffer[BLOCKSIZE] = '\0';
     write(dest, buffer, BLOCKSIZE);
     close(dest);
 }
-
 /*
  *
  - PRIVATE: Creates a directory
@@ -281,9 +283,7 @@ int extract(int tar, int file_position, int end_file)
     {
         header_t *header = malloc(sizeof(header_t));
         header = get_header(tar);
-        bool_t dir_exists = FALSE;
         lseek(tar, ENDBLK, SEEK_CUR);
-
         /* check for path has directory and return position of dirname in path string */
         int *pos = has_path_dir(header);
         if (pos[0] >= 0) 
@@ -292,7 +292,7 @@ int extract(int tar, int file_position, int end_file)
         if (header->typeflag == REGTYPE || header->typeflag == LNKTYPE)
         {
             touch(header, tar);
-            file_position = lseek(tar, next_header_position(header) - BLOCKSIZE, SEEK_CUR);
+            file_position = lseek(tar, 0, SEEK_CUR);
         }
         else if(header->typeflag == DIRTYPE)
         {
@@ -313,6 +313,8 @@ int extract(int tar, int file_position, int end_file)
         else if(header->typeflag == CHRTYPE || header->typeflag == BLKTYPE || header->typeflag == CONTTYPE) 
         {
             make_special(header);
+            file_position += BLOCKSIZE;
+        }else{
             file_position += BLOCKSIZE;
         }
         /* ELSE DO SKIP */
