@@ -7,7 +7,6 @@ void print_values(char *field, size_t len, int field_pos, int offset)
 	char header_field[][20] = {"name", "mode", "uid", "gid", "size", "mtime", "chksum", "linkname", "typeflag", "magic", "version", "uname", "gname", "devmajor", "devminor", "preflix"};
 
 	char *temp = field;
-	unsigned int sum = 0;
 	printf("Field: %s -- length: %lu  -- offset: %d\n", header_field[field_pos], len, offset);
 
 	for (int i = len - 1; i >= 0; i--)
