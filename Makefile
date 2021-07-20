@@ -6,7 +6,7 @@ OBJ=obj/my_tar.o    	   				\
 		obj/option.o	    					\
 		obj/list_and_extract.o
 
-CFLAGS=-W -g3 -Iinclude
+CFLAGS +=-W -g3 -Iinclude -Wall -Wextra
 HEADER=include/my_tar.h
 CC=gcc 
 BIN=bin/my_tar
