@@ -35,8 +35,7 @@ void add_link_or_regtype(header_t *header, char *path)
 		header->typeflag = SYMTYPE;
 
 		size_t buff_size = (lstats.st_size / sizeof(char)) + 1;
-		int num_bytes;
-		num_bytes = readlink(path, header->linkname, buff_size);
+		readlink(path, header->linkname, buff_size);
 		header->linkname[buff_size + 1] = '\0';
 	}
 	else
